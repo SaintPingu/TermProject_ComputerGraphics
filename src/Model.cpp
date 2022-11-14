@@ -39,7 +39,6 @@ GLvoid Model::LoadModel(const GLchar* path)
 		{
 			glm::vec3 vertex;
 			fscanf(objFile, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-			vertices.emplace_back(vertex);
 
 			if (vertex.y < bottom)
 			{
@@ -67,6 +66,11 @@ GLvoid Model::LoadModel(const GLchar* path)
 			{
 				back = vertex.z;
 			}
+
+			vertices.emplace_back(vertex);
+			vertex.x = round(vertex.x * 100) / 100.0f;
+			vertex.z = round(vertex.z * 100) / 100.0f;
+			verticesXZ.insert(glm::vec2(vertex.x, vertex.z));
 		}
 		else if (strcmp(data, "vt") == 0)
 		{
@@ -170,6 +174,9 @@ GLvoid Model::LoadModel(const GLchar* path)
 //		}
 //	}
 //}
+
+
+
 const vector<glm::vec3>& Model::GetVertices() const
 {
 	return vertices;

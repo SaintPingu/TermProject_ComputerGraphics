@@ -96,6 +96,7 @@ public:
 	~IdentityObject();
 	virtual GLvoid InitBuffers();
 	virtual GLvoid BindBuffers();
+	virtual GLvoid DeleteBuffers();
 
 	virtual GLfloat GetWidth() const;
 	virtual GLfloat GetHeight() const;
@@ -172,6 +173,7 @@ public:
 
 	// collision
 	GLrect GetXZRect() const;
+	set<glm::vec2, CompareSet> GetBoundings_XZ() const;
 };
 
 class CustomObject : public IdentityObject {
@@ -209,6 +211,7 @@ public:
 	Line();
 	Line(const glm::vec3& v1, const glm::vec3& v2);
 	GLvoid Draw() const;
+	GLvoid SetVertex(const GLboolean& index, const glm::vec3& pos);
 };
 class Triangle : public CustomObject {
 public:
@@ -291,8 +294,9 @@ public:
 
 
 
-
-
 const Cube* GetIdentityCube();
 const Line* GetIdentityLine();
 const ModelObject* GetIdentityPlayer();
+
+////////// [ DEBUG ] //////////
+GLvoid DrawWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

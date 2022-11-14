@@ -15,4 +15,5 @@ Map::Map()
 GLvoid Map::Draw()
 {
 	object->Draw();
+	// DrawWireXZ(object->GetBoundings_XZ(), 1.0f); // Draw a wireframe on the floor of the map
 }

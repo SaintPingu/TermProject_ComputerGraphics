@@ -125,6 +125,20 @@ static unordered_map<Dir, Dir> dir_opposite = {
 constexpr GLfloat FLOAT_MAX = numeric_limits<GLfloat>::max();
 constexpr GLfloat FLOAT_MIN = numeric_limits<GLfloat>::min();
 
+class CompareSet {
+public:
+	// for use set to glm::vec2
+	bool operator() (const glm::vec2& lhs, const glm::vec2& rhs) const
+	{
+		if (lhs.x < rhs.x)
+		{
+			return true;
+		}
+		return false;
+	}
+};
+
+
 GLfloat GetRandColor();
 GLvoid MultiplyVector(const glm::mat4& transform, glm::vec3& vector);
 GLvoid Rotate(glm::vec3& vector, const GLfloat& theta, const glm::vec3& axis);
@@ -583,8 +597,6 @@ typedef struct GLpoint {
 		return (x == rhs.x && y == rhs.y) ? true : false;
 	}
 }GLpoint;
-
-
 
 
 

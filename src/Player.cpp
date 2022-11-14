@@ -280,6 +280,7 @@ GLvoid Player::Update()
 GLvoid Player::Draw() const
 {
 	body->Draw();
+	DrawWireXZ(GetIdentityPlayer()->GetBoundings_XZ(), 2.0f, BLUE);
 }
 GLvoid Player::DrawIcon() const
 {

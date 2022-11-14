@@ -286,9 +286,7 @@ GLvoid Object::ModelTransform() const
 
 IdentityObject::~IdentityObject()
 {
-	glDeleteBuffers(1, &VAO);
-	glDeleteBuffers(2, &VBO[0]);
-	glDeleteBuffers(1, &EBO);
+	DeleteBuffers();
 }
 GLvoid IdentityObject::InitValues()
 {
@@ -338,6 +336,12 @@ GLvoid IdentityObject::BindBuffers()
 	}
 
 	glBindVertexArray(0);
+}
+GLvoid IdentityObject::DeleteBuffers()
+{
+	glDeleteBuffers(1, &VAO);
+	glDeleteBuffers(2, &VBO[0]);
+	glDeleteBuffers(1, &EBO);
 }
 
 GLvoid IdentityObject::Draw() const
@@ -604,7 +608,10 @@ GLrect ModelObject::GetXZRect() const
 	Cuboid cuboid(&position, &scale, GetWidth(), GetHeight(), GetDepth());
 	return cuboid.GetXZRect();
 }
-
+set<glm::vec2, CompareSet> ModelObject::GetBoundings_XZ() const
+{
+	return model->GetBoundings_XZ();
+}
 
 
 
@@ -710,6 +717,10 @@ GLvoid Line::Draw() const
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
+}
+GLvoid Line::SetVertex(const GLboolean& index, const glm::vec3& pos)
+{
+	vertices[index] = pos;
 }
 
 // Triangle
@@ -1083,6 +1094,54 @@ GLvoid Ball::Update()
 	MoveGlobal({ 0.0f, -0.5f, 0.0f });
 	MoveGlobal(vector * speed);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+GLvoid DrawWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color, const glm::vec3* pivot)
+{
+	Line* line = nullptr;
+
+	for (glm::vec2 v1 : vertices)
+	{
+		for (glm::vec2 v2 : vertices)
+		{
+			/*if (v1 == v2)
+			{
+				continue;
+			}*/
+			if (pivot != nullptr)
+			{
+				v1.x += pivot->x;
+				yPos += pivot->y;
+				v1.y += pivot->z;
+			}
+
+			line = new Line({ v1.x , yPos, v1.y }, { v2.x , yPos, v2.y });
+			line->SetColor(color);
+			line->BindBuffers();
+			line->Draw();
+			delete line;
+		}
+	}
+}
+
+
+
+
+
+
+
+
 
 
 static Cube* cubeObject = nullptr;

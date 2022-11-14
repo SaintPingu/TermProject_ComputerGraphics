@@ -8,6 +8,8 @@ private:
 	vector<glm::vec3> uvs;
 	vector<glm::vec3> normals;
 	vector<size_t> vertexIndices;
+	
+	set<glm::vec2, CompareSet> verticesXZ;
 
 	Cuboid* cuboid = nullptr;
 	GLfloat width = 0;
@@ -17,9 +19,14 @@ public:
 	Model(const GLchar* path);
 	GLvoid LoadModel(const GLchar* path);
 
+	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const
+	{
+		return verticesXZ;
+	}
+
 	const vector<glm::vec3>& GetVertices() const;
-	size_t GetVertexCount() const;
 	const vector<size_t>& GetIndices() const;
+	size_t GetVertexCount() const;
 	size_t GetIndexCount() const;
 	glm::vec3 GetVertex(const size_t& index) const;
 

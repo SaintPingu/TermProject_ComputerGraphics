@@ -268,6 +268,7 @@ GLvoid DrawScene(GLvoid)
 		}
 
 		map->Draw();
+		
 		if (player != nullptr)
 		{
 			if (i == 0)
@@ -505,6 +506,7 @@ GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 }
 GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 {
+	// WARNING : GLUT_KEY_LEFT(100) == 'd'(100)
 	switch (key)
 	{
 	case GLUT_KEY_HOME:
@@ -513,10 +515,5 @@ GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 	case GLUT_KEY_F1:
 		isWireFrame = !isWireFrame;
 		break;
-	}
-
-	if (player != nullptr)
-	{
-		player->ProcessKeyDown(key);
 	}
 }
