@@ -414,10 +414,20 @@ GLvoid MousePassiveMotion(GLint x, GLint y)
 
 
 
-
-
+// interlock with a control key
+static unordered_map<unsigned char, unsigned char> CtrlMap = {
+	{23, 'w'},
+	{19, 's'},
+	{1, 'a'},
+	{4, 'd'},
+};
 GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 {
+	if (CtrlMap.find(key) != CtrlMap.end())
+	{
+		key = CtrlMap[key];
+	}
+
 	switch (key)
 	{
 		// controls
@@ -483,6 +493,11 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 }
 GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 {
+	if (CtrlMap.find(key) != CtrlMap.end())
+	{
+		key = CtrlMap[key];
+	}
+
 	if (player != nullptr)
 	{
 		player->ProcessKeyUp(key);

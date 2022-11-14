@@ -287,8 +287,6 @@ GLvoid Player::DrawIcon() const
 
 GLvoid Player::ProcessKeyDown(const GLint& key)
 {
-	// Bug : key value changed when the key with a control key
-	printf("%d\n", key);
 	crntState->HandleEvent(Event::KeyDown, key);
 }
 GLvoid Player::ProcessKeyUp(const GLint& key)
