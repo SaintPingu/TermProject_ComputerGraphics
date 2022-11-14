@@ -2,130 +2,225 @@
 #include "Player.h"
 #include "Object.h"
 #include "Camera.h"
+#include "Timer.h"
 
 using namespace playerState;
 
 // movement key sets
-const set<unsigned char> movFB = { 'w', 'W', 's', 'S' };
-const set<unsigned char> movLR = { 'a', 'A', 'd', 'D' };
-const set<unsigned char> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
+const set<GLint> movFB = { 'w', 'W', 's', 'S' };
+const set<GLint> movLR = { 'a', 'A', 'd', 'D' };
+const set<GLint> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
 
-GLvoid Idle::Enter(Player* player, const Event& e, const unsigned char& value)
+////////////////////////////// [ State ] //////////////////////////////
+// [ IDLE ] //
+GLvoid Idle::Enter(const Event& e, const GLint& value)
 {
-	PlayerState::Enter(player);
-
 	player->Stop();
 }
 GLvoid Idle::Exit()
 {
-	PlayerState::Exit();
 }
 GLvoid Idle::Update()
 {
 	
 }
-GLvoid Idle::HandleKeyDown(const unsigned char& key)
+
+GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 {
-	if(movKeys.find(key) != movKeys.end())
+	switch (e)
 	{
-		player->ChangeState(Player::State::Walk, Event::KeyDown, key);
-	}
-}
-GLvoid Idle::HandleKeyUp(const unsigned char& key)
-{
-	if (movKeys.find(key) != movKeys.end())
-	{
-		player->ChangeState(Player::State::Walk, Event::KeyUp, key);
+	case Event::KeyDown:
+		if(movKeys.find(key) != movKeys.end())
+		{
+			player->ChangeState(Player::State::Walk, e, key);
+		}
+		else if (key == GLUT_KEY_SPACEBAR)
+		{
+			player->ChangeState(Player::State::Jump);
+		}
+		break;
+	case Event::KeyUp:
+		if (movKeys.find(key) != movKeys.end())
+		{
+			player->ChangeState(Player::State::Walk, Event::KeyUp, key);
+		}
+		break;
 	}
 }
 
-
-GLvoid Walk::Enter(Player* player, const Event& e, const unsigned char& value)
+// [ WALK ] //
+GLvoid Walk::Enter(const Event& e, const GLint& value)
 {
-	PlayerState::Enter(player);
-	if (e == Event::KeyDown)
+	switch (e)
 	{
+	case Event::KeyDown:
 		player->AddDir(value);
-	}
-	else
-	{
+		break;
+	case Event::KeyUp:
 		player->SubDir(value);
+		break;
+	default:
+		break;
 	}
 }
 GLvoid Walk::Exit()
 {
-	PlayerState::Exit();
 }
 GLvoid Walk::Update()
 {
 	player->Move();
 }
-GLvoid Walk::HandleKeyDown(const unsigned char& key)
+GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 {
-	const Event e = Event::KeyDown;
-
-	player->AddDir(key);
-	if (player->GetDirHori() == 0 && player->GetDirVert() == 0)
+	switch (e)
 	{
-		player->ChangeState(Player::State::Idle, e, key);
+	case Event::KeyDown:
+		if (movKeys.find(key) != movKeys.end())
+		{
+			player->AddDir(key);
+		}
+
+		if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+		{
+			player->ChangeState(Player::State::Idle, e, key);
+		}
+		else if (key == GLUT_KEY_SPACEBAR)
+		{
+			player->ChangeState(Player::State::Jump);
+		}
+		break;
+	case Event::KeyUp:
+		if (movKeys.find(key) != movKeys.end())
+		{
+			player->SubDir(key);
+		}
+
+		if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+		{
+			player->ChangeState(Player::State::Idle, e, key);
+		}
+		break;
 	}
 }
-GLvoid Walk::HandleKeyUp(const unsigned char& key)
-{
-	const Event e = Event::KeyUp;
 
-	player->SubDir(key);
-	if (player->GetDirHori() == 0 && player->GetDirVert() == 0)
+
+// [ JUMP ] //
+GLvoid Jump::Enter(const Event& e, const GLint& value)
+{
+	t = 0;
+	player->SetDir(GLUT_KEY_SPACEBAR, UP);
+}
+GLvoid Jump::Exit()
+{
+}
+GLvoid Jump::Update()
+{
+	t += timer::DeltaTime();
+	if (t >= jumpTime)
 	{
-		player->ChangeState(Player::State::Idle, e, key);
+		if (player->GetDirY() == UP)
+		{
+			t = 0;
+			player->SetDir(GLUT_KEY_SPACEBAR, DOWN);
+		}
+		else
+		{
+			player->SetDir(GLUT_KEY_SPACEBAR, 0);
+			if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+			{
+				player->ChangeState(Player::State::Idle);
+			}
+			else
+			{
+				player->ChangeState(Player::State::Walk);
+			}
+		}
+		return;
+	}
+	player->Move();
+}
+GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
+{
+	if (key == GLUT_KEY_SPACEBAR)
+	{
+		return;
+	}
+
+	if (movKeys.find(key) != movKeys.end())
+	{
+		switch (e)
+		{
+		case Event::KeyDown:
+			player->AddDir(key);
+			break;
+		case Event::KeyUp:
+			player->SubDir(key);
+			break;
+		}
 	}
 }
-GLvoid Player::AddDir(const unsigned char& key)
+
+
+////////////////////////////// [ Player ] //////////////////////////////
+GLvoid Player::AddDir(const GLint& key)
 {
 	switch (key)
 	{
 	case 'w':
 	case 'W':
-		dirFB += FRONT;
+		dirZ += FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirFB += BACK;
+		dirZ += BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirLR += LEFT;
+		dirX += LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirLR += RIGHT;
+		dirX += RIGHT;
+		break;
+	default:
 		break;
 	}
 }
-GLvoid Player::SubDir(const unsigned char& key)
+GLvoid Player::SubDir(const GLint& key)
 {
 	switch (key)
 	{
 	case 'w':
 	case 'W':
-		dirFB -= FRONT;
+		dirZ -= FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirFB -= BACK;
+		dirZ -= BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirLR -= LEFT;
+		dirX -= LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirLR -= RIGHT;
+		dirX -= RIGHT;
+		break;
+	default:
+		break;
+	}
+}
+GLvoid Player::SetDir(const GLint& key, const GLint& value)
+{
+	switch (key)
+	{
+	case GLUT_KEY_SPACEBAR:
+		dirY = value;
 		break;
 	}
 }
 
-GLvoid Player::ChangeState(const State& playerState, const Event& e, const unsigned char& value)
+GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint& value)
 {
 	if (crntState != nullptr)
 	{
@@ -136,16 +231,19 @@ GLvoid Player::ChangeState(const State& playerState, const Event& e, const unsig
 	switch (playerState)
 	{
 	case State::Idle:
-		crntState = new Idle();
+		crntState = new Idle(this);
 		break;
 	case State::Walk:
-		crntState = new Walk();
+		crntState = new Walk(this);
+		break;
+	case State::Jump:
+		crntState = new Jump(this);
 		break;
 	default:
 		assert(0);
 	}
 
-	crntState->Enter(this, e, value);
+	crntState->Enter(e, value);
 }
 
 
@@ -187,32 +285,27 @@ GLvoid Player::DrawIcon() const
 {
 }
 
-GLvoid Player::ProcessKeyDown(const unsigned char& key)
+GLvoid Player::ProcessKeyDown(const GLint& key)
 {
-	crntState->HandleKeyDown(key);
+	// Bug : key value changed when the key with a control key
+	printf("%d\n", key);
+	crntState->HandleEvent(Event::KeyDown, key);
 }
-GLvoid Player::ProcessKeyUp(const unsigned char& key)
+GLvoid Player::ProcessKeyUp(const GLint& key)
 {
-	crntState->HandleKeyUp(key);
+	crntState->HandleEvent(Event::KeyUp, key);
 }
 
 GLvoid Player::Move()
 {
-	body->MoveZ(speed * dirFB);
-	body->MoveX(speed * dirLR);
+	body->MoveX(speed * dirX);
+	body->MoveY(jumpSpeed * dirY);
+	body->MoveZ(speed * dirZ);
 }
 GLvoid Player::Stop()
 {
-	dirLR = 0;
-	dirFB = 0;
-}
-GLvoid Player::AddDirVert(const GLchar& direction)
-{
-	dirFB += direction;
-}
-GLvoid Player::AddDirHori(const GLchar& direction)
-{
-	dirLR += direction;
+	dirX = 0;
+	dirZ = 0;
 }
 
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)

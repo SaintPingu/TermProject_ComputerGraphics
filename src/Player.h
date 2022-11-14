@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #define PLAYER_WALK_SPEED 10 // 10 m/s
+#define PLAYER_JUMP_SPEED 20 // 15 m/s
 
 class SharedObject;
 class Camera;
@@ -14,37 +15,44 @@ namespace playerState {
 	protected:
 		Player* player = nullptr;
 	public:
-		virtual GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0)
+		PlayerState(Player* player)
 		{
 			this->player = player;
 		}
-		virtual GLvoid Exit()
-		{
-			this->player = nullptr;
-		}
+		virtual GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) abstract;
+		virtual GLvoid Exit() abstract;
 		virtual GLvoid Update() abstract;
-		virtual GLvoid HandleKeyDown(const unsigned char& key) abstract;
-		virtual GLvoid HandleKeyUp(const unsigned char& key) abstract;
+		virtual GLvoid HandleEvent(const Event& e, const GLint& key) abstract;
 	};
 
 	class Idle : public PlayerState {
 	public:
-		Idle() {};
-		GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0) override;
+		Idle(Player* player) : PlayerState(player) {};
+		GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) override;
 		GLvoid Exit() override;
 		GLvoid Update() override;
-		GLvoid HandleKeyDown(const unsigned char& key) override;
-		GLvoid HandleKeyUp(const unsigned char& key) override;
+		GLvoid HandleEvent(const Event& e, const GLint& key) override;
 	};
 
 	class Walk : public PlayerState {
 	public:
-		Walk() {};
-		GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0) override;
+		Walk(Player* player) : PlayerState(player) {};
+		GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) override;
 		GLvoid Exit() override;
 		GLvoid Update() override;
-		GLvoid HandleKeyDown(const unsigned char& key) override;
-		GLvoid HandleKeyUp(const unsigned char& key) override;
+		GLvoid HandleEvent(const Event& e, const GLint& key) override;
+	};
+
+	class Jump : public PlayerState {
+	private:
+		const GLfloat jumpTime = 0.5f;
+		GLfloat t = 0;
+	public:
+		Jump(Player* player) : PlayerState(player) {};
+		GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) override;
+		GLvoid Exit() override;
+		GLvoid Update() override;
+		GLvoid HandleEvent(const Event& e, const GLint& key) override;
 	};
 }
 
@@ -53,8 +61,9 @@ namespace playerState {
 class Player {
 private:
 	playerState::PlayerState* crntState = nullptr;
-	GLchar dirFB = 0;
-	GLchar dirLR = 0;
+	GLchar dirX = 0;
+	GLchar dirY = 0;
+	GLchar dirZ = 0;
 
 	glm::vec3 position = { 0, 0, 0 };
 	glm::vec3 tpCameraPosition = { 0, 0, 0 };
@@ -68,6 +77,7 @@ private:
 	Triangle* icon = nullptr;
 
 	GLfloat speed = PLAYER_WALK_SPEED;
+	GLfloat jumpSpeed = PLAYER_JUMP_SPEED;
 
 	GLfloat floor = 0.0f;
 	GLfloat top = 0.0f;
@@ -82,7 +92,7 @@ public:
 
 	// state
 	enum class State { Idle = 0, Walk, Run, Jump };
-	GLvoid ChangeState(const State& playerState, const Event& e = Event::None, const unsigned char& value = 0);
+	GLvoid ChangeState(const State& playerState, const Event& e = Event::None, const GLint& value = 0);
 
 	// Frame
 	GLvoid Update();
@@ -90,24 +100,18 @@ public:
 	GLvoid DrawIcon() const;
 
 	// Process
-	GLvoid ProcessKeyDown(const unsigned char& key);
-	GLvoid ProcessKeyUp(const unsigned char& key);
+	GLvoid ProcessKeyDown(const GLint& key);
+	GLvoid ProcessKeyUp(const GLint& key);
 
 	// Movement
 	GLvoid Move();
 	GLvoid Stop();
-	GLvoid AddDirVert(const GLchar& direction);
-	GLvoid AddDirHori(const GLchar& direction);
-	inline constexpr GLchar GetDirVert() const
-	{
-		return dirFB;
-	}
-	inline constexpr GLchar GetDirHori() const
-	{
-		return dirLR;
-	}
-	GLvoid AddDir(const unsigned char& key);
-	GLvoid SubDir(const unsigned char& key);
+	GLvoid AddDir(const GLint& key);
+	GLvoid SubDir(const GLint& key);
+	GLvoid SetDir(const GLint& key, const GLint& value);
+	inline constexpr GLchar GetDirX() const { return dirX; }
+	inline constexpr GLchar GetDirY() const { return dirY; }
+	inline constexpr GLchar GetDirZ() const { return dirZ; }
 
 	// Rotation
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);

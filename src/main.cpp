@@ -24,7 +24,7 @@ GLvoid MouseMotion(GLint x, GLint y);
 GLvoid MousePassiveMotion(GLint x, GLint y);
 GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y);
 GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y);
-GLvoid ProcessSpecialKeyboard(GLint key, GLint x, GLint y);
+GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y);
 
 GLvoid ToggleDepthTest();
 
@@ -88,7 +88,7 @@ GLint main(GLint argc, GLchar** argv)
 	glutPositionFunc(RePosition);
 	glutKeyboardFunc(ProcessKeyDown);
 	glutKeyboardUpFunc(ProcessKeyUp);
-	glutSpecialFunc(ProcessSpecialKeyboard);
+	glutSpecialFunc(ProcessSpecialKeyDown);
 	timer::StartUpdate();
 
 	glutMainLoop();
@@ -313,11 +313,6 @@ GLvoid Update()
 	timer::CalculateFPS();
 	timer::Update();
 
-	if (player != nullptr)
-	{
-		player->Update();
-	}
-
 	// movement
 	if (cameraMain == cameraFree)
 	{
@@ -349,6 +344,11 @@ GLvoid Update()
 			cameraFree->MoveGlobal({ 0, cameraSpeed, 0 });
 		}
 	}
+	else if (player != nullptr)
+	{
+		player->Update();
+	}
+
 	
 	glutPostRedisplay();
 }
@@ -488,7 +488,7 @@ GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 		player->ProcessKeyUp(key);
 	}
 }
-GLvoid ProcessSpecialKeyboard(GLint key, GLint x, GLint y)
+GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 {
 	switch (key)
 	{
@@ -498,5 +498,10 @@ GLvoid ProcessSpecialKeyboard(GLint key, GLint x, GLint y)
 	case GLUT_KEY_F1:
 		isWireFrame = !isWireFrame;
 		break;
+	}
+
+	if (player != nullptr)
+	{
+		player->ProcessKeyDown(key);
 	}
 }
