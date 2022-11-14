@@ -6,21 +6,19 @@
 using namespace playerState;
 
 // movement key sets
-const set<unsigned char> movVert = { 'w', 'W', 's', 'S' };
-const set<unsigned char> movHori = { 'a', 'A', 'd', 'D' };
+const set<unsigned char> movFB = { 'w', 'W', 's', 'S' };
+const set<unsigned char> movLR = { 'a', 'A', 'd', 'D' };
 const set<unsigned char> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
 
-GLvoid Idle::Enter(Player* player, const unsigned char& e)
+GLvoid Idle::Enter(Player* player, const Event& e, const unsigned char& value)
 {
 	PlayerState::Enter(player);
 
-	printf("Enter Idle\n");
 	player->Stop();
 }
 GLvoid Idle::Exit()
 {
 	PlayerState::Exit();
-	printf("Exit Idle\n");
 }
 GLvoid Idle::Update()
 {
@@ -30,29 +28,33 @@ GLvoid Idle::HandleKeyDown(const unsigned char& key)
 {
 	if(movKeys.find(key) != movKeys.end())
 	{
-		player->ChangeState(Player::State::Walk, key);
+		player->ChangeState(Player::State::Walk, Event::KeyDown, key);
 	}
 }
 GLvoid Idle::HandleKeyUp(const unsigned char& key)
 {
-	if (movVert.find(key) != movVert.end())
+	if (movKeys.find(key) != movKeys.end())
 	{
-		player->ChangeState(Player::State::Walk, key);
+		player->ChangeState(Player::State::Walk, Event::KeyUp, key);
 	}
 }
 
 
-GLvoid Walk::Enter(Player* player, const unsigned char& e)
+GLvoid Walk::Enter(Player* player, const Event& e, const unsigned char& value)
 {
 	PlayerState::Enter(player);
-	player->AddDir(e);
-
-	printf("Enter Walk\n");
+	if (e == Event::KeyDown)
+	{
+		player->AddDir(value);
+	}
+	else
+	{
+		player->SubDir(value);
+	}
 }
 GLvoid Walk::Exit()
 {
 	PlayerState::Exit();
-	printf("Exit Walk\n");
 }
 GLvoid Walk::Update()
 {
@@ -60,18 +62,22 @@ GLvoid Walk::Update()
 }
 GLvoid Walk::HandleKeyDown(const unsigned char& key)
 {
+	const Event e = Event::KeyDown;
+
 	player->AddDir(key);
 	if (player->GetDirHori() == 0 && player->GetDirVert() == 0)
 	{
-		player->ChangeState(Player::State::Idle, key);
+		player->ChangeState(Player::State::Idle, e, key);
 	}
 }
 GLvoid Walk::HandleKeyUp(const unsigned char& key)
 {
+	const Event e = Event::KeyUp;
+
 	player->SubDir(key);
 	if (player->GetDirHori() == 0 && player->GetDirVert() == 0)
 	{
-		player->ChangeState(Player::State::Idle, key);;
+		player->ChangeState(Player::State::Idle, e, key);
 	}
 }
 GLvoid Player::AddDir(const unsigned char& key)
@@ -80,19 +86,19 @@ GLvoid Player::AddDir(const unsigned char& key)
 	{
 	case 'w':
 	case 'W':
-		dirVert += FRONT;
+		dirFB += FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirVert += BACK;
+		dirFB += BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirHori += LEFT;
+		dirLR += LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirHori += RIGHT;
+		dirLR += RIGHT;
 		break;
 	}
 }
@@ -102,24 +108,24 @@ GLvoid Player::SubDir(const unsigned char& key)
 	{
 	case 'w':
 	case 'W':
-		dirVert -= FRONT;
+		dirFB -= FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirVert -= BACK;
+		dirFB -= BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirHori -= LEFT;
+		dirLR -= LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirHori -= RIGHT;
+		dirLR -= RIGHT;
 		break;
 	}
 }
 
-GLvoid Player::ChangeState(const State& playerState, const unsigned char& e)
+GLvoid Player::ChangeState(const State& playerState, const Event& e, const unsigned char& value)
 {
 	if (crntState != nullptr)
 	{
@@ -139,7 +145,7 @@ GLvoid Player::ChangeState(const State& playerState, const unsigned char& e)
 		assert(0);
 	}
 
-	crntState->Enter(this, e);
+	crntState->Enter(this, e, value);
 }
 
 
@@ -152,7 +158,7 @@ Player::Player(const glm::vec3& position)
 
 	fpCamera = new Camera();
 	fpCamera->SetPivot(&this->position);
-	fpCamera->MoveY(0.2f);
+	fpCamera->MoveY(0.7f);
 	fpCamera->SetFovY(110.0f);
 	fpCamera->SetLook(body->GetLook());
 
@@ -192,21 +198,21 @@ GLvoid Player::ProcessKeyUp(const unsigned char& key)
 
 GLvoid Player::Move()
 {
-	body->MoveZ(velocity * dirVert);
-	body->MoveX(velocity * dirHori);
+	body->MoveZ(velocity * dirFB);
+	body->MoveX(velocity * dirLR);
 }
 GLvoid Player::Stop()
 {
-	dirHori = 0;
-	dirVert = 0;
+	dirLR = 0;
+	dirFB = 0;
 }
 GLvoid Player::AddDirVert(const GLchar& direction)
 {
-	dirVert += direction;
+	dirFB += direction;
 }
 GLvoid Player::AddDirHori(const GLchar& direction)
 {
-	dirHori += direction;
+	dirLR += direction;
 }
 
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)

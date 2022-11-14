@@ -109,6 +109,8 @@
 
 using namespace std;
 
+enum class Event { None, KeyDown, KeyUp };
+
 enum class Dir { None, Left, Right, Up, Down, Front, Back };
 static unordered_map<Dir, Dir> dir_opposite = {
 	{Dir::Left, Dir::Right},

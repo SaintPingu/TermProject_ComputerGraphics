@@ -12,7 +12,7 @@ namespace playerState {
 	protected:
 		Player* player = nullptr;
 	public:
-		virtual GLvoid Enter(Player* player, const unsigned char& e = 0)
+		virtual GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0)
 		{
 			this->player = player;
 		}
@@ -28,7 +28,7 @@ namespace playerState {
 	class Idle : public PlayerState {
 	public:
 		Idle() {};
-		GLvoid Enter(Player* player, const unsigned char& e = 0) override;
+		GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0) override;
 		GLvoid Exit() override;
 		GLvoid Update() override;
 		GLvoid HandleKeyDown(const unsigned char& key) override;
@@ -38,7 +38,7 @@ namespace playerState {
 	class Walk : public PlayerState {
 	public:
 		Walk() {};
-		GLvoid Enter(Player* player, const unsigned char& e = 0) override;
+		GLvoid Enter(Player* player, const Event& e = Event::None, const unsigned char& value = 0) override;
 		GLvoid Exit() override;
 		GLvoid Update() override;
 		GLvoid HandleKeyDown(const unsigned char& key) override;
@@ -51,8 +51,8 @@ namespace playerState {
 class Player {
 private:
 	playerState::PlayerState* crntState = nullptr;
-	GLchar dirVert = 0;
-	GLchar dirHori = 0;
+	GLchar dirFB = 0;
+	GLchar dirLR = 0;
 
 	glm::vec3 position = { 0, 0, 0 };
 	glm::vec3 tpCameraPosition = { 0, 0, 0 };
@@ -80,7 +80,7 @@ public:
 
 	// state
 	enum class State { Idle = 0, Walk, Run, Jump };
-	GLvoid ChangeState(const State& playerState, const unsigned char& e = 0);
+	GLvoid ChangeState(const State& playerState, const Event& e = Event::None, const unsigned char& value = 0);
 
 	// Frame
 	GLvoid Update();
@@ -98,11 +98,11 @@ public:
 	GLvoid AddDirHori(const GLchar& direction);
 	inline constexpr GLchar GetDirVert() const
 	{
-		return dirVert;
+		return dirFB;
 	}
 	inline constexpr GLchar GetDirHori() const
 	{
-		return dirHori;
+		return dirLR;
 	}
 	GLvoid AddDir(const unsigned char& key);
 	GLvoid SubDir(const unsigned char& key);
