@@ -198,8 +198,8 @@ GLvoid Player::ProcessKeyUp(const unsigned char& key)
 
 GLvoid Player::Move()
 {
-	body->MoveZ(velocity * dirFB);
-	body->MoveX(velocity * dirLR);
+	body->MoveZ(speed * dirFB);
+	body->MoveX(speed * dirLR);
 }
 GLvoid Player::Stop()
 {

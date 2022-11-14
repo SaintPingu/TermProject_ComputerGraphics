@@ -25,21 +25,21 @@ GLvoid Camera::Move(const glm::vec3& vector)
 GLvoid Camera::MoveX(const GLfloat& amount)
 {
 	glm::vec3 right = GetRight();
-	this->position += -right * amount * velocity;
+	this->position += -right * amount * speed;
 }
 GLvoid Camera::MoveY(const GLfloat& amount)
 {
 	glm::vec3 up = GetUp();
-	this->position += up * amount * velocity;
+	this->position += up * amount * speed;
 }
 GLvoid Camera::MoveZ(const GLfloat& amount)
 {
 	glm::vec3 look = GetLook();
-	this->position += look * amount * velocity;
+	this->position += look * amount * speed;
 }
 GLvoid Camera::MoveGlobal(const glm::vec3& offset)
 {
-	position += offset * velocity;
+	position += offset * speed;
 }
 
 GLvoid Camera::Look(const glm::vec3& point)

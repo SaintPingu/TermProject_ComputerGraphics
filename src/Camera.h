@@ -9,7 +9,7 @@ private:
 	GLboolean isPersp = true;
 	const glm::vec3* pivot = nullptr;
 public:
-	const GLfloat velocity = 10.0f;
+	const GLfloat speed = 10.0f;
 
 	Camera();
 	Camera(const glm::vec3& position);

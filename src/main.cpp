@@ -18,7 +18,7 @@ GLvoid Init();
 GLvoid InitMeshes();
 GLvoid DrawScene(GLvoid);
 
-GLvoid Idle();
+GLvoid Update();
 GLvoid Mouse(GLint button, GLint state, GLint x, GLint y);
 GLvoid MouseMotion(GLint x, GLint y);
 GLvoid MousePassiveMotion(GLint x, GLint y);
@@ -76,7 +76,7 @@ GLint main(GLint argc, GLchar** argv)
 	InitShader();
 	Init();
 
-	glutIdleFunc(Idle);
+	glutIdleFunc(Update);
 	glutDisplayFunc(DrawScene);
 	glutReshapeFunc(Reshape);
 	glutSetCursor(GLUT_CURSOR_NONE);
@@ -230,35 +230,8 @@ GLvoid SetWindow(GLint index)
 	}
 }
 
-size_t frameCount = 0;
-GLfloat fps = 0;
-DWORD crntTime = 0;
-DWORD prevTime = 0;
-GLvoid CalculateFPS()
-{
-	++frameCount;
-
-	crntTime = glutGet(GLUT_ELAPSED_TIME);
-
-	GLint timeInterval = crntTime - prevTime;
-	if (timeInterval > 1000)
-	{
-		fps = frameCount / (timeInterval / 1000.0f);
-
-		prevTime = crntTime;
-
-		frameCount = 0;
-	}
-
-	COORD cursor = { 0,0 };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
-	printf("fps : %.3f\n", fps);
-}
-
 GLvoid DrawScene(GLvoid)
 {
-	CalculateFPS();
-
 	glClearColor(backColor.r, backColor.g, backColor.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (isWireFrame)
@@ -335,8 +308,16 @@ GLvoid DrawScene(GLvoid)
 
 
 ///// [ HANDLE EVENTS ] /////
-GLvoid Idle()
+GLvoid Update()
 {
+	timer::CalculateFPS();
+	timer::Update();
+
+	if (player != nullptr)
+	{
+		player->Update();
+	}
+
 	// movement
 	if (cameraMain == cameraFree)
 	{
@@ -367,11 +348,6 @@ GLvoid Idle()
 		{
 			cameraFree->MoveGlobal({ 0, cameraSpeed, 0 });
 		}
-	}
-	
-	if (player != nullptr)
-	{
-		player->Update();
 	}
 	
 	glutPostRedisplay();

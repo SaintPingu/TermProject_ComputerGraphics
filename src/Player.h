@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#define PLAYER_WALK_SPEED 10 // 10 m/s
+
 class SharedObject;
 class Camera;
 class Cuboid;
@@ -65,7 +67,7 @@ private:
 
 	Triangle* icon = nullptr;
 
-	GLfloat velocity = 0.1f;
+	GLfloat speed = PLAYER_WALK_SPEED;
 
 	GLfloat floor = 0.0f;
 	GLfloat top = 0.0f;

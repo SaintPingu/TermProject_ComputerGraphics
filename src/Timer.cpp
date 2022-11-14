@@ -3,26 +3,61 @@
 #include "Object.h"
 #include "Camera.h"
 
-#define DEFAULT_TIMER_ELAPSE 10
-
 #define EXIT -1
 #define INIT -2
 #define READY -3
 
 
 GLboolean CameraRotation_YAxis(GLint value);
-GLboolean CameraRotation_Y(GLint value);
 
 static unordered_map<Timer, GLboolean(*)(GLint)> timerTable = {
 	{ Timer::WolrdRotation_Y, CameraRotation_YAxis },
-	{ Timer::CameraRotation_Y, CameraRotation_Y },
 };
 
 static set<GLboolean(*)(GLint)> timers;
 static GLboolean isUpdate = false;
 
-// extern
-extern Camera* cameraFree;
+
+
+// fps
+static GLfloat deltaTime = 0;
+static DWORD lastTime = 0;
+static DWORD fps_lastTime = 0;
+GLvoid timer::CalculateFPS()
+{
+	static GLfloat fps = 0;
+	static size_t frameCount = 0;
+	static DWORD crntTime = 0;
+
+	++frameCount;
+
+	crntTime = glutGet(GLUT_ELAPSED_TIME);
+	deltaTime = (crntTime - lastTime) / 1000.0f;
+
+	GLint timeInterval = crntTime - fps_lastTime;
+
+	if (timeInterval > 1000)
+	{
+		fps = frameCount / (timeInterval / 1000.0f);
+
+		frameCount = 0;
+
+		fps_lastTime = crntTime;
+	}
+
+	lastTime = crntTime;
+	COORD cursor = { 0,0 };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
+	printf("fps : %.3f\n", fps);
+	printf("delta time : %lf\n", deltaTime);
+
+	//printf("%d\n", fp);
+}
+GLfloat timer::DeltaTime()
+{
+	return deltaTime;
+}
+
 
 // init
 GLvoid timer::Init()
@@ -32,6 +67,9 @@ GLvoid timer::Init()
 		Timer timer = static_cast<Timer>(i);
 		InitTimer(timerTable[timer]);
 	}
+
+	lastTime = glutGet(GLUT_ELAPSED_TIME);
+	fps_lastTime = glutGet(GLUT_ELAPSED_TIME);
 
 	timers.clear();
 }
@@ -62,7 +100,6 @@ GLvoid timer::StartUpdate()
 	}
 
 	isUpdate = true;
-	glutTimerFunc(DEFAULT_TIMER_ELAPSE, timer::Update, 0);
 }
 GLvoid timer::StopUpdate()
 {
@@ -70,7 +107,7 @@ GLvoid timer::StopUpdate()
 }
 
 
-GLvoid timer::Update(GLint value)
+GLvoid timer::Update()
 {
 	if (isUpdate == false)
 	{
@@ -92,8 +129,6 @@ GLvoid timer::Update(GLint value)
 		timerFunc(EXIT);
 		timers.erase(timerFunc);
 	}
-
-	glutTimerFunc(DEFAULT_TIMER_ELAPSE, timer::Update, 0);
 }
 
 
@@ -160,53 +195,5 @@ GLboolean CameraRotation_YAxis(GLint value)
 		break;
 	}
 
-	cameraFree->RotateYAxis(glm::radians(1.0f * dir));
-
 	return true;
 }
-
-GLboolean CameraRotation_X(GLint value)
-{
-	static GLint dir = 0;
-	switch (value)
-	{
-	case 0:
-		break;
-	case INIT:
-		dir = LEFT;
-		return false;
-	case EXIT:
-		dir *= -1;
-		return false;
-	default:
-		break;
-	}
-
-	cameraFree->RotateLocal(glm::radians(1.0f * dir), 0.0f, 0.0f);
-
-	return true;
-}
-GLboolean CameraRotation_Y(GLint value)
-{
-	static GLint dir = 0;
-	switch (value)
-	{
-	case 0:
-		break;
-	case INIT:
-		dir = LEFT;
-		return false;
-	case EXIT:
-		dir *= -1;
-		return false;
-	default:
-		assert(0);
-	}
-
-	cameraFree->RotateLocal(0.0f, glm::radians(50.0f * dir), 0.0f);
-
-	return true;
-}
-
-
-

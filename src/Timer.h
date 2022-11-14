@@ -2,7 +2,6 @@
 
 enum class Timer : GLint {
 	WolrdRotation_Y = 0,
-	CameraRotation_Y,
 };
 
 namespace timer {
@@ -13,7 +12,7 @@ namespace timer {
 
 	GLvoid StartUpdate();
 	GLvoid StopUpdate();
-	GLvoid Update(GLint value);
+	GLvoid Update();
 
 	GLvoid ToggleTimer(const Timer& timer);
 	GLvoid EnableTimer(const Timer& timer);
@@ -23,4 +22,8 @@ namespace timer {
 	GLvoid ToggleTimer(GLboolean(*timerFunc)(GLint));
 	GLvoid EnableTimer(GLboolean(*timerFunc)(GLint));
 	GLvoid DisableTimer(GLboolean(*timerFunc)(GLint));
+
+	GLvoid CalculateFPS();
+	GLfloat DeltaTime();
 }
+

@@ -222,21 +222,21 @@ GLvoid Object::Move(const glm::vec3& vector)
 GLvoid Object::MoveX(const GLfloat& amount)
 {
 	glm::vec3 right = GetRight();
-	this->position += right * amount;
+	this->position += right * amount * timer::DeltaTime();
 }
 GLvoid Object::MoveY(const GLfloat& amount)
 {
 	glm::vec3 up = GetUp();
-	this->position += up * amount;
+	this->position += up * amount * timer::DeltaTime();
 }
 GLvoid Object::MoveZ(const GLfloat& amount)
 {
 	glm::vec3 look = GetLook();
-	this->position += look * amount;
+	this->position += look * amount * timer::DeltaTime();
 }
 GLvoid Object::MoveGlobal(const glm::vec3& vector)
 {
-	this->position += vector;
+	this->position += vector * timer::DeltaTime();
 }
 
 
