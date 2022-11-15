@@ -294,6 +294,8 @@ public:
 	Circle(const glm::vec3* pivot, const GLfloat& radius, const glm::vec3 offset = { 0,0,0 });
 
 	GLvoid Draw() const;
+
+	GLvoid SetColor(const COLORREF& color);
 	glm::vec2 GetCenter() const;
 	GLfloat GetRadius() const;
 };

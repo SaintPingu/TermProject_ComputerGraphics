@@ -39,24 +39,17 @@ GLboolean Map::CheckCollision(const Circle* boundingCircle)
 	}
 	if (center.x - radius < leftBottom.x)
 	{
-		if (::CheckCollision(leftTop, leftBottom, center, radius) == true)
+		if (::CheckCollision(leftTop, leftBottom, center, radius) == GL_TRUE)
 		{
 			return true;
 		}
 	}
 	else if (center.x + radius > rightBottom.x)
 	{
-		if (::CheckCollision(rightTop, rightBottom, center, radius) == true)
+		if (::CheckCollision(rightTop, rightBottom, center, radius) == GL_TRUE)
 		{
 			return true;
 		}
-	}
-
-
-	SetConsoleCursor(0, 0);
-	for (const glm::vec2& vertex : boundingMap)
-	{
-		Vector2::PrintPos(vertex);
 	}
 
 	return false;

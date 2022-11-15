@@ -281,7 +281,8 @@ Player::Player(const glm::vec3& position)
 	fpCamera->SetFovY(110.0f);
 	fpCamera->SetLook(object->GetLook());
 
-	boundingCircle = new Circle(&this->position, PLAYER_RADIUS, { 0, 2.5f, 0 });
+	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 2.5f, 0 });
+	boundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
 }
@@ -303,7 +304,7 @@ GLvoid Player::Update()
 GLvoid Player::Draw() const
 {
 	object->Draw();
-	
+	boundingCircle->Draw();
 }
 GLvoid Player::DrawIcon() const
 {
@@ -320,16 +321,16 @@ GLvoid Player::ProcessKeyUp(const GLint& key)
 
 GLvoid Player::Move()
 {
+	glm::vec3 prevPos = object->GetPosition();
 	if (dirX != 0.0f) object->MoveX(speed * dirX);
 	if (dirY != 0.0f) object->MoveY(jumpSpeed * dirY);
 	if (dirZ != 0.0f) object->MoveZ(speed * dirZ);
 
-	if (crntMap->CheckCollision(boundingCircle) == true)
+	// xz collision
+	if (crntMap->CheckCollision(boundingCircle) == GL_TRUE)
 	{
-		printf("Collision!!\n");
-		object->MoveX(-speed * dirX);
-		object->MoveY(-jumpSpeed * dirY);
-		object->MoveZ(-speed * dirZ);
+		object->SetPosX(prevPos.x);
+		object->SetPosZ(prevPos.z);
 	}
 }
 GLvoid Player::Stop()

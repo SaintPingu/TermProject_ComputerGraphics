@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #define PLAYER_RADIUS 5 // Width = 10 : 1m -> radius = 0.5m
-#define PLAYER_WALK_SPEED 50 // 1 m/s
+// #define PLAYER_WALK_SPEED 10 // 1 m/s
+#define PLAYER_WALK_SPEED 50 // for test
 #define PLAYER_JUMP_SPEED 30 // 3 m/s
 
 class SharedObject;

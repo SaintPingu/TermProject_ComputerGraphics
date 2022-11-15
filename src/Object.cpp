@@ -247,7 +247,7 @@ glm::mat4 Object::GetTransform() const
 
 	if (pivot != nullptr)
 	{
-		transform = glm::translate(transform, { -(*pivot).x, (*pivot).y, -(*pivot).z });
+		transform = glm::translate(transform, { (*pivot).x, (*pivot).y, (*pivot).z });
 	}
 
 	transform *= glm::mat4_cast(rotation);
@@ -1005,13 +1005,17 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 	this->offset = offset;
 	this->radius = radius;
 	circle = new SharedObject(GetIdentityCircle());
-	circle->Scale(radius * 2);
+	circle->SetScale(radius);
 	circle->SetPivot(position);
 	circle->Move(offset);
 }
 GLvoid Circle::Draw() const
 {
 	circle->Draw();
+}
+GLvoid Circle::SetColor(const COLORREF& color)
+{
+	circle->SetColor(color);
 }
 glm::vec2 Circle::GetCenter() const
 {
