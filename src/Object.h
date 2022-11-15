@@ -283,6 +283,16 @@ public:
 };
 
 
+class Circle {
+private:
+	const glm::vec3* position = nullptr;
+	GLfloat radius = 0.0f;
+public:
+	Circle(const glm::vec3* position, const GLfloat& radius);
+
+	GLvoid Draw() const;
+};
+
 ////////// [ OBJECTS ] //////////
 
 
@@ -297,6 +307,7 @@ public:
 const Cube* GetIdentityCube();
 const Line* GetIdentityLine();
 const ModelObject* GetIdentityPlayer();
+const ModelObject* GetIdentityCircle();
 
 ////////// [ DEBUG ] //////////
 GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

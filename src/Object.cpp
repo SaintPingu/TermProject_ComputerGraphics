@@ -8,6 +8,7 @@ extern vector<IdentityObject*> objects;
 extern const Model* cubeModel;
 extern const Model* sphereModel;
 extern const Model* playerModel;
+extern const Model* circleModel;
 
 
 Object::Object()
@@ -999,6 +1000,11 @@ GLvoid Cuboid::Draw() const
 }
 
 
+Circle::Circle(const glm::vec3* position, const GLfloat& radius)
+{
+	this->position = position;
+	this->radius = radius;
+}
 
 
 
@@ -1189,4 +1195,17 @@ const ModelObject* GetIdentityPlayer()
 	}
 
 	return playerObject;
+}
+
+static ModelObject* circleObject = nullptr;
+const ModelObject* GetIdentityCircle()
+{
+	if (circleObject == nullptr)
+	{
+		circleObject = new ModelObject(circleModel);
+		circleObject->SetColor(RED);
+		circleObject->BindBuffers();
+	}
+
+	return circleObject;
 }

@@ -47,6 +47,8 @@ namespace playerState {
 	private:
 		const GLfloat jumpTime = 0.5f;
 		GLfloat t = 0;
+
+		GLboolean isKeyUp = false;
 	public:
 		Jump(Player* player) : PlayerState(player) {};
 		GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) override;

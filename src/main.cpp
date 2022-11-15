@@ -71,9 +71,7 @@ GLint main(GLint argc, GLchar** argv)
 	glutCreateWindow("TestProject");
 
 	glewExperimental = GL_TRUE;
-	glewInit();
 
-	InitShader();
 	Init();
 
 	glutIdleFunc(Update);
@@ -106,16 +104,18 @@ GLint main(GLint argc, GLchar** argv)
 MyColor backColor;
 GLvoid Init()
 {
-	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
+	glewInit();
+	InitShader();
+
 	InitMeshes();
 
 	timer::Init();
 
-	backColor.SetColor(CYAN);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	backColor.SetColor(CYAN);
 
 	cameraFree = new Camera({ 0, 200.0f, 100.0f });
 	cameraFree->Look({ 0,0,0 });
@@ -126,6 +126,8 @@ GLvoid Init()
 
 	cameraMain = cameraFree;
 	crntCamera = cameraMain;
+
+	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 }
 
 GLvoid InitMeshes()

@@ -6,6 +6,7 @@ const Model* mapModel = new Model("obj\\map.obj");
 const Model* playerModel = new Model("obj\\player.obj");
 const Model* cubeModel = new Model("obj\\cube.obj");
 const Model* sphereModel = new Model("obj\\sphere.obj");
+const Model* circleModel = new Model("obj\\circle.obj");
 
 Model::Model(const GLchar* path)
 {
@@ -31,7 +32,6 @@ GLvoid Model::LoadModel(const GLchar* path)
 	GLfloat back = FLOAT_MIN;
 
 	GLchar data[128];
-	size_t count = 0;
 	while (feof(objFile) == false)
 	{
 		fscanf(objFile, "%s", data);
@@ -75,7 +75,6 @@ GLvoid Model::LoadModel(const GLchar* path)
 			vertex.x = round(vertex.x * 100) / 100.0f;
 			vertex.z = round(vertex.z * 100) / 100.0f;
 			verticesXZ.insert(glm::vec2(vertex.x, vertex.z));
-			count++;
 		}
 		else if (strcmp(data, "vt") == 0)
 		{
@@ -119,8 +118,6 @@ GLvoid Model::LoadModel(const GLchar* path)
 	width = right - left;
 	height = top - bottom;
 	depth = back - front;
-
-	printf("%s : %d\n", path, count);
 }
 //GLvoid LoadModel(const GLchar* path)
 //{

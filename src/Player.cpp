@@ -125,14 +125,22 @@ GLvoid Jump::Update()
 		}
 		else
 		{
-			player->SetDir(GLUT_KEY_SPACEBAR, 0);
-			if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+			if (isKeyUp)
 			{
-				player->ChangeState(Player::State::Idle);
+				player->SetDir(GLUT_KEY_SPACEBAR, 0);
+				if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+				{
+					player->ChangeState(Player::State::Idle);
+				}
+				else
+				{
+					player->ChangeState(Player::State::Walk);
+				}
 			}
 			else
 			{
-				player->ChangeState(Player::State::Walk);
+				t = 0;
+				player->SetDir(GLUT_KEY_SPACEBAR, UP);
 			}
 		}
 		return;
@@ -143,6 +151,14 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 {
 	if (key == GLUT_KEY_SPACEBAR)
 	{
+		if (e == Event::KeyUp)
+		{
+			isKeyUp = true;
+		}
+		else if (e == Event::KeyDown)
+		{
+			isKeyUp = false;
+		}
 		return;
 	}
 
