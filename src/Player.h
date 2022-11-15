@@ -1,14 +1,15 @@
 #include "stdafx.h"
 
-#define PLAYER_WALK_SPEED 10 // 10 m/s
-#define PLAYER_JUMP_SPEED 20 // 15 m/s
+#define PLAYER_RADIUS 5 // Width = 10 : 1m -> radius = 0.5m
+#define PLAYER_WALK_SPEED 50 // 1 m/s
+#define PLAYER_JUMP_SPEED 30 // 3 m/s
 
 class SharedObject;
 class Camera;
 class Cuboid;
 class Triangle;
 class Player;
-
+class Circle;
 
 namespace playerState {
 	class PlayerState abstract {
@@ -45,7 +46,7 @@ namespace playerState {
 
 	class Jump : public PlayerState {
 	private:
-		const GLfloat jumpTime = 0.5f;
+		const GLfloat jumpTime = 0.5f; // jump up N sec
 		GLfloat t = 0;
 
 		GLboolean isKeyUp = false;
@@ -72,7 +73,7 @@ private:
 	GLfloat tpCameraPitch = 0.0f;
 
 
-	SharedObject* body = nullptr;
+	SharedObject* object = nullptr;
 	Camera* fpCamera = nullptr;
 	Camera* tpCamera = nullptr;
 
@@ -85,6 +86,8 @@ private:
 	GLfloat top = 0.0f;
 	GLfloat yTop = 0.0f;
 	GLfloat yBot = 0.0f;
+
+	Circle* boundingCircle = nullptr;
 
 public:
 	Player(const glm::vec3& position);

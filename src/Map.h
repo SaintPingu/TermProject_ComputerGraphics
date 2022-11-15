@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 class ModelObject;
+class Circle;
 
 class Map {
 private:
@@ -9,4 +10,5 @@ public:
 	Map();
 
 	GLvoid Draw();
+	GLboolean CheckCollision(const Circle* boundingCircle);
 };

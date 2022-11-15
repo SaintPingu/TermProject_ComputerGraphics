@@ -17,7 +17,7 @@
 #include <unordered_map>
 
 #include <myGL/glew.h>
-#include <myGL/freeglut.h>w
+#include <myGL/freeglut.h>
 #include <myGL/freeglut_ext.h>
 #include <myGL/glm/glm.hpp>
 #include <myGL/glm/ext.hpp>
@@ -130,7 +130,7 @@ public:
 	// for use set to glm::vec2
 	bool operator() (const glm::vec2& lhs, const glm::vec2& rhs) const
 	{
-		if (lhs.x < rhs.x)
+		if (lhs.x < rhs.x) // sort by x
 		{
 			return true;
 		}
@@ -144,11 +144,8 @@ GLvoid MultiplyVector(const glm::mat4& transform, glm::vec3& vector);
 GLvoid Rotate(glm::vec3& vector, const GLfloat& theta, const glm::vec3& axis);
 
 
-class Vector2 {
+class Vector2 : public glm::vec2 {
 public:
-	GLfloat x = 0;
-	GLfloat y = 0;
-
 	Vector2()
 	{
 		x = 0;
@@ -163,6 +160,11 @@ public:
 	{
 		this->x = static_cast<GLfloat>(x);
 		this->y = static_cast<GLfloat>(y);
+	}
+
+	inline constexpr operator glm::vec2() const
+	{
+		return { x, y };
 	}
 
 	inline Vector2 operator+(const Vector2& rhs) const
@@ -261,7 +263,7 @@ public:
 		return axisNormalized;
 	}
 
-	static inline GLvoid PrintPos(const Vector2& v)
+	static inline GLvoid PrintPos(const glm::vec2& v)
 	{
 		printf("(%.3f, %.3f)\n", v.x, v.y);
 	}
@@ -643,4 +645,5 @@ inline constexpr GLboolean IsInfinite(const GLfloat& n)
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
 
 
-void SetConsoleCursor(int x, int y);
+GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2& center, const  GLfloat& radius);
+void SetConsoleCursor(short x, short y);

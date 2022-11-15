@@ -1000,12 +1000,28 @@ GLvoid Cuboid::Draw() const
 }
 
 
-Circle::Circle(const glm::vec3* position, const GLfloat& radius)
+Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3 offset)
 {
-	this->position = position;
+	this->offset = offset;
 	this->radius = radius;
+	circle = new SharedObject(GetIdentityCircle());
+	circle->Scale(radius * 2);
+	circle->SetPivot(position);
+	circle->Move(offset);
 }
-
+GLvoid Circle::Draw() const
+{
+	circle->Draw();
+}
+glm::vec2 Circle::GetCenter() const
+{
+	glm::vec3 pos = circle->GetPosition();
+	return { pos.x, pos.z };
+}
+GLfloat Circle::GetRadius() const
+{
+	return radius;
+}
 
 
 

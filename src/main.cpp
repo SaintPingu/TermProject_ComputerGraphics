@@ -43,7 +43,7 @@ glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 // objects
 vector<IdentityObject*> objects;
 vector<IdentityObject*> minimapObjects;
-Map* map = nullptr;
+Map* crntMap = nullptr;
 Player* player = nullptr;
 
 // modes
@@ -166,7 +166,7 @@ GLvoid InitMeshes()
 		object->BindBuffers();
 	}
 
-	map = new Map();
+	crntMap = new Map();
 	player = new Player({ 0,0,0});
 }
 
@@ -188,10 +188,10 @@ GLvoid Reset()
 	cameraFree = nullptr;
 	cameraTop = nullptr;
 
-	if (map != nullptr)
+	if (crntMap != nullptr)
 	{
-		delete map;
-		map = nullptr;
+		delete crntMap;
+		crntMap = nullptr;
 	}
 	if (player != nullptr)
 	{
@@ -269,7 +269,7 @@ GLvoid DrawScene(GLvoid)
 			}
 		}
 
-		map->Draw();
+		crntMap->Draw();
 		
 		if (player != nullptr)
 		{

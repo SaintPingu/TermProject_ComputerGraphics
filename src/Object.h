@@ -285,12 +285,17 @@ public:
 
 class Circle {
 private:
-	const glm::vec3* position = nullptr;
+	SharedObject* circle = nullptr;
+
+	glm::vec3 offset = { 0,0,0 };
+
 	GLfloat radius = 0.0f;
 public:
-	Circle(const glm::vec3* position, const GLfloat& radius);
+	Circle(const glm::vec3* pivot, const GLfloat& radius, const glm::vec3 offset = { 0,0,0 });
 
 	GLvoid Draw() const;
+	glm::vec2 GetCenter() const;
+	GLfloat GetRadius() const;
 };
 
 ////////// [ OBJECTS ] //////////

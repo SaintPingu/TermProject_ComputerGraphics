@@ -3,6 +3,11 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Timer.h"
+#include "Map.h"
+
+
+// extern
+extern Map* crntMap;
 
 using namespace playerState;
 
@@ -268,34 +273,37 @@ Player::Player(const glm::vec3& position)
 {
 	this->position = position;
 	this->tpCameraPosition = position;
-	body = new SharedObject(GetIdentityPlayer());
+	object = new SharedObject(GetIdentityPlayer());
 
 	fpCamera = new Camera();
 	fpCamera->SetPivot(&this->position);
 	fpCamera->MoveY(0.7f);
 	fpCamera->SetFovY(110.0f);
-	fpCamera->SetLook(body->GetLook());
+	fpCamera->SetLook(object->GetLook());
+
+	boundingCircle = new Circle(&this->position, PLAYER_RADIUS, { 0, 2.5f, 0 });
 
 	ChangeState(State::Idle);
 }
 Player::~Player()
 {
-	delete body;
+	delete object;
 }
 
 GLvoid Player::Update()
 {
 	crntState->Update();
 
-	position = body->GetPosition();
-	tpCameraPosition = body->GetPosition();
+	position = object->GetPosition();
+	tpCameraPosition = object->GetPosition();
 	tpCameraPosition.y += 0.5f;
 	tpCameraPosition.z -= 0.5f;
-	RotatePosition(tpCameraPosition, body->GetPosition(), body->GetUp(), tpCameraPitch);
+	RotatePosition(tpCameraPosition, object->GetPosition(), object->GetUp(), tpCameraPitch);
 }
 GLvoid Player::Draw() const
 {
-	body->Draw();
+	object->Draw();
+	
 }
 GLvoid Player::DrawIcon() const
 {
@@ -312,9 +320,17 @@ GLvoid Player::ProcessKeyUp(const GLint& key)
 
 GLvoid Player::Move()
 {
-	body->MoveX(speed * dirX);
-	body->MoveY(jumpSpeed * dirY);
-	body->MoveZ(speed * dirZ);
+	if (dirX != 0.0f) object->MoveX(speed * dirX);
+	if (dirY != 0.0f) object->MoveY(jumpSpeed * dirY);
+	if (dirZ != 0.0f) object->MoveZ(speed * dirZ);
+
+	if (crntMap->CheckCollision(boundingCircle) == true)
+	{
+		printf("Collision!!\n");
+		object->MoveX(-speed * dirX);
+		object->MoveY(-jumpSpeed * dirY);
+		object->MoveZ(-speed * dirZ);
+	}
 }
 GLvoid Player::Stop()
 {
@@ -324,8 +340,8 @@ GLvoid Player::Stop()
 
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
 {
-	body->RotateLocal(yaw, pitch, roll);
-	fpCamera->SetLook(body->GetLook());
+	object->RotateLocal(yaw, pitch, roll);
+	fpCamera->SetLook(object->GetLook());
 	/*tpCamera->Look(body->GetPosition());
 	tpCameraPitch += pitch;*/
 
@@ -334,7 +350,7 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 glm::vec3 Player::GetPosition() const
 {
-	return body->GetPosition();
+	return object->GetPosition();
 }
 
 

@@ -15,5 +15,49 @@ Map::Map()
 GLvoid Map::Draw()
 {
 	object->Draw();
-	// DrawDebugWireXZ(object->GetBoundings_XZ(), 10.0f); // Draw a wireframe on the floor of the map
+}
+
+GLboolean Map::CheckCollision(const Circle* boundingCircle)
+{
+	set<glm::vec2, CompareSet> boundingMap = object->GetBoundings_XZ();
+	auto iter = boundingMap.begin();
+	glm::vec2 leftTop = *(iter++);
+	glm::vec2 leftBottom = *(iter++);
+	glm::vec2 rightBottom = *(iter++);
+	glm::vec2 rightTop = *(iter++);
+
+	glm::vec2 center = boundingCircle->GetCenter();
+	GLfloat radius = boundingCircle->GetRadius();
+
+	if (center.y - radius <= leftTop.y)
+	{
+		return true;
+	}
+	if (center.y + radius >= leftBottom.y)
+	{
+		return true;
+	}
+	if (center.x - radius < leftBottom.x)
+	{
+		if (::CheckCollision(leftTop, leftBottom, center, radius) == true)
+		{
+			return true;
+		}
+	}
+	else if (center.x + radius > rightBottom.x)
+	{
+		if (::CheckCollision(rightTop, rightBottom, center, radius) == true)
+		{
+			return true;
+		}
+	}
+
+
+	SetConsoleCursor(0, 0);
+	for (const glm::vec2& vertex : boundingMap)
+	{
+		Vector2::PrintPos(vertex);
+	}
+
+	return false;
 }

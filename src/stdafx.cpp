@@ -134,10 +134,47 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 
 
 
+GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm::vec2& center, const GLfloat& radius)
+{
+	glm::vec2 dir = end - start;	// start to end
+	glm::vec2 f = start - center;	// center to start
+
+	GLfloat a = glm::dot(dir, dir);
+	GLfloat b = 2 * glm::dot(f, dir);
+	GLfloat c = glm::dot(f, f) - (radius * radius);
+
+	GLfloat discriminant = (b * b) - 4 * a * c;
+
+	if (discriminant < 0)
+	{
+		return false; // no intersection
+	}
+	else
+	{
+		// ray didn't totally miss sphere, so there is a solution to the equation.
+
+		discriminant = sqrtf(discriminant);
+
+		// either solution may be on or off the ray so need to test both
+		// t1 is always the smaller value, because BOTH discriminant and a are non-negative.
+		GLfloat t1 = (-b - discriminant) / (2 * a);
+		GLfloat t2 = (-b + discriminant) / (2 * a);
+
+		if (t1 >= 0 && t1 <= 1)
+		{
+			return true;
+		}
+		if (t2 >= 0 && t2 <= 1)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
-
-void SetConsoleCursor(int x, int y)
+void SetConsoleCursor(short x, short y)
 {
 	COORD cursor = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
