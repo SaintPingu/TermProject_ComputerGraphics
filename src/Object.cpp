@@ -339,9 +339,9 @@ GLvoid IdentityObject::BindBuffers()
 }
 GLvoid IdentityObject::DeleteBuffers()
 {
-	glDeleteBuffers(1, &VAO);
 	glDeleteBuffers(2, &VBO[0]);
 	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &VAO);
 }
 
 GLvoid IdentityObject::Draw() const
@@ -1106,24 +1106,33 @@ GLvoid Ball::Update()
 
 
 
-
-GLvoid DrawWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color, const glm::vec3* pivot)
+// Bug : does not work correctly when a vertices size is large
+GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color, const glm::vec3* pivot)
 {
+	if (pivot != nullptr)
+	{
+		yPos += pivot->y;
+	}
+
 	Line* line = nullptr;
 
 	for (glm::vec2 v1 : vertices)
 	{
+		if (pivot != nullptr)
+		{
+			v1.x += pivot->x;
+			v1.y += pivot->z;
+		}
 		for (glm::vec2 v2 : vertices)
 		{
-			/*if (v1 == v2)
+			if (v1 == v2)
 			{
 				continue;
-			}*/
+			}
 			if (pivot != nullptr)
 			{
-				v1.x += pivot->x;
-				yPos += pivot->y;
-				v1.y += pivot->z;
+				v2.x += pivot->x;
+				v2.y += pivot->z;
 			}
 
 			line = new Line({ v1.x , yPos, v1.y }, { v2.x , yPos, v2.y });

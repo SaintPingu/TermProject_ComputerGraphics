@@ -46,8 +46,7 @@ GLvoid timer::CalculateFPS()
 	}
 
 	lastTime = crntTime;
-	/*COORD cursor = { 0,0 };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
+	/*SetConsoleCursor(0, 0);
 	printf("fps : %.3f\n", fps);
 	printf("delta time : %lf\n", deltaTime);*/
 

@@ -31,6 +31,7 @@ GLvoid Model::LoadModel(const GLchar* path)
 	GLfloat back = FLOAT_MIN;
 
 	GLchar data[128];
+	size_t count = 0;
 	while (feof(objFile) == false)
 	{
 		fscanf(objFile, "%s", data);
@@ -68,9 +69,13 @@ GLvoid Model::LoadModel(const GLchar* path)
 			}
 
 			vertices.emplace_back(vertex);
+
+			// process of floating point precision error
+			// Bug : only insert half vertices
 			vertex.x = round(vertex.x * 100) / 100.0f;
 			vertex.z = round(vertex.z * 100) / 100.0f;
 			verticesXZ.insert(glm::vec2(vertex.x, vertex.z));
+			count++;
 		}
 		else if (strcmp(data, "vt") == 0)
 		{
@@ -114,6 +119,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 	width = right - left;
 	height = top - bottom;
 	depth = back - front;
+
+	printf("%s : %d\n", path, count);
 }
 //GLvoid LoadModel(const GLchar* path)
 //{

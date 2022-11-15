@@ -345,7 +345,7 @@ GLvoid Update()
 			cameraFree->MoveGlobal({ 0, cameraSpeed, 0 });
 		}
 	}
-	else if (player != nullptr)
+	if (player != nullptr)
 	{
 		player->Update();
 	}

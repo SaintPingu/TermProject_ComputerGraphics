@@ -299,4 +299,4 @@ const Line* GetIdentityLine();
 const ModelObject* GetIdentityPlayer();
 
 ////////// [ DEBUG ] //////////
-GLvoid DrawWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);
+GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

@@ -641,3 +641,6 @@ inline constexpr GLboolean IsInfinite(const GLfloat& n)
 }
 
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
+
+
+void SetConsoleCursor(int x, int y);

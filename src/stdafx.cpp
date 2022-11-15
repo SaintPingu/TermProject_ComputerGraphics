@@ -129,3 +129,16 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 	MultiplyVector(transform, position);
 	position += pivot;
 }
+
+
+
+
+
+
+
+
+void SetConsoleCursor(int x, int y)
+{
+	COORD cursor = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
+}
