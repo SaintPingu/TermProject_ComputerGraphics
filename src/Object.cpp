@@ -281,7 +281,7 @@ GLvoid Object::ModelTransform() const
 {
 	glm::mat4 transform = GetTransform();
 	transform::Apply(shader, transform, "modelTransform");
-	transform::Apply(shader, glm::transpose(glm::inverse(transform)), "invModelTransform");
+	transform::Apply(shader, glm::transpose(glm::inverse(transform)), "normalTransform");
 }
 
 

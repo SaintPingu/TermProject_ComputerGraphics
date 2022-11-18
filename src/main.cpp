@@ -164,18 +164,17 @@ GLvoid InitMeshes()
 	line->MoveGlobal({ 0, 0, lineLength });
 	customObjects.emplace_back(line);
 
-	light = new Ball();
-	light->SetColor(ORANGE);
-	light->SetScale(2.0f);
-	light->SetPosition({ 200, 300, 200 });
-	lightObjects.emplace_back(light);
-
 	extern const Model* sphereModel;
 	ModelObject* temp = new ModelObject(sphereModel);
 	temp->SetColor(ORANGE);
-	temp->Scale(5.0f);
 	temp->SetPosition({ 0, 0, 20 });
 	lightObjects.emplace_back(temp);
+
+	// light object
+	light = new Ball();
+	light->SetColor(ORANGE);
+	light->SetPosition({ 200, 400, 200 });
+	lightObjects.emplace_back(light);
 
 	for (IdentityObject* object : customObjects)
 	{
@@ -192,6 +191,13 @@ GLvoid InitMeshes()
 
 	crntMap = new Map();
 	player = new Player({ 0,0,0});
+
+	glUseProgram(GetShaderProgram(Shader::Light));
+	ApplyLightColorRef(WHITE);
+	SetShader(Shader::Light, "light.ambient", 0.3f);
+	SetShader(Shader::Light, "light.diffuse", 1.0f);
+	SetShader(Shader::Light, "light.specular", 1.0f);
+	SetShader(Shader::Light, "light.shininess", 128.0f);
 }
 
 GLvoid Reset()
@@ -273,8 +279,6 @@ GLvoid DrawScene()
 	{
 		glPolygonMode(GL_FRONT, GL_FILL);
 	}
-	
-	glPointSize(4.0f);
 
 	SetWindow(0);
 
@@ -292,7 +296,7 @@ GLvoid DrawScene()
 	glUseProgram(GetShaderProgram(crntShader));
 	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
 	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
-	ApplyLightPos(light->GetPosition(), light->GetTransform());
+	SetShader(Shader::Light, "light.pos", light->GetPosition());
 	ApplyCameraPos(crntCamera->GetPosition());
 
 	for (const IdentityObject* object : lightObjects)
@@ -340,7 +344,7 @@ GLvoid Update()
 	// movement
 	if (cameraMain == cameraFree)
 	{
-		constexpr GLfloat cameraMovement = 0.1f;
+		constexpr GLfloat cameraMovement = 0.3f;
 		GLfloat cameraSpeed = cameraMovement;
 
 		if (IS_KEY_DOWN(KEY_UP))

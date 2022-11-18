@@ -77,6 +77,10 @@ public:
 	// transform
 	glm::mat4 GetTransform() const;
 	GLvoid ModelTransform() const;
+	inline glm::vec3 GetTransformedPos() const
+	{
+		return glm::vec3(GetTransform() * glm::vec4(position, 1.0f));
+	}
 
 	// draw
 	virtual GLvoid Draw() const abstract;
