@@ -274,14 +274,15 @@ Player::Player(const glm::vec3& position)
 	this->position = position;
 	this->tpCameraPosition = position;
 	object = new SharedObject(GetIdentityPlayer());
+	object->SetColor(WHITE);
 
 	fpCamera = new Camera();
 	fpCamera->SetPivot(&this->position);
-	fpCamera->MoveY(0.7f);
+	fpCamera->MoveY(1.8f);
 	fpCamera->SetFovY(110.0f);
 	fpCamera->SetLook(object->GetLook());
 
-	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 2.5f, 0 });
+	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 3.0f, 0 });
 	boundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);

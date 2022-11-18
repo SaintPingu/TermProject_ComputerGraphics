@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "Model.h"
 #include "Object.h"
+#include "Model.h"
+#include "Shader.h"
 #include "Transform.h"
 #include "Timer.h"
 
@@ -82,6 +83,14 @@ const glm::vec3* Object::GetRefScale() const
 GLvoid Object::Rotate(const glm::vec3& axis, const GLfloat& degree)
 {
 	rotation *= glm::angleAxis(glm::radians(degree), glm::normalize(axis));
+}
+GLvoid Object::SetRotation(const glm::vec3& axis, const GLfloat& degree)
+{
+	rotation = glm::angleAxis(glm::radians(degree), glm::normalize(axis));
+}
+GLvoid Object::SetRotation(const glm::quat& rotation)
+{
+	this->rotation = rotation;
 }
 GLvoid Object::RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree)
 {
@@ -243,7 +252,7 @@ GLvoid Object::MoveGlobal(const glm::vec3& vector)
 
 glm::mat4 Object::GetTransform() const
 {
-	glm::mat4 transform = glm::mat4(1.0f);
+	glm::mat4 transform = transform::GetWorld();
 
 	if (pivot != nullptr)
 	{
@@ -270,9 +279,9 @@ glm::mat4 Object::GetTransform() const
 }
 GLvoid Object::ModelTransform() const
 {
-	glm::mat4 transform = transform::GetWorld();
-	transform *= GetTransform();
-	transform::Apply(transform, "modelTransform");
+	glm::mat4 transform = GetTransform();
+	transform::Apply(shader, transform, "modelTransform");
+	transform::Apply(shader, glm::transpose(glm::inverse(transform)), "invModelTransform");
 }
 
 
@@ -295,6 +304,8 @@ GLvoid IdentityObject::InitValues()
 	VBO[0] = 0;
 	VBO[1] = 0;
 	EBO = 0;
+
+	SetShader(Shader::Light);
 }
 GLvoid IdentityObject::InitBuffers()
 {
@@ -302,17 +313,34 @@ GLvoid IdentityObject::InitBuffers()
 	glGenBuffers(2, &VBO[0]);
 	glGenBuffers(1, &EBO);
 }
-
+GLvoid IdentityObject::DeleteBuffers()
+{
+	glDeleteBuffers(2, &VBO[0]);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &VAO);
+}
 
 GLvoid IdentityObject::BindBuffers()
 {
 	vector<GLfloat> vertices;
-	vector<GLfloat> colors;
+	vector<GLfloat> normals;
 	vector<size_t> indices;
 
 	PullVertices(vertices);
-	PullColors(colors);
 	PullIndices(indices);
+
+	switch (shader)
+	{
+	case Shader::Color:
+		PullColors(normals);
+		break;
+	case Shader::Light:
+		PullNormals(normals);
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 	glBindVertexArray(VAO);
 
@@ -322,7 +350,7 @@ GLvoid IdentityObject::BindBuffers()
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * colors.size(), colors.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * normals.size(), normals.data(), GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1);
 
@@ -338,17 +366,21 @@ GLvoid IdentityObject::BindBuffers()
 
 	glBindVertexArray(0);
 }
-GLvoid IdentityObject::DeleteBuffers()
+
+GLvoid IdentityObject::SetColor(const COLORREF& color)
 {
-	glDeleteBuffers(2, &VBO[0]);
-	glDeleteBuffers(1, &EBO);
-	glDeleteVertexArrays(1, &VAO);
+	this->color = MyColor(color);
 }
 
 GLvoid IdentityObject::Draw() const
 {
 	const size_t indexCount = GetIndexCount();
 	IdentityObject::ModelTransform();
+
+	if (shader == Shader::Light)
+	{
+		ApplyObjectColor(color);
+	}
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
@@ -375,6 +407,7 @@ GLfloat IdentityObject::GetDepth() const
 SharedObject::SharedObject(const IdentityObject* object)
 {
 	SetObject(object);
+	this->shader = object->GetShader();
 }
 
 GLvoid SharedObject::Draw() const
@@ -382,9 +415,9 @@ GLvoid SharedObject::Draw() const
 	const size_t indexCount = this->object->GetIndexCount();
 	SharedObject::ModelTransform();
 
-	if (isChangeColor)
+	if (shader == Shader::Light)
 	{
-		transform::ApplyColor(color);
+		ApplyObjectColor(color);
 	}
 
 	glBindVertexArray(this->object->GetVAO());
@@ -409,23 +442,12 @@ GLvoid SharedObject::Draw() const
 		}
 	}
 	glBindVertexArray(0);
-
-	if (isChangeColor)
-	{
-		transform::DisableColor();
-	}
 }
 
 GLvoid SharedObject::SetColor(const COLORREF& color)
 {
 	this->color = MyColor(color);
-	isChangeColor = true;
 }
-GLvoid SharedObject::DisableColor()
-{
-	isChangeColor = false;
-}
-
 
 
 
@@ -450,13 +472,15 @@ GLvoid ModelObject::LoadModel(const Model* model)
 	InitBuffers();
 	this->model = model;
 }
-GLvoid ModelObject::PullColors(vector<GLfloat>& colors) const
+GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 {
-	for (size_t i = 0; i < this->colors.size(); ++i)
+	const vector<glm::vec3> objectNormals = model->GetNormals();
+
+	for (size_t i = 0; i < objectNormals.size(); ++i)
 	{
-		colors.emplace_back(this->colors[i].r);
-		colors.emplace_back(this->colors[i].g);
-		colors.emplace_back(this->colors[i].b);
+		normals.emplace_back(objectNormals[i].x);
+		normals.emplace_back(objectNormals[i].y);
+		normals.emplace_back(objectNormals[i].z);
 	}
 }
 GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
@@ -571,39 +595,6 @@ GLfloat ModelObject::GetDepth() const
 	GLfloat depth = model->GetDepth();
 	return depth * scale.z;
 }
-
-GLvoid ModelObject::ClearColor()
-{
-	colors.clear();
-	colors.reserve(model->GetVertexCount());
-}
-GLvoid ModelObject::SetColor(const COLORREF& color)
-{
-	ClearColor();
-
-	MyColor myColor;
-	myColor.SetColor(color);
-	for (size_t i = 0; i < model->GetVertexCount(); ++i)
-	{
-		colors.emplace_back(myColor);
-	}
-}
-GLvoid ModelObject::SetColor(const size_t& index, const MyColor& color)
-{
-	::CheckOutOfIndex(index, colors.size());
-
-	colors[index] = color;
-}
-GLvoid ModelObject::RandomizeColor()
-{
-	ClearColor();
-	for (size_t i = 0; i < model->GetVertexCount(); ++i)
-	{
-		MyColor color;
-		color.Randomize();
-		colors.emplace_back(color);
-	}
-}
 GLrect ModelObject::GetXZRect() const
 {
 	Cuboid cuboid(&position, &scale, GetWidth(), GetHeight(), GetDepth());
@@ -619,11 +610,11 @@ set<glm::vec2, CompareSet> ModelObject::GetBoundings_XZ() const
 ///// private /////
 GLvoid CustomObject::PullColors(vector<GLfloat>& colors) const
 {
-	for (size_t i = 0; i < this->colors.size(); ++i)
+	for (size_t i = 0; i < this->vertices.size(); ++i)
 	{
-		colors.emplace_back(this->colors[i].r);
-		colors.emplace_back(this->colors[i].g);
-		colors.emplace_back(this->colors[i].b);
+		colors.emplace_back(color.r);
+		colors.emplace_back(color.g);
+		colors.emplace_back(color.b);
 	}
 }
 GLvoid CustomObject::PullVertices(vector<GLfloat>& vertices) const
@@ -656,33 +647,17 @@ size_t CustomObject::GetVertexCount() const
 CustomObject::CustomObject()
 {
 	IdentityObject::InitValues();
-	InitBuffers();
+	IdentityObject::InitBuffers();
+	SetShader(Shader::Color);
 }
 CustomObject::CustomObject(vector<glm::vec3>& vertices) : CustomObject()
 {
 	this->vertices = vertices;
-	colors.resize(vertices.size());
 }
 CustomObject::CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices) : CustomObject(vertices)
 {
 	this->indices = indices;
 }
-GLvoid CustomObject::SetColor(const COLORREF& color)
-{
-	colors.clear();
-	colors.resize(vertices.size());
-	for (size_t i = 0; i < colors.size(); ++i)
-	{
-		colors[i].SetColor(color);
-	}
-}
-GLvoid CustomObject::SetColor(const size_t& index, const COLORREF& color)
-{
-	::CheckOutOfIndex(index, colors.size());
-
-	colors[index].SetColor(color);
-}
-
 
 
 

@@ -25,6 +25,7 @@ public:
 	}
 
 	const vector<glm::vec3>& GetVertices() const;
+	const vector<glm::vec3>& GetNormals() const;
 	const vector<size_t>& GetIndices() const;
 	size_t GetVertexCount() const;
 	size_t GetIndexCount() const;

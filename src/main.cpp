@@ -16,7 +16,7 @@ GLboolean isFirstPerson = false;
 
 GLvoid Init();
 GLvoid InitMeshes();
-GLvoid DrawScene(GLvoid);
+GLvoid DrawScene();
 
 GLvoid Update();
 GLvoid Mouse(GLint button, GLint state, GLint x, GLint y);
@@ -35,13 +35,17 @@ GLint screenWidth = DEFAULT_SCREEN_WIDTH;
 GLint screenHeight = DEFAULT_SCREEN_HEIGHT;
 GLboolean isMultiWindow = false;
 
-
 // world
 glm::vec3 worldPosition(0.0f, 0.0f, 0.0f);
 glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 
+// lights
+Ball* light = nullptr;
+MyColor lightColor;
+
 // objects
-vector<IdentityObject*> objects;
+vector<IdentityObject*> customObjects;
+vector<IdentityObject*> lightObjects;
 vector<IdentityObject*> minimapObjects;
 Map* crntMap = nullptr;
 Player* player = nullptr;
@@ -68,6 +72,7 @@ GLint main(GLint argc, GLchar** argv)
 	glutInitWindowPosition(DEFAULT_SCREEN_POS_X, DEFAULT_SCREEN_POS_Y);
 	glutInitWindowSize(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
+	glShadeModel(GL_SMOOTH);
 	glutCreateWindow("TestProject");
 
 	glewExperimental = GL_TRUE;
@@ -106,7 +111,6 @@ GLvoid Init()
 {
 	glewInit();
 	InitShader();
-
 	InitMeshes();
 
 	timer::Init();
@@ -128,6 +132,9 @@ GLvoid Init()
 	crntCamera = cameraMain;
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
+
+	lightColor.SetColor(WHITE);
+	ApplyLightColor(lightColor);
 }
 
 GLvoid InitMeshes()
@@ -141,23 +148,40 @@ GLvoid InitMeshes()
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(RED);
 	line->MoveGlobal({ lineLength, 0, 0 });
-	objects.emplace_back(line);
+	customObjects.emplace_back(line);
 
 	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
 	vectorLine_2 = { 0.0f, lineLength, 0.0f };
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(GREEN);
 	line->MoveGlobal({ 0, lineLength, 0 });
-	objects.emplace_back(line);
+	customObjects.emplace_back(line);
 
 	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
 	vectorLine_2 = { 0.0f, 0.0f, lineLength };
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(BLUE);
 	line->MoveGlobal({ 0, 0, lineLength });
-	objects.emplace_back(line);
+	customObjects.emplace_back(line);
 
-	for (IdentityObject* object : objects)
+	light = new Ball();
+	light->SetColor(ORANGE);
+	light->SetScale(2.0f);
+	light->SetPosition({ 200, 300, 200 });
+	lightObjects.emplace_back(light);
+
+	extern const Model* sphereModel;
+	ModelObject* temp = new ModelObject(sphereModel);
+	temp->SetColor(ORANGE);
+	temp->Scale(5.0f);
+	temp->SetPosition({ 0, 0, 20 });
+	lightObjects.emplace_back(temp);
+
+	for (IdentityObject* object : customObjects)
+	{
+		object->BindBuffers();
+	}
+	for (IdentityObject* object : lightObjects)
 	{
 		object->BindBuffers();
 	}
@@ -172,7 +196,11 @@ GLvoid InitMeshes()
 
 GLvoid Reset()
 {
-	for (IdentityObject* object : objects)
+	for (IdentityObject* object : customObjects)
+	{
+		delete object;
+	}
+	for (IdentityObject* object : lightObjects)
 	{
 		delete object;
 	}
@@ -180,7 +208,8 @@ GLvoid Reset()
 	{
 		delete object;
 	}
-	objects.clear();
+	customObjects.clear();
+	lightObjects.clear();
 	minimapObjects.clear();
 
 	delete cameraFree;
@@ -232,7 +261,7 @@ GLvoid SetWindow(GLint index)
 	}
 }
 
-GLvoid DrawScene(GLvoid)
+GLvoid DrawScene()
 {
 	glClearColor(backColor.r, backColor.g, backColor.b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -245,51 +274,43 @@ GLvoid DrawScene(GLvoid)
 		glPolygonMode(GL_FRONT, GL_FILL);
 	}
 	
-	glUseProgram(GetShaderProgram());
 	glPointSize(4.0f);
 
-	for (size_t i = 0; i < 2; ++i)
+	SetWindow(0);
+
+	Shader crntShader = Shader::Color;
+	glUseProgram(GetShaderProgram(crntShader));
+	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
+	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
+	for (const IdentityObject* object : customObjects)
 	{
-		SetWindow(i);
+		object->Draw();
+	}
 
-		transform::Apply(transform::GetWorld(), "modelTransform");
-		transform::Apply(transform::GetView(crntCamera), "viewTransform");
-		transform::Apply(transform::GetProj(crntCamera), "projTransform");
 
-		for (const IdentityObject* object : objects)
-		{
-			object->Draw();
-		}
+	crntShader = Shader::Light;
+	glUseProgram(GetShaderProgram(crntShader));
+	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
+	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
+	ApplyLightPos(light->GetPosition(), light->GetTransform());
+	ApplyCameraPos(crntCamera->GetPosition());
 
-		if (i == 1)
-		{
-			for (const IdentityObject* object : minimapObjects)
-			{
-				object->Draw();
-			}
-		}
+	for (const IdentityObject* object : lightObjects)
+	{
+		object->Draw();
+	}
 
-		crntMap->Draw();
+	crntMap->Draw();
 		
-		if (player != nullptr)
+	if (player != nullptr)
+	{
+		if (!isFirstPerson)
 		{
-			if (i == 0)
-			{
-				if (!isFirstPerson)
-				{
-					player->Draw();
-				}
-			}
-			else
-			{
-				player->DrawIcon();
-			}
+			player->Draw();
 		}
-		
 	}
 
 	glBindVertexArray(0);
-
 	glutSwapBuffers();
 }
 
@@ -322,7 +343,7 @@ GLvoid Update()
 		constexpr GLfloat cameraMovement = 0.1f;
 		GLfloat cameraSpeed = cameraMovement;
 
-		if (IS_KEY_DOWN(VK_UP))
+		if (IS_KEY_DOWN(KEY_UP))
 		{
 			cameraFree->MoveZ(cameraSpeed);
 		}
@@ -338,11 +359,11 @@ GLvoid Update()
 		{
 			cameraFree->MoveX(cameraSpeed);
 		}
-		if (IS_KEY_DOWN(KEY_CTRL))
+		if (IS_KEY_DOWN(VK_NEXT))
 		{
 			cameraFree->MoveGlobal({ 0, -cameraSpeed, 0 });
 		}
-		if (IS_KEY_DOWN(KEY_SPACE))
+		if (IS_KEY_DOWN(VK_PRIOR))
 		{
 			cameraFree->MoveGlobal({ 0, cameraSpeed, 0 });
 		}
@@ -457,7 +478,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		ToggleDepthTest();
 		break;
 
-		// camear
+		// camera
 	case '1':
 		cameraMain = cameraFree;
 		isFirstPerson = false;
@@ -469,13 +490,13 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 			isFirstPerson = true;
 		}
 		break;
-	case '3':
-		if (player != nullptr)
-		{
-			cameraMain = player->GetThirdPersonCamera();
-			isFirstPerson = false;
-		}
-		break;
+	//case '3':
+	//	if (player != nullptr)
+	//	{
+	//		cameraMain = player->GetThirdPersonCamera();
+	//		isFirstPerson = false;
+	//	}
+	//	break;
 		// objects
 
 	

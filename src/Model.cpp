@@ -2,10 +2,10 @@
 #include "model.h"
 #include "object.h"
 
-const Model* mapModel = new Model("obj\\map.obj");
-const Model* playerModel = new Model("obj\\player.obj");
-const Model* cubeModel = new Model("obj\\cube.obj");
-const Model* sphereModel = new Model("obj\\sphere.obj");
+const Model* mapModel = new Model("obj\\map2.obj");
+const Model* playerModel = new Model("obj\\tank.obj");
+const Model* cubeModel = new Model("obj\\cube2.obj");
+const Model* sphereModel = new Model("obj\\GeoSphere.obj");
 const Model* circleModel = new Model("obj\\circle.obj");
 
 Model::Model(const GLchar* path)
@@ -21,6 +21,7 @@ GLvoid Model::LoadModel(const GLchar* path)
 		assert(0);
 		return;
 	}
+	printf("Load Model : %s\n", path);
 
 	GLfloat left = FLOAT_MAX;
 	GLfloat right = FLOAT_MIN;
@@ -184,6 +185,10 @@ GLvoid Model::LoadModel(const GLchar* path)
 const vector<glm::vec3>& Model::GetVertices() const
 {
 	return vertices;
+}
+const vector<glm::vec3>& Model::GetNormals() const
+{
+	return normals;
 }
 size_t Model::GetVertexCount() const
 {

@@ -84,4 +84,18 @@
       <Filter>PCH</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\light_fragment.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\light_vertex.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\vertex.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\fragment.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
 </Project>

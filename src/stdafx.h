@@ -108,11 +108,14 @@
 #define DEFAULT_SCREEN_WIDTH 900
 #define DEFAULT_SCREEN_HEIGHT 900
 
+#define NUM_OF_SHADER 2
+
 using namespace std;
 
 enum class Event { None, KeyDown, KeyUp };
-
+enum class Shader { Color = 0, Light, None };	// 'None' must be positioned at last
 enum class Dir { None, Left, Right, Up, Down, Front, Back };
+
 static unordered_map<Dir, Dir> dir_opposite = {
 	{Dir::Left, Dir::Right},
 	{Dir::Right, Dir::Left},

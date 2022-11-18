@@ -2,29 +2,92 @@
 #include "Shader.h"
 #include "File.h"
 
-static GLint shaderProgram = 0;
-static GLint vertexShader = 0;
-static GLint fragmentShader = 0;
+static GLint shaders[NUM_OF_SHADER];
+
+GLint Make_ShaderProgram(const Shader& shader);
+GLint Make_VertexShaders(const string& name);
+GLint Make_FragmentShaders(const string& name);
 
 GLvoid InitShader()
 {
-	shaderProgram = Make_ShaderProgram();
+	for (GLsizei i = 0; i < NUM_OF_SHADER; ++i)
+	{
+		const Shader shader = static_cast<Shader>(i);
+		GLint* shaderProgram = &shaders[i];
+		*shaderProgram = Make_ShaderProgram(shader);
+
+		if (shader == Shader::Light)
+		{
+			glUseProgram(*shaderProgram);
+			unsigned int lightColorLocation = glGetUniformLocation(*shaderProgram, "lightColor");
+			glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
+		}
+	}
 }
-GLint GetShaderProgram()
+GLint GetShaderProgram(const Shader& shader)
 {
-	return shaderProgram;
+	return shaders[static_cast<GLint>(shader)];
 }
 
-GLvoid Make_VertexShaders()
+GLint Make_ShaderProgram(const Shader& shader)
+{
+	string vertexShaderName;
+	string fragShaderName;
+	switch (shader)
+	{
+	case Shader::Color:
+		vertexShaderName = "vertex.glsl";
+		fragShaderName = "fragment.glsl";
+		break;
+	case Shader::Light:
+		vertexShaderName = "light_vertex.glsl";
+		fragShaderName = "light_fragment.glsl";
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	GLint vertexShader = Make_VertexShaders(vertexShaderName);
+	GLint fragShader = Make_FragmentShaders(fragShaderName);
+
+	GLint ShaderProgramID = glCreateProgram();
+
+	glAttachShader(ShaderProgramID, vertexShader);
+	glAttachShader(ShaderProgramID, fragShader);
+
+	glLinkProgram(ShaderProgramID);
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragShader);
+
+	GLint result;
+	GLchar errorLog[512];
+	glGetProgramiv(ShaderProgramID, GL_LINK_STATUS, &result);
+	if (!result)
+	{
+		glGetProgramInfoLog(ShaderProgramID, 512, NULL, errorLog);
+		std::cerr << "[ ERROR ] make shader program\n";
+		assert(0);
+	}
+
+	return ShaderProgramID;
+}
+
+GLint Make_VertexShaders(const string& name)
 {
 	GLchar* vertexSource = nullptr;
-	vertexSource = FileToBuffer("shaders\\vertex.glsl");
+
+	const string path = "shaders\\" + name;
+
+	vertexSource = FileToBuffer(path.c_str());
 	if (vertexSource == nullptr)
 	{
 		assert(0);
 	}
+	cout << "Load Vertex Shader: " << path << endl;
 
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	GLint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, (const GLchar**)&vertexSource, NULL);
 	glCompileShader(vertexShader);
 
@@ -35,58 +98,61 @@ GLvoid Make_VertexShaders()
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
 		std::cerr << "[ ERROR ] make vertex shaders\n";
-		return;
+		printf("Vertex Error : %s\n", errorLog);
+		assert(0);
 	}
+
+	return vertexShader;
 }
-GLvoid Make_FragmentShaders()
+GLint Make_FragmentShaders(const string& name)
 {
 	GLchar* fragmentSource = nullptr;
-	fragmentSource = FileToBuffer("shaders\\fragment.glsl");
+	const string path = "shaders\\" + name;
+
+	fragmentSource = FileToBuffer(path.c_str());
 	if (fragmentSource == nullptr)
 	{
 		assert(0);
 	}
+	cout << "Load Fragment Shader : " << path << endl;
 
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentSource, NULL);
-	glCompileShader(fragmentShader);
+	GLint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragShader, 1, (const GLchar**)&fragmentSource, NULL);
+	glCompileShader(fragShader);
 
 	GLint result;
 	GLchar errorLog[512];
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, errorLog);
+		glGetShaderInfoLog(fragShader, 512, NULL, errorLog);
 		std::cerr << "[ ERROR ] make fragment shaders\n";
-		return;
+		printf("Fragment Error : %s\n", errorLog);
+		assert(0);
 	}
+
+	return fragShader;
 }
 
-GLint Make_ShaderProgram()
+GLvoid ApplyLightPos(const glm::vec3& lightPos, const glm::mat4& transform)
 {
-	Make_VertexShaders();
-	Make_FragmentShaders();
-
-	GLint ShaderProgramID = glCreateProgram();
-
-	glAttachShader(ShaderProgramID, vertexShader);
-	glAttachShader(ShaderProgramID, fragmentShader);
-
-	glLinkProgram(ShaderProgramID);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	GLint result;
-	GLchar errorLog[512];
-	glGetProgramiv(ShaderProgramID, GL_LINK_STATUS, &result);
-	if (!result)
-	{
-		glGetProgramInfoLog(ShaderProgramID, 512, NULL, errorLog);
-		std::cerr << "[ ERROR ] make shader program\n";
-		return false;
-	}
-	glUseProgram(ShaderProgramID);
-
-	return ShaderProgramID;
+	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "lightPos");
+	glUniform3f(lightPosLocation, lightPos.x, lightPos.y, lightPos.z);
+	unsigned int lightTransformLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "lightTransform");
+	glUniformMatrix4fv(lightTransformLocation, 1, GL_FALSE, glm::value_ptr(transform));
+}
+GLvoid ApplyLightColor(const glm::vec3& color)
+{
+	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "lightColor");
+	glUniform3f(lightPosLocation, color.r, color.g, color.b);
+}
+GLvoid ApplyCameraPos(const glm::vec3& cameraPos)
+{
+	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "viewPos");
+	glUniform3f(lightPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
+}
+GLvoid ApplyObjectColor(const glm::vec3& color)
+{
+	unsigned int objColorLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "objectColor");
+	glUniform3f(objColorLocation, color.r, color.g, color.b);
 }

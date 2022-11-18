@@ -123,6 +123,10 @@ public:
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
 
 	// Variables
+	const glm::vec3* GetRefPos() const
+	{
+		return &position;
+	}
 	glm::vec3 GetPosition() const;
 	inline constexpr Camera* GetFirstPersonCamera()
 	{

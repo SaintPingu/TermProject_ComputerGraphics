@@ -6,9 +6,9 @@
 
 glm::mat4 transform::GetWorld()
 {
-	glm::mat4 transform = glm::mat4(1.0f);
+	// glm::mat4 transform = glm::mat4(1.0f);
 
-	return transform;
+	return glm::mat4(1.0f);
 }
 
 glm::mat4 transform::GetView(const Camera* camera)
@@ -27,7 +27,7 @@ glm::mat4 transform::GetView(const Camera* camera)
 extern glm::vec3 worldPosition;
 glm::mat4 transform::GetProj(const Camera* camera)
 {
-	constexpr GLfloat farLength = 500;
+	constexpr GLfloat farLength = 1500;
 
 	const glm::vec3 cameraPos = camera->GetPosition();
 	const GLfloat size = glm::length(worldPosition - cameraPos) / 2;
@@ -47,33 +47,20 @@ glm::mat4 transform::GetProj(const Camera* camera)
 
 
 
-GLvoid transform::Apply(const glm::mat4& transform, const GLchar* name)
+GLvoid transform::Apply(const Shader& shader, const glm::mat4& transform, const GLchar* name)
 {
-	const GLint shaderID = GetShaderProgram();
+	const GLint shaderID = GetShaderProgram(shader);
 	const GLint location = glGetUniformLocation(shaderID, name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 }
-GLvoid transform::Disable(const GLchar* name)
+GLvoid transform::Apply(const Shader& shader, const glm::vec3& vector, const GLchar* name)
+{
+	unsigned int location = glGetUniformLocation(GetShaderProgram(shader), name);
+	glUniform3f(location, vector.x, vector.y, vector.z);
+}
+GLvoid transform::Disable(const Shader& shader, const GLchar* name)
 {
 	const glm::mat4 transform = glm::mat4(1.0f);
-	const GLint modelLocation = glGetUniformLocation(GetShaderProgram(), name);
+	const GLint modelLocation = glGetUniformLocation(GetShaderProgram(shader), name);
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-}
-
-
-GLvoid transform::ApplyColor(const glm::vec3& color)
-{
-	const GLchar* name = "newColor";
-	const GLint shaderID = GetShaderProgram();
-	GLint location = glGetUniformLocation(shaderID, name);
-	glUniform3fv(location, 1, glm::value_ptr(color));
-
-	location = glGetUniformLocation(shaderID, "isChangeColor");
-	glUniform1i(location, true);
-}
-GLvoid transform::DisableColor()
-{
-	const GLint shaderID = GetShaderProgram();
-	const GLint location = glGetUniformLocation(shaderID, "isChangeColor");
-	glUniform1i(location, false);
 }

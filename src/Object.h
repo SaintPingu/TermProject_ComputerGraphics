@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
 class Model;
-
+enum class Shader;
 
 ////////// [ TOP ROOT ] //////////
 class Object abstract {
 protected:
+	Shader shader = Shader::None;
+
 	glm::vec3 position = { 0, 0, 0 };
 	glm::vec3 scale = { 0, 0, 0 };
 	glm::vec3 scaleOrigin = { 0, 0, 0 };
@@ -38,6 +40,8 @@ public:
 
 	// rotation
 	GLvoid Rotate(const glm::vec3& axis, const GLfloat& degree);
+	GLvoid SetRotation(const glm::vec3& axis, const GLfloat& degree);
+	GLvoid SetRotation(const glm::quat& rotation);
 	GLvoid RotateLocal(const glm::vec3& axis, const GLfloat& degree);
 	GLvoid RotateLocal(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
 	GLvoid RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
@@ -76,6 +80,15 @@ public:
 
 	// draw
 	virtual GLvoid Draw() const abstract;
+
+	inline constexpr Shader GetShader() const
+	{
+		return shader;
+	}
+	inline constexpr GLvoid SetShader(const Shader& shader)
+	{
+		this->shader = shader;
+	}
 };
 
 
@@ -87,7 +100,10 @@ protected:
 	GLuint VBO[2] = { 0,0 };
 	GLuint EBO = 0;
 
+	MyColor color;
+
 	virtual GLvoid PullColors(vector<GLfloat>& colors) const abstract;
+	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
 	virtual GLvoid PullVertices(vector<GLfloat>& vertices) const abstract;
 	virtual GLvoid PullIndices(vector<size_t>& vertexIndices) const abstract;
 
@@ -105,9 +121,16 @@ public:
 	// buffers
 	virtual size_t GetIndexCount() const abstract;
 	virtual size_t GetVertexCount() const abstract;
+
+	virtual GLvoid SetColor(const COLORREF& color);
+
 	inline constexpr const GLuint& GetVAO() const
 	{
 		return VAO;
+	}
+	inline MyColor GetColor() const
+	{
+		return color;
 	}
 
 	// draw
@@ -130,7 +153,6 @@ public:
 	GLvoid Draw() const;
 
 	GLvoid SetColor(const COLORREF& color);
-	GLvoid DisableColor();
 	inline constexpr const IdentityObject* GetIdentityObject() const
 	{
 		return object;
@@ -145,9 +167,9 @@ public:
 class ModelObject : public IdentityObject {
 protected:
 	const Model* model = nullptr;
-	vector<MyColor> colors;
 
-	GLvoid PullColors(vector<GLfloat>& colors) const;
+	GLvoid PullColors(vector<GLfloat>& colors) const {};
+	GLvoid PullNormals(vector<GLfloat>& normals) const;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
 public:
@@ -165,12 +187,6 @@ public:
 	GLfloat GetHeight() const;
 	GLfloat GetDepth() const;
 
-	// colors
-	GLvoid ClearColor();
-	GLvoid SetColor(const COLORREF& color);
-	GLvoid SetColor(const size_t& index, const MyColor& color);
-	GLvoid RandomizeColor();
-
 	// collision
 	GLrect GetXZRect() const;
 	set<glm::vec2, CompareSet> GetBoundings_XZ() const;
@@ -180,8 +196,8 @@ class CustomObject : public IdentityObject {
 protected:
 	vector<glm::vec3> vertices;
 	vector<size_t> indices;
-	vector<MyColor> colors;
 
+	GLvoid PullNormals(vector<GLfloat>& normals) const {};
 	GLvoid PullColors(vector<GLfloat>& colors) const;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
@@ -193,10 +209,6 @@ public:
 	// buffers
 	size_t GetIndexCount() const;
 	size_t GetVertexCount() const;
-
-	// colors
-	GLvoid SetColor(const COLORREF& color);
-	GLvoid SetColor(const size_t& index, const COLORREF& color);
 };
 
 
@@ -251,7 +263,6 @@ public:
 class Ball : public ModelObject {
 private:
 	GLfloat speed = 1.0f;
-	set<const Plane*> interPlanes;
 public:
 	glm::vec3 vector = { 0,0,0 };
 	Ball();
