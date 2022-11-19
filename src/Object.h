@@ -38,6 +38,7 @@ public:
 
 	// rotation
 	GLvoid Rotate(const glm::vec3& axis, const GLfloat& degree);
+	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
 	GLvoid SetRotation(const glm::vec3& axis, const GLfloat& degree);
 	GLvoid SetRotation(const glm::quat& rotation);
 	GLvoid RotateLocal(const glm::vec3& axis, const GLfloat& degree);
@@ -368,6 +369,7 @@ const ModelObject* GetIdentityCircle();
 const Cube* GetIdentityCube();
 const Sphere* GetIdentitySphere();
 const ModelObject* GetIdentityPlayer();
+const ModelObject* GetIdentityGun();
 
 
 

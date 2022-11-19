@@ -8,6 +8,8 @@ const Model* cubeModel = new Model("obj\\cube.obj");
 const Model* sphereModel = new Model("obj\\GeoSphere.obj");
 const Model* circleModel = new Model("obj\\circle.obj");
 
+const Model* gunModel = new Model("obj\\gun.obj");
+
 Model::Model(const GLchar* path)
 {
 	LoadModel(path);

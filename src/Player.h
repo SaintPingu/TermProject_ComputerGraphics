@@ -76,6 +76,7 @@ private:
 
 
 	SharedObject* object = nullptr;
+	SharedObject* gun = nullptr;
 	Camera* fpCamera = nullptr;
 	Camera* tpCamera = nullptr;
 
@@ -103,7 +104,7 @@ public:
 
 	// Frame
 	GLvoid Update();
-	GLvoid Draw() const;
+	GLvoid Draw(const GLboolean& isFirstPerson) const;
 	GLvoid DrawIcon() const;
 
 	// Process

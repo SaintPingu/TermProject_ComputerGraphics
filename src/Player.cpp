@@ -182,7 +182,51 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ////////////////////////////// [ Player ] //////////////////////////////
+Player::Player(const glm::vec3& position)
+{
+	this->position = position;
+	this->tpCameraPosition = position;
+	object = new SharedObject(GetIdentityPlayer());
+	object->SetColor(WHITE);
+
+	gun = new SharedObject(GetIdentityGun());
+	gun->SetColor(YELLOW);
+	gun->SetPivot(&this->position);
+	gun->SetRotationPivot(&this->position);
+	gun->SetPosition({ -10, 10, 5 });
+
+	fpCamera = new Camera();
+	fpCamera->SetPivot(&this->position);
+	fpCamera->MoveY(1.8f);
+	fpCamera->SetFovY(110.0f);
+	fpCamera->SetLook(object->GetLook());
+
+	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 3.0f, 0 });
+	boundingCircle->SetColor(BLUE);
+
+	ChangeState(State::Idle);
+}
+Player::~Player()
+{
+	delete object;
+}
+
+
+
 GLvoid Player::AddDir(const GLint& key)
 {
 	switch (key)
@@ -269,28 +313,7 @@ GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint
 
 
 
-Player::Player(const glm::vec3& position)
-{
-	this->position = position;
-	this->tpCameraPosition = position;
-	object = new SharedObject(GetIdentityPlayer());
-	object->SetColor(WHITE);
 
-	fpCamera = new Camera();
-	fpCamera->SetPivot(&this->position);
-	fpCamera->MoveY(1.8f);
-	fpCamera->SetFovY(110.0f);
-	fpCamera->SetLook(object->GetLook());
-
-	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 3.0f, 0 });
-	boundingCircle->SetColor(BLUE);
-
-	ChangeState(State::Idle);
-}
-Player::~Player()
-{
-	delete object;
-}
 
 GLvoid Player::Update()
 {
@@ -302,8 +325,14 @@ GLvoid Player::Update()
 	tpCameraPosition.z -= 0.5f;
 	RotatePosition(tpCameraPosition, object->GetPosition(), object->GetUp(), tpCameraPitch);
 }
-GLvoid Player::Draw() const
+GLvoid Player::Draw(const GLboolean& isFirstPerson) const
 {
+	gun->Draw();
+	if (isFirstPerson)
+	{
+		return;
+	}
+
 	object->Draw();
 	boundingCircle->Draw();
 }
@@ -343,6 +372,7 @@ GLvoid Player::Stop()
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
 {
 	object->RotateLocal(yaw, pitch, roll);
+	gun->Rotate(yaw, pitch, roll);
 	fpCamera->SetLook(object->GetLook());
 	/*tpCamera->Look(body->GetPosition());
 	tpCameraPitch += pitch;*/

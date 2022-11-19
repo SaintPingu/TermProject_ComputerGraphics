@@ -9,6 +9,7 @@ extern const Model* cubeModel;
 extern const Model* sphereModel;
 extern const Model* playerModel;
 extern const Model* circleModel;
+extern const Model* gunModel;
 
 
 
@@ -16,6 +17,28 @@ extern const Model* circleModel;
 GLvoid Object::Rotate(const glm::vec3& axis, const GLfloat& degree)
 {
 	rotation *= glm::angleAxis(glm::radians(degree), glm::normalize(axis));
+	::Rotate(look, glm::radians(degree), axis);
+}
+GLvoid Object::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
+{
+	if (yaw != 0.0f)
+	{
+		glm::vec3 axis = GetRight();
+		rotation *= glm::angleAxis(glm::radians(yaw), axis);
+		::Rotate(look, glm::radians(yaw), axis);
+	}
+	if (pitch != 0.0f)
+	{
+		glm::vec3 axis = GetUp();
+		rotation *= glm::angleAxis(glm::radians(pitch), axis);
+		::Rotate(look, glm::radians(pitch), axis);
+	}
+	if (roll != 0.0f)
+	{
+		glm::vec3 axis = GetLook();
+		rotation *= glm::angleAxis(glm::radians(roll), axis);
+		::Rotate(look, glm::radians(roll), axis);
+	}
 }
 GLvoid Object::SetRotation(const glm::vec3& axis, const GLfloat& degree)
 {
@@ -286,9 +309,18 @@ glm::mat4 ShaderObject::GetTransform() const
 	}
 	else
 	{
-		transform = glm::translate(transform, -*rotationPivot);
-		transform *= glm::mat4_cast(localRotation);
-		transform = glm::translate(transform, *rotationPivot);
+		if (pivot == nullptr)
+		{
+			transform = glm::translate(transform, -*rotationPivot);
+			transform *= glm::mat4_cast(localRotation);
+			transform = glm::translate(transform, *rotationPivot);
+		}
+		else
+		{
+			transform = glm::translate(transform, -*rotationPivot + (*pivot));
+			transform *= glm::mat4_cast(localRotation);
+			transform = glm::translate(transform, *rotationPivot - (*pivot));
+		}
 	}
 
 	transform = glm::scale(transform, scale);
@@ -1164,6 +1196,7 @@ static ModelObject* circleObject = nullptr;
 static Cube* cubeObject = nullptr;
 static Sphere* sphereObject = nullptr;
 static ModelObject* playerObject = nullptr;
+static ModelObject* gunObject = nullptr;
 
 const Line* GetIdentityLine()
 {
@@ -1213,4 +1246,14 @@ const ModelObject* GetIdentityPlayer()
 	}
 
 	return playerObject;
+}
+
+const ModelObject* GetIdentityGun()
+{
+	if (gunObject == nullptr)
+	{
+		gunObject = new ModelObject(gunModel);
+	}
+
+	return gunObject;
 }

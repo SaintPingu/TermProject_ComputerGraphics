@@ -289,10 +289,7 @@ GLvoid DrawScene()
 		
 	if (player != nullptr)
 	{
-		if (!isFirstPerson)
-		{
-			player->Draw();
-		}
+		player->Draw(isFirstPerson);
 	}
 
 	light->Draw();
