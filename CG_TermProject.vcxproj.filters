@@ -48,6 +48,9 @@
     <ClInclude Include="src\stdafx.h">
       <Filter>PCH</Filter>
     </ClInclude>
+    <ClInclude Include="src\Light.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Object.cpp">
@@ -82,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

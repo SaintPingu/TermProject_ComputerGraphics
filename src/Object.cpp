@@ -5,79 +5,12 @@
 #include "Transform.h"
 #include "Timer.h"
 
-extern vector<IdentityObject*> objects;
 extern const Model* cubeModel;
 extern const Model* sphereModel;
 extern const Model* playerModel;
 extern const Model* circleModel;
 
 
-Object::Object()
-{
-	InitValues();
-}
-Object::~Object() {}
-
-GLvoid Object::InitValues()
-{
-	position = { 0.0f, 0.0f, 0.0f };
-	scale = { 1.0f,1.0f,1.0f };
-	scaleOrigin = { 1.0f,1.0f,1.0f };
-
-	look = { 0.0f, 0.0f, 1.0f };
-	rotation = { 0.0f, 0.0f, 1.0f, 0.0f };
-	localRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
-
-	pivot = nullptr;
-}
-GLvoid Object::SetScale(const GLfloat& scale)
-{
-	this->scale.x = scale;
-	this->scale.y = scale;
-	this->scale.z = scale;
-}
-GLvoid Object::SetScale(const glm::vec3& scale)
-{
-	this->scale = scale;
-}
-GLvoid Object::ScaleOrigin(const GLfloat& scale)
-{
-	Scale(scale);
-	position *= scale;
-}
-
-GLvoid Object::Scale(const GLfloat& scale)
-{
-	this->scale *= scale;
-}
-GLvoid Object::ScaleX(const GLfloat& amount)
-{
-	scale.x *= amount;
-}
-GLvoid Object::ScaleY(const GLfloat& amount)
-{
-	scale.y *= amount;
-}
-GLvoid Object::ScaleZ(const GLfloat& amount)
-{
-	scale.z *= amount;
-}
-GLvoid Object::SetScaleX(const GLfloat& scale)
-{
-	this->scale.x = scale;
-}
-GLvoid Object::SetScaleY(const GLfloat& scale)
-{
-	this->scale.y = scale;
-}
-GLvoid Object::SetScaleZ(const GLfloat& scale)
-{
-	this->scale.z = scale;
-}
-const glm::vec3* Object::GetRefScale() const
-{
-	return &scale;
-}
 
 
 GLvoid Object::Rotate(const glm::vec3& axis, const GLfloat& degree)
@@ -250,7 +183,92 @@ GLvoid Object::MoveGlobal(const glm::vec3& vector)
 }
 
 
-glm::mat4 Object::GetTransform() const
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ShaderObject::ShaderObject()
+{
+	InitValues();
+	SetColor(DEFAULT_OBJECT_COLOR);
+}
+ShaderObject::~ShaderObject() {}
+
+GLvoid ShaderObject::InitValues()
+{
+	position = { 0.0f, 0.0f, 0.0f };
+	scale = { 1.0f,1.0f,1.0f };
+	scaleOrigin = { 1.0f,1.0f,1.0f };
+
+	look = { 0.0f, 0.0f, 1.0f };
+	rotation = { 0.0f, 0.0f, 1.0f, 0.0f };
+	localRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+	pivot = nullptr;
+}
+GLvoid ShaderObject::SetScale(const GLfloat& scale)
+{
+	this->scale.x = scale;
+	this->scale.y = scale;
+	this->scale.z = scale;
+}
+GLvoid ShaderObject::SetScale(const glm::vec3& scale)
+{
+	this->scale = scale;
+}
+GLvoid ShaderObject::ScaleOrigin(const GLfloat& scale)
+{
+	Scale(scale);
+	position *= scale;
+}
+
+GLvoid ShaderObject::Scale(const GLfloat& scale)
+{
+	this->scale *= scale;
+}
+GLvoid ShaderObject::ScaleX(const GLfloat& amount)
+{
+	scale.x *= amount;
+}
+GLvoid ShaderObject::ScaleY(const GLfloat& amount)
+{
+	scale.y *= amount;
+}
+GLvoid ShaderObject::ScaleZ(const GLfloat& amount)
+{
+	scale.z *= amount;
+}
+GLvoid ShaderObject::SetScaleX(const GLfloat& scale)
+{
+	this->scale.x = scale;
+}
+GLvoid ShaderObject::SetScaleY(const GLfloat& scale)
+{
+	this->scale.y = scale;
+}
+GLvoid ShaderObject::SetScaleZ(const GLfloat& scale)
+{
+	this->scale.z = scale;
+}
+const glm::vec3* ShaderObject::GetRefScale() const
+{
+	return &scale;
+}
+
+
+glm::mat4 ShaderObject::GetTransform() const
 {
 	glm::mat4 transform = transform::GetWorld();
 
@@ -277,7 +295,7 @@ glm::mat4 Object::GetTransform() const
 
 	return transform;
 }
-GLvoid Object::ModelTransform() const
+GLvoid ShaderObject::ModelTransform() const
 {
 	glm::mat4 transform = GetTransform();
 	transform::Apply(shader, transform, "modelTransform");
@@ -293,13 +311,17 @@ GLvoid Object::ModelTransform() const
 
 
 
-
+IdentityObject::IdentityObject() : ShaderObject()
+{
+	InitBuffers();
+}
 IdentityObject::~IdentityObject()
 {
 	DeleteBuffers();
 }
 GLvoid IdentityObject::InitValues()
 {
+	ShaderObject::InitValues();
 	VAO = 0;
 	VBO[0] = 0;
 	VBO[1] = 0;
@@ -367,20 +389,12 @@ GLvoid IdentityObject::BindBuffers()
 	glBindVertexArray(0);
 }
 
-GLvoid IdentityObject::SetColor(const COLORREF& color)
-{
-	this->color = MyColor(color);
-}
-
 GLvoid IdentityObject::Draw() const
 {
 	const size_t indexCount = GetIndexCount();
 	IdentityObject::ModelTransform();
 
-	if (shader == Shader::Light)
-	{
-		ApplyObjectColor(color);
-	}
+	ApplyObjectColor(shader, color);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
@@ -404,10 +418,10 @@ GLfloat IdentityObject::GetDepth() const
 
 
 
-SharedObject::SharedObject(const IdentityObject* object)
+SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 {
 	SetObject(object);
-	this->shader = object->GetShader();
+	SetShader(object->GetShader());
 }
 
 GLvoid SharedObject::Draw() const
@@ -415,10 +429,7 @@ GLvoid SharedObject::Draw() const
 	const size_t indexCount = this->object->GetIndexCount();
 	SharedObject::ModelTransform();
 
-	if (shader == Shader::Light)
-	{
-		ApplyObjectColor(color);
-	}
+	ApplyObjectColor(shader, color);
 
 	glBindVertexArray(this->object->GetVAO());
 	if (indexCount > 0)
@@ -444,13 +455,6 @@ GLvoid SharedObject::Draw() const
 	glBindVertexArray(0);
 }
 
-GLvoid SharedObject::SetColor(const COLORREF& color)
-{
-	this->color = MyColor(color);
-}
-
-
-
 
 
 
@@ -462,15 +466,18 @@ GLvoid SharedObject::SetColor(const COLORREF& color)
 
 
 ///// private /////
-ModelObject::ModelObject(const Model* model)
+ModelObject::ModelObject(const Model* model) : IdentityObject()
 {
-	this->LoadModel(model);
+	LoadModel(model);
 }
 GLvoid ModelObject::LoadModel(const Model* model)
 {
 	IdentityObject::InitValues();
 	InitBuffers();
 	this->model = model;
+
+	SetShader(Shader::Light);
+	BindBuffers();
 }
 GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 {
@@ -644,19 +651,20 @@ size_t CustomObject::GetVertexCount() const
 
 
 ///// public /////
-CustomObject::CustomObject()
+CustomObject::CustomObject() : IdentityObject()
 {
-	IdentityObject::InitValues();
-	IdentityObject::InitBuffers();
 	SetShader(Shader::Color);
 }
 CustomObject::CustomObject(vector<glm::vec3>& vertices) : CustomObject()
 {
 	this->vertices = vertices;
+	BindBuffers();
 }
-CustomObject::CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices) : CustomObject(vertices)
+CustomObject::CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices) : CustomObject()
 {
+	this->vertices = vertices;
 	this->indices = indices;
+	BindBuffers();
 }
 
 
@@ -674,17 +682,19 @@ CustomObject::CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices)
 ////////// [ BASIC OBJECTS ] //////////
 
 // Line
-Line::Line()
+Line::Line() : CustomObject()
 {
 	glm::vec3 v1 = { 0, 0, 1.0f };
 	glm::vec3 v2 = { 0, 0, -1.0f };
 	vertices.emplace_back(v1);
 	vertices.emplace_back(v2);
+	BindBuffers();
 }
 Line::Line(const glm::vec3& v1, const glm::vec3& v2) : CustomObject()
 {
 	vertices.emplace_back(v1);
 	vertices.emplace_back(v2);
+	BindBuffers();
 }
 GLvoid Line::Draw() const
 {
@@ -700,7 +710,7 @@ GLvoid Line::SetVertex(const GLboolean& index, const glm::vec3& pos)
 }
 
 // Triangle
-Triangle::Triangle()
+Triangle::Triangle() : CustomObject()
 {
 	const vector<glm::vec3> defaultTriangle = {
 		{  0, 0, -1},
@@ -708,6 +718,8 @@ Triangle::Triangle()
 		{  1, 0,  1},
 	};
 	vertices = defaultTriangle;
+
+	BindBuffers();
 }
 GLvoid Triangle::Draw() const
 {
@@ -728,6 +740,8 @@ Plane::Plane() : CustomObject()
 		{ 1, 0,  1},
 	};
 	vertices = defaultPlane;
+
+	BindBuffers();
 }
 GLvoid Plane::Draw() const
 {
@@ -1004,7 +1018,6 @@ GLfloat Circle::GetRadius() const
 
 
 
-
 Cube::Cube() : ModelObject()
 {
 	const Model* model = cubeModel;
@@ -1073,28 +1086,20 @@ GLboolean Cube::CheckCollide(const GLrect& rect) const
 
 
 
-Ball::Ball() : ModelObject()
+Sphere::Sphere() : ModelObject()
 {
 	const Model* model = sphereModel;
 	ModelObject::LoadModel(model);
-
-	GLfloat degreeY = GetRandom<GLfloat>(360);
-	GLfloat degreeX = GetRandom<GLfloat>(360);
-
-	vector = Vector3::Back();
-	vector = Vector3::RotateOrigin(vector, glm::radians(degreeY), Vector3::Up());
-	vector = Vector3::RotateOrigin(vector, glm::radians(degreeX), Vector3::Right());
 }
-GLvoid Ball::Update()
-{
-	GLfloat rotationSpeed = 5.0f;
-	RotateLocal(Vector3::Up(), vector.x * rotationSpeed);
-	RotateLocal(Vector3::Right(), vector.y * rotationSpeed);
-	RotateLocal(Vector3::Look(), vector.z * rotationSpeed);
 
-	MoveGlobal({ 0.0f, -0.5f, 0.0f });
-	MoveGlobal(vector * speed);
-}
+
+
+
+
+
+
+
+
 
 
 
@@ -1154,53 +1159,58 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-static Cube* cubeObject = nullptr;
-const Cube* GetIdentityCube()
-{
-	if (cubeObject == nullptr)
-	{
-		cubeObject = new Cube();
-		cubeObject->SetColor(GRAY);
-		cubeObject->BindBuffers();
-	}
-
-	return cubeObject;
-}
 static Line* lineObject = nullptr;
+static ModelObject* circleObject = nullptr;
+static Cube* cubeObject = nullptr;
+static Sphere* sphereObject = nullptr;
+static ModelObject* playerObject = nullptr;
+
 const Line* GetIdentityLine()
 {
 	if (lineObject == nullptr)
 	{
 		lineObject = new Line();
-		lineObject->SetColor(RED);
-		lineObject->BindBuffers();
 	}
 
 	return lineObject;
 }
 
-static ModelObject* playerObject = nullptr;
-const ModelObject* GetIdentityPlayer()
-{
-	if (playerObject == nullptr)
-	{
-		playerObject = new ModelObject(playerModel);
-		playerObject->SetColor(RED);
-		playerObject->BindBuffers();
-	}
-
-	return playerObject;
-}
-
-static ModelObject* circleObject = nullptr;
 const ModelObject* GetIdentityCircle()
 {
 	if (circleObject == nullptr)
 	{
 		circleObject = new ModelObject(circleModel);
-		circleObject->SetColor(RED);
-		circleObject->BindBuffers();
 	}
 
 	return circleObject;
+}
+
+const Cube* GetIdentityCube()
+{
+	if (cubeObject == nullptr)
+	{
+		cubeObject = new Cube();
+	}
+
+	return cubeObject;
+}
+
+const Sphere* GetIdentitySphere()
+{
+	if (sphereObject == nullptr)
+	{
+		sphereObject = new Sphere();
+	}
+
+	return sphereObject;
+}
+
+const ModelObject* GetIdentityPlayer()
+{
+	if (playerObject == nullptr)
+	{
+		playerObject = new ModelObject(playerModel);
+	}
+
+	return playerObject;
 }

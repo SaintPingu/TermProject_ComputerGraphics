@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "Map.h"
+#include "Light.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -40,13 +41,13 @@ glm::vec3 worldPosition(0.0f, 0.0f, 0.0f);
 glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 
 // lights
-Ball* light = nullptr;
+Light* light = nullptr;
 MyColor lightColor;
 
 // objects
-vector<IdentityObject*> customObjects;
-vector<IdentityObject*> lightObjects;
-vector<IdentityObject*> minimapObjects;
+vector<ShaderObject*> customObjects;
+vector<ShaderObject*> lightObjects;
+vector<ShaderObject*> minimapObjects;
 Map* crntMap = nullptr;
 Player* player = nullptr;
 
@@ -143,6 +144,7 @@ GLvoid InitMeshes()
 	Line* line = nullptr;
 	Vector3 vectorLine_1, vectorLine_2;
 
+	// coordinate system lines
 	vectorLine_1 = { -lineLength, 0.0f, 0.0f };
 	vectorLine_2 = { lineLength, 0.0f, 0.0f };
 	line = new Line(vectorLine_1, vectorLine_2);
@@ -163,54 +165,33 @@ GLvoid InitMeshes()
 	line->SetColor(BLUE);
 	line->MoveGlobal({ 0, 0, lineLength });
 	customObjects.emplace_back(line);
+	//
 
-	extern const Model* sphereModel;
-	ModelObject* temp = new ModelObject(sphereModel);
+	// light test object
+	SharedObject* temp = new SharedObject(GetIdentitySphere());
 	temp->SetColor(ORANGE);
 	temp->SetPosition({ 0, 0, 20 });
 	lightObjects.emplace_back(temp);
 
 	// light object
-	light = new Ball();
-	light->SetColor(ORANGE);
+	light = new Light();
 	light->SetPosition({ 200, 400, 200 });
-	lightObjects.emplace_back(light);
-
-	for (IdentityObject* object : customObjects)
-	{
-		object->BindBuffers();
-	}
-	for (IdentityObject* object : lightObjects)
-	{
-		object->BindBuffers();
-	}
-	for (IdentityObject* object : minimapObjects)
-	{
-		object->BindBuffers();
-	}
 
 	crntMap = new Map();
 	player = new Player({ 0,0,0});
-
-	glUseProgram(GetShaderProgram(Shader::Light));
-	ApplyLightColorRef(WHITE);
-	SetShader(Shader::Light, "light.ambient", 0.3f);
-	SetShader(Shader::Light, "light.diffuse", 1.0f);
-	SetShader(Shader::Light, "light.specular", 1.0f);
-	SetShader(Shader::Light, "light.shininess", 128.0f);
 }
 
 GLvoid Reset()
 {
-	for (IdentityObject* object : customObjects)
+	for (ShaderObject* object : customObjects)
 	{
 		delete object;
 	}
-	for (IdentityObject* object : lightObjects)
+	for (ShaderObject* object : lightObjects)
 	{
 		delete object;
 	}
-	for (IdentityObject* object : minimapObjects)
+	for (ShaderObject* object : minimapObjects)
 	{
 		delete object;
 	}
@@ -286,7 +267,7 @@ GLvoid DrawScene()
 	glUseProgram(GetShaderProgram(crntShader));
 	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
 	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
-	for (const IdentityObject* object : customObjects)
+	for (const ShaderObject* object : customObjects)
 	{
 		object->Draw();
 	}
@@ -299,7 +280,7 @@ GLvoid DrawScene()
 	SetShader(Shader::Light, "light.pos", light->GetPosition());
 	ApplyCameraPos(crntCamera->GetPosition());
 
-	for (const IdentityObject* object : lightObjects)
+	for (const ShaderObject* object : lightObjects)
 	{
 		object->Draw();
 	}
@@ -313,6 +294,8 @@ GLvoid DrawScene()
 			player->Draw();
 		}
 	}
+
+	light->Draw();
 
 	glBindVertexArray(0);
 	glutSwapBuffers();
@@ -494,13 +477,13 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 			isFirstPerson = true;
 		}
 		break;
-	//case '3':
-	//	if (player != nullptr)
-	//	{
-	//		cameraMain = player->GetThirdPersonCamera();
-	//		isFirstPerson = false;
-	//	}
-	//	break;
+	case '0':
+		if (light != nullptr)
+		{
+			cameraMain->SetPosition(light->GetPosition());
+			isFirstPerson = false;
+		}
+		break;
 		// objects
 
 	

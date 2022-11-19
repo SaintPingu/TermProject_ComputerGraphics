@@ -1,42 +1,40 @@
+#pragma once
 #include "stdafx.h"
+
+#define DEFAULT_OBJECT_COLOR GRAY
 
 class Model;
 enum class Shader;
+enum class IdentityObjects { Line = 0, Circle, Cube, Sphere, Player };
 
-////////// [ TOP ROOT ] //////////
+/************************************************** [ TOP ROOTS ] **************************************************/
+//////////////////////////////////////// [ Object ] ////////////////////////////////////////
 class Object abstract {
 protected:
-	Shader shader = Shader::None;
-
 	glm::vec3 position = { 0, 0, 0 };
-	glm::vec3 scale = { 0, 0, 0 };
-	glm::vec3 scaleOrigin = { 0, 0, 0 };
 
 	glm::vec3 look = { 0, 0, 0 };
 	glm::quat rotation = { 0, 0, 0, 0 };
 	glm::quat localRotation = { 0, 0, 0, 0 };
-	const glm::vec3* pivot = nullptr;
+
 	const glm::vec3* rotationPivot = nullptr;
+	const glm::vec3* pivot = nullptr;
+
 public:
-	Object();
-	~Object();
-	virtual GLvoid InitValues();
-	// scaling
-	GLvoid SetScale(const GLfloat& scale);
-	GLvoid SetScale(const glm::vec3& scale);
-	GLvoid ScaleOrigin(const GLfloat& scale);
-	GLvoid Scale(const GLfloat& scale);
-	GLvoid ScaleX(const GLfloat& amount);
-	GLvoid ScaleY(const GLfloat& amount);
-	GLvoid ScaleZ(const GLfloat& amount);
-	GLvoid SetScaleX(const GLfloat& scale);
-	GLvoid SetScaleY(const GLfloat& scale);
-	GLvoid SetScaleZ(const GLfloat& scale);
-	const glm::vec3* GetRefScale() const;
-	inline constexpr glm::vec3 GetScale() const
-	{
-		return scale;
-	}
+	// position
+	const glm::vec3* GetRefPos() const;
+	glm::vec3 GetPosition() const;
+	GLvoid SetPosition(const glm::vec3& position);
+	GLvoid SetPosX(const GLfloat& amount);
+	GLvoid SetPosY(const GLfloat& amount);
+	GLvoid SetPosZ(const GLfloat& amount);
+
+	GLvoid Move(const glm::vec3& vector);
+	GLvoid MoveX(const GLfloat& amount);
+	GLvoid MoveY(const GLfloat& amount);
+	GLvoid MoveZ(const GLfloat& amount);
+	GLvoid MoveGlobal(const glm::vec3& vector);
+	GLvoid SetPivot(const glm::vec3* pivot);
 
 	// rotation
 	GLvoid Rotate(const glm::vec3& axis, const GLfloat& degree);
@@ -53,58 +51,71 @@ public:
 	glm::quat GetLocalRotation() const;
 	GLvoid SetRotationPivot(const glm::vec3* pivot);
 
-	// position
-	const glm::vec3* GetRefPos() const;
-	glm::vec3 GetPosition() const;
-	GLvoid SetPosition(const glm::vec3& position);
-	GLvoid SetPosX(const GLfloat& amount);
-	GLvoid SetPosY(const GLfloat& amount);
-	GLvoid SetPosZ(const GLfloat& amount);
-
-	GLvoid Move(const glm::vec3& vector);
-	GLvoid MoveX(const GLfloat& amount);
-	GLvoid MoveY(const GLfloat& amount);
-	GLvoid MoveZ(const GLfloat& amount);
-	GLvoid MoveGlobal(const glm::vec3& vector);
-	GLvoid SetPivot(const glm::vec3* pivot);
-
 	// direction
 	GLvoid SetLook(const glm::vec3& look);
 	glm::vec3 GetLook() const;
 	glm::vec3 GetRight() const;
 	glm::vec3 GetUp() const;
+};
+
+//////////////////////////////////////// [ SharedObject ] ////////////////////////////////////////
+class ShaderObject abstract : public Object {
+protected:
+	Shader shader = Shader::None;
+	MyColor color;
+
+	glm::vec3 scale = { 0, 0, 0 };
+	glm::vec3 scaleOrigin = { 0, 0, 0 };
+
+public:
+	ShaderObject();
+	~ShaderObject();
+	virtual GLvoid InitValues();
+	// scaling
+	GLvoid SetScale(const GLfloat& scale);
+	GLvoid SetScale(const glm::vec3& scale);
+	GLvoid ScaleOrigin(const GLfloat& scale);
+	GLvoid Scale(const GLfloat& scale);
+	GLvoid ScaleX(const GLfloat& amount);
+	GLvoid ScaleY(const GLfloat& amount);
+	GLvoid ScaleZ(const GLfloat& amount);
+	GLvoid SetScaleX(const GLfloat& scale);
+	GLvoid SetScaleY(const GLfloat& scale);
+	GLvoid SetScaleZ(const GLfloat& scale);
+	const glm::vec3* GetRefScale() const;
+	inline constexpr glm::vec3 GetScale() const { return scale; }
 
 	// transform
 	glm::mat4 GetTransform() const;
 	GLvoid ModelTransform() const;
-	inline glm::vec3 GetTransformedPos() const
-	{
-		return glm::vec3(GetTransform() * glm::vec4(position, 1.0f));
-	}
+	inline glm::vec3 GetTransformedPos() const { return glm::vec3(GetTransform() * glm::vec4(position, 1.0f)); }
 
 	// draw
 	virtual GLvoid Draw() const abstract;
+	inline GLvoid SetColor(const COLORREF& color) { this->color = MyColor(color); }
 
-	inline constexpr Shader GetShader() const
-	{
-		return shader;
-	}
-	inline constexpr GLvoid SetShader(const Shader& shader)
-	{
-		this->shader = shader;
-	}
+	// shader
+	inline constexpr Shader GetShader() const { return shader; }
+	inline constexpr GLvoid SetShader(const Shader& shader) { this->shader = shader; }
 };
 
 
 
-////////// [ MAJOR ROOT ] //////////
-class IdentityObject : public Object{
+
+
+
+
+
+
+
+/************************************************** [ MAJOR ROOTS ] **************************************************/
+//////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
+// IdentityObject should BindBuffers() when generated
+class IdentityObject : public ShaderObject{
 protected:
 	GLuint VAO = 0;
 	GLuint VBO[2] = { 0,0 };
 	GLuint EBO = 0;
-
-	MyColor color;
 
 	virtual GLvoid PullColors(vector<GLfloat>& colors) const abstract;
 	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
@@ -113,6 +124,7 @@ protected:
 
 	GLvoid InitValues();
 public:
+	IdentityObject();
 	~IdentityObject();
 	virtual GLvoid InitBuffers();
 	virtual GLvoid BindBuffers();
@@ -126,8 +138,6 @@ public:
 	virtual size_t GetIndexCount() const abstract;
 	virtual size_t GetVertexCount() const abstract;
 
-	virtual GLvoid SetColor(const COLORREF& color);
-
 	inline constexpr const GLuint& GetVAO() const
 	{
 		return VAO;
@@ -138,25 +148,24 @@ public:
 	}
 
 	// draw
-	virtual GLvoid Draw() const;
+	virtual GLvoid Draw() const override;
 };
 
-class SharedObject : public Object {
+//////////////////////////////////////// [ SharedObject ] ////////////////////////////////////////
+class SharedObject : public ShaderObject {
 protected:
 	const IdentityObject* object = nullptr;
-	MyColor color;
 	GLboolean isChangeColor = false;
 public:
-	SharedObject() {}
+	SharedObject() {};
 	SharedObject(const IdentityObject* object);
 	inline constexpr GLvoid SetObject(const IdentityObject* object)
 	{
 		this->object = object;
 	}
 
-	GLvoid Draw() const;
+	GLvoid Draw() const override;
 
-	GLvoid SetColor(const COLORREF& color);
 	inline constexpr const IdentityObject* GetIdentityObject() const
 	{
 		return object;
@@ -167,7 +176,14 @@ public:
 
 
 
-////////// [ MINOR ROOTS ] //////////
+
+
+
+
+
+
+/************************************************** [ MINOR ROOTS ] **************************************************/
+//////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
 class ModelObject : public IdentityObject {
 protected:
 	const Model* model = nullptr;
@@ -196,6 +212,7 @@ public:
 	set<glm::vec2, CompareSet> GetBoundings_XZ() const;
 };
 
+//////////////////////////////////////// [ CustomObject ] ////////////////////////////////////////
 class CustomObject : public IdentityObject {
 protected:
 	vector<glm::vec3> vertices;
@@ -220,8 +237,13 @@ public:
 
 
 
-////////// [ BASIC OBJECTS ] //////////
 
+
+
+
+
+/************************************************** [ BASIC OBJECTS ] **************************************************/
+//////////////////////////////////////// [ Line ] ////////////////////////////////////////
 class Line : public CustomObject {
 public:
 	Line();
@@ -229,12 +251,16 @@ public:
 	GLvoid Draw() const;
 	GLvoid SetVertex(const GLboolean& index, const glm::vec3& pos);
 };
+
+//////////////////////////////////////// [ Triangle ] ////////////////////////////////////////
 class Triangle : public CustomObject {
 public:
 	Triangle();
 	Triangle(vector<glm::vec3>& vertices) : CustomObject(vertices) { if (vertices.size() != 3) assert(0); }
 	GLvoid Draw() const;
 };
+
+//////////////////////////////////////// [ Plane ] ////////////////////////////////////////
 class Plane : public CustomObject {
 public:
 	Plane();
@@ -244,6 +270,7 @@ public:
 };
 
 
+//////////////////////////////////////// [ Cube ] ////////////////////////////////////////
 class Cube : public ModelObject {
 private:
 	vector<Cube*> childs;
@@ -264,18 +291,25 @@ public:
 	GLboolean CheckCollide(const GLrect& rect) const;
 };
 
-class Ball : public ModelObject {
-private:
-	GLfloat speed = 1.0f;
-public:
-	glm::vec3 vector = { 0,0,0 };
-	Ball();
-	GLvoid Update();
 
-	GLvoid CheckCollision();
+//////////////////////////////////////// [ Sphere ] ////////////////////////////////////////
+class Sphere : public ModelObject {
+public:
+	Sphere();
 };
 
 
+
+
+
+
+
+
+
+
+
+/************************************************** [ COLLISION OBJECTS ] **************************************************/
+//////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
 class Cuboid {
 private:
 	const glm::vec3* position = nullptr;
@@ -297,7 +331,7 @@ public:
 	GLvoid Draw() const;
 };
 
-
+//////////////////////////////////////// [ Circle ] ////////////////////////////////////////
 class Circle {
 private:
 	SharedObject* circle = nullptr;
@@ -315,7 +349,10 @@ public:
 	GLfloat GetRadius() const;
 };
 
-////////// [ OBJECTS ] //////////
+
+
+
+/************************************************** [ OTHER OBJECTS ] **************************************************/
 
 
 
@@ -326,10 +363,15 @@ public:
 
 
 
-const Cube* GetIdentityCube();
 const Line* GetIdentityLine();
-const ModelObject* GetIdentityPlayer();
 const ModelObject* GetIdentityCircle();
+const Cube* GetIdentityCube();
+const Sphere* GetIdentitySphere();
+const ModelObject* GetIdentityPlayer();
+
+
+
+
 
 ////////// [ DEBUG ] //////////
 GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

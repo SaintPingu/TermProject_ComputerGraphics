@@ -147,9 +147,9 @@ GLvoid ApplyCameraPos(const glm::vec3& cameraPos)
 	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "viewPos");
 	glUniform3f(lightPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
 }
-GLvoid ApplyObjectColor(const glm::vec3& color)
+GLvoid ApplyObjectColor(const Shader& shader, const glm::vec3& color)
 {
-	unsigned int objColorLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "objectColor");
+	unsigned int objColorLocation = glGetUniformLocation(GetShaderProgram(shader), "objectColor");
 	glUniform3f(objColorLocation, color.r, color.g, color.b);
 }
 

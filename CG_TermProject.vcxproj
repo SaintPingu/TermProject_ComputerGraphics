@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\File.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Object.h" />
@@ -33,6 +34,7 @@
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\File.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Model.cpp" />

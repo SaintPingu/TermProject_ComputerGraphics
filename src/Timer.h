@@ -1,3 +1,4 @@
+#pragma once
 #include "stdafx.h"
 
 enum class Timer : GLint {
