@@ -8,12 +8,13 @@
 #include "Transform.h"
 #include "Map.h"
 #include "Light.h"
+#include "Bullet.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
 Camera* cameraFree = nullptr;
 Camera* cameraTop = nullptr;
-GLboolean isFirstPerson = false;
+CameraMode cameraMode = CameraMode::Free;
 
 GLvoid Init();
 GLvoid InitMeshes();
@@ -41,13 +42,11 @@ glm::vec3 worldPosition(0.0f, 0.0f, 0.0f);
 glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 
 // lights
+BulletManager* bulletManager = nullptr;
 Light* light = nullptr;
 MyColor lightColor;
 
 // objects
-vector<ShaderObject*> customObjects;
-vector<ShaderObject*> lightObjects;
-vector<ShaderObject*> minimapObjects;
 Map* crntMap = nullptr;
 Player* player = nullptr;
 
@@ -132,6 +131,8 @@ GLvoid Init()
 	cameraMain = cameraFree;
 	crntCamera = cameraMain;
 
+	bulletManager = new BulletManager();
+
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	lightColor.SetColor(WHITE);
@@ -150,54 +151,43 @@ GLvoid InitMeshes()
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(RED);
 	line->MoveGlobal({ lineLength, 0, 0 });
-	customObjects.emplace_back(line);
+	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
 	vectorLine_2 = { 0.0f, lineLength, 0.0f };
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(GREEN);
 	line->MoveGlobal({ 0, lineLength, 0 });
-	customObjects.emplace_back(line);
+	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
 	vectorLine_2 = { 0.0f, 0.0f, lineLength };
 	line = new Line(vectorLine_1, vectorLine_2);
 	line->SetColor(BLUE);
 	line->MoveGlobal({ 0, 0, lineLength });
-	customObjects.emplace_back(line);
+	AddObject(Shader::Color, line);
 	//
 
 	// light test object
 	SharedObject* temp = new SharedObject(GetIdentitySphere());
 	temp->SetColor(ORANGE);
 	temp->SetPosition({ 0, 0, 20 });
-	lightObjects.emplace_back(temp);
+	AddObject(Shader::Light, temp);
 
 	// light object
 	light = new Light();
 	light->SetPosition({ 200, 400, 200 });
 
 	crntMap = new Map();
-	player = new Player({ 0,0,0});
+	player = new Player({ 0,0,0 }, &cameraMode);
 }
 
 GLvoid Reset()
 {
-	for (ShaderObject* object : customObjects)
-	{
-		delete object;
-	}
-	for (ShaderObject* object : lightObjects)
-	{
-		delete object;
-	}
-	for (ShaderObject* object : minimapObjects)
-	{
-		delete object;
-	}
-	customObjects.clear();
-	lightObjects.clear();
-	minimapObjects.clear();
+	ResetObjects();
+
+	delete bulletManager;
+	bulletManager = nullptr;
 
 	delete cameraFree;
 	delete cameraTop;
@@ -267,10 +257,7 @@ GLvoid DrawScene()
 	glUseProgram(GetShaderProgram(crntShader));
 	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
 	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
-	for (const ShaderObject* object : customObjects)
-	{
-		object->Draw();
-	}
+	DrawObjects(crntShader);
 
 
 	crntShader = Shader::Light;
@@ -279,17 +266,13 @@ GLvoid DrawScene()
 	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
 	SetShader(Shader::Light, "light.pos", light->GetPosition());
 	ApplyCameraPos(crntCamera->GetPosition());
-
-	for (const ShaderObject* object : lightObjects)
-	{
-		object->Draw();
-	}
+	DrawObjects(crntShader);
 
 	crntMap->Draw();
 		
 	if (player != nullptr)
 	{
-		player->Draw(isFirstPerson);
+		player->Draw(cameraMode);
 	}
 
 	light->Draw();
@@ -320,36 +303,61 @@ GLvoid Update()
 {
 	timer::CalculateFPS();
 	timer::Update();
+	bulletManager->Update();
+
+	constexpr GLfloat cameraMovement = 100.0f;
+	GLfloat cameraSpeed = cameraMovement;
 
 	// movement
 	if (cameraMain == cameraFree)
 	{
-		constexpr GLfloat cameraMovement = 0.3f;
-		GLfloat cameraSpeed = cameraMovement;
-
 		if (IS_KEY_DOWN(KEY_UP))
 		{
-			cameraFree->MoveZ(cameraSpeed);
+			cameraMain->MoveZ(cameraSpeed);
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveZ(cameraSpeed);
+			}
 		}
 		if (IS_KEY_DOWN(KEY_DOWN))
 		{
-			cameraFree->MoveZ(-cameraSpeed);
+			cameraMain->MoveZ(-cameraSpeed);
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveZ(-cameraSpeed);
+			}
 		}
 		if (IS_KEY_DOWN(KEY_LEFT))
 		{
-			cameraFree->MoveX(-cameraSpeed);
+			cameraMain->MoveX(-cameraSpeed);
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveX(-cameraSpeed);
+			}
 		}
 		if (IS_KEY_DOWN(KEY_RIGHT))
 		{
-			cameraFree->MoveX(cameraSpeed);
+			cameraMain->MoveX(cameraSpeed);
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveX(cameraSpeed);
+			}
 		}
 		if (IS_KEY_DOWN(VK_NEXT))
 		{
-			cameraFree->MoveGlobal({ 0, -cameraSpeed, 0 });
+			cameraMain->MoveGlobal({ 0, -cameraSpeed, 0 });
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveGlobal({ 0, -cameraSpeed, 0 });
+			}
 		}
 		if (IS_KEY_DOWN(VK_PRIOR))
 		{
-			cameraFree->MoveGlobal({ 0, cameraSpeed, 0 });
+			cameraMain->MoveGlobal({ 0, cameraSpeed, 0 });
+			if (cameraMode == CameraMode::Light)
+			{
+				light->MoveGlobal({ 0, -cameraSpeed, 0 });
+			}
 		}
 	}
 	if (player != nullptr)
@@ -389,6 +397,11 @@ GLvoid Mouse(GLint button, GLint state, GLint x, GLint y)
 		}
 		break;
 	}
+
+	if (player != nullptr)
+	{
+		player->ProcessMouse(button, state, x, y);
+	}
 }
 
 
@@ -410,11 +423,11 @@ GLvoid MousePassiveMotion(GLint x, GLint y)
 
 	if (cameraMain == cameraFree)
 	{
-		cameraFree->RotateLocal(-dy, dx, 0.0f);
+		cameraFree->RotateLocal(dy, dx, 0.0f);
 	}
 	else if(player != nullptr)
 	{
-		player->Rotate(0.0f, dx, 0.0f);
+		player->Rotate(dy, dx, 0.0f);
 	}
 
 	SetCursorPos(mouseCenter.x, mouseCenter.y);
@@ -465,20 +478,28 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		// camera
 	case '1':
 		cameraMain = cameraFree;
-		isFirstPerson = false;
+		cameraMode = CameraMode::Free;
 		break;
 	case '2':
 		if (player != nullptr)
 		{
 			cameraMain = player->GetFirstPersonCamera();
-			isFirstPerson = true;
+			cameraMode = CameraMode::FirstPerson;
+		}
+		break;
+	case '3':
+		if (player != nullptr)
+		{
+			cameraMain = player->GetThirdPersonCamera();
+			cameraMode = CameraMode::ThirdPerson;
 		}
 		break;
 	case '0':
 		if (light != nullptr)
 		{
+			cameraMain = cameraFree;
 			cameraMain->SetPosition(light->GetPosition());
-			isFirstPerson = false;
+			cameraMode = CameraMode::Light;
 		}
 		break;
 		// objects

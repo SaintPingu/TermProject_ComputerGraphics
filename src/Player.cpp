@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Timer.h"
 #include "Map.h"
+#include "Gun.h"
 
 
 // extern
@@ -196,26 +197,27 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 
 
 ////////////////////////////// [ Player ] //////////////////////////////
-Player::Player(const glm::vec3& position)
+Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 {
 	this->position = position;
 	this->tpCameraPosition = position;
-	object = new SharedObject(GetIdentityPlayer());
+	this->cameraMode = cameraMode;
+	object = new SharedObject(GetIdentityObject(IdentityObjects::Player));
 	object->SetColor(WHITE);
 
-	gun = new SharedObject(GetIdentityGun());
-	gun->SetColor(YELLOW);
-	gun->SetPivot(&this->position);
-	gun->SetRotationPivot(&this->position);
-	gun->SetPosition({ -10, 10, 5 });
 
 	fpCamera = new Camera();
 	fpCamera->SetPivot(&this->position);
-	fpCamera->MoveY(1.8f);
+	fpCamera->SetPosY(38);
+	//fpCamera->SetPosZ(10);
 	fpCamera->SetFovY(110.0f);
 	fpCamera->SetLook(object->GetLook());
 
-	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 3.0f, 0 });
+	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS*2, fpCamera->GetPosition().y - 20, 0);
+	gun = new Gun(gunPosition, &this->position);
+	
+
+	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 1.0f, 0 });
 	boundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
@@ -325,10 +327,10 @@ GLvoid Player::Update()
 	tpCameraPosition.z -= 0.5f;
 	RotatePosition(tpCameraPosition, object->GetPosition(), object->GetUp(), tpCameraPitch);
 }
-GLvoid Player::Draw(const GLboolean& isFirstPerson) const
+GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
 	gun->Draw();
-	if (isFirstPerson)
+	if (cameraMode == CameraMode::FirstPerson)
 	{
 		return;
 	}
@@ -347,6 +349,18 @@ GLvoid Player::ProcessKeyDown(const GLint& key)
 GLvoid Player::ProcessKeyUp(const GLint& key)
 {
 	crntState->HandleEvent(Event::KeyUp, key);
+}
+GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
+{
+	switch (button)
+	{
+	case GLUT_LEFT_BUTTON:
+		if (state == GLUT_DOWN)
+		{
+			gun->Fire(mYaw, mPitch);
+		}
+		break;
+	}
 }
 
 GLvoid Player::Move()
@@ -371,20 +385,24 @@ GLvoid Player::Stop()
 
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
 {
-	object->RotateLocal(yaw, pitch, roll);
-	gun->Rotate(yaw, pitch, roll);
-	fpCamera->SetLook(object->GetLook());
-	/*tpCamera->Look(body->GetPosition());
-	tpCameraPitch += pitch;*/
+	mYaw += yaw;
+	mPitch += pitch;
+	if (fabs(mYaw) > 89.0f)
+	{
+		mYaw = 89.0f * GetSign(mYaw);
+	}
 
-	//icon->RotateLocal(Vector3::Up(), pitch);
+	object->RotateLocal(0, pitch, 0);
+
+	fpCamera->ResetLook();
+	fpCamera->SetLook(object->GetLook());
+	fpCamera->RotateLocal(mYaw, 0, 0);
+
+	gun->Rotate(mYaw, mPitch);
+	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
 }
 
 glm::vec3 Player::GetPosition() const
 {
 	return object->GetPosition();
 }
-
-
-
-

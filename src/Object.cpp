@@ -12,12 +12,23 @@ extern const Model* circleModel;
 extern const Model* gunModel;
 
 
+Object::Object()
+{
+	InitValues();
+}
+GLvoid Object::InitValues()
+{
+	position = Vector3::Zero();
 
+	look = Vector3::Look();
+	rotation = { 0.0f, 0.0f, 1.0f, 0.0f };
 
+	pivot = nullptr;
+	rotationPivot = nullptr;
+}
 GLvoid Object::Rotate(const glm::vec3& axis, const GLfloat& degree)
 {
 	rotation *= glm::angleAxis(glm::radians(degree), glm::normalize(axis));
-	::Rotate(look, glm::radians(degree), axis);
 }
 GLvoid Object::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
 {
@@ -25,19 +36,16 @@ GLvoid Object::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 	{
 		glm::vec3 axis = GetRight();
 		rotation *= glm::angleAxis(glm::radians(yaw), axis);
-		::Rotate(look, glm::radians(yaw), axis);
 	}
 	if (pitch != 0.0f)
 	{
 		glm::vec3 axis = GetUp();
 		rotation *= glm::angleAxis(glm::radians(pitch), axis);
-		::Rotate(look, glm::radians(pitch), axis);
 	}
 	if (roll != 0.0f)
 	{
 		glm::vec3 axis = GetLook();
 		rotation *= glm::angleAxis(glm::radians(roll), axis);
-		::Rotate(look, glm::radians(roll), axis);
 	}
 }
 GLvoid Object::SetRotation(const glm::vec3& axis, const GLfloat& degree)
@@ -60,28 +68,23 @@ GLvoid Object::RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const 
 }
 GLvoid Object::RotateLocal(const glm::vec3& axis, const GLfloat& degree)
 {
-	localRotation *= glm::angleAxis(glm::radians(degree), glm::normalize(axis));
-
-	::Rotate(look, degree, axis);
+	::Rotate(look, glm::radians(degree), axis);
 }
 GLvoid Object::RotateLocal(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
 {
-	if (yaw != 0.0f)
-	{
-		glm::vec3 axis = GetRight();
-		localRotation *= glm::angleAxis(glm::radians(yaw), axis);
-		::Rotate(look, glm::radians(yaw), axis);
-	}
 	if (pitch != 0.0f)
 	{
 		glm::vec3 axis = GetUp();
-		localRotation *= glm::angleAxis(glm::radians(pitch), axis);
 		::Rotate(look, glm::radians(pitch), axis);
+	}
+	if (yaw != 0.0f)
+	{
+		glm::vec3 axis = GetRight();
+		::Rotate(look, glm::radians(yaw), axis);
 	}
 	if (roll != 0.0f)
 	{
 		glm::vec3 axis = GetLook();
-		localRotation *= glm::angleAxis(glm::radians(roll), axis);
 		::Rotate(look, glm::radians(roll), axis);
 	}
 }
@@ -95,9 +98,7 @@ GLvoid Object::RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, con
 }
 GLvoid Object::SetLocalRotation(const glm::vec3& axis, const GLfloat& degree)
 {
-	localRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
-	look = { 0.0f, 0.0f, 1.0f };
-	localRotation *= glm::angleAxis(glm::radians(degree), glm::normalize(axis));
+	look = Vector3::Look();
 
 	if (axis == Vector3::Up() || axis == Vector3::Right())
 	{
@@ -108,18 +109,10 @@ GLvoid Object::ResetRotation()
 {
 	rotation = { 0, 0, 1.0f, 0 };
 }
-GLvoid Object::ResetLocalRotation()
-{
-	localRotation = { 0, 0, 1.0f, 0 };
-}
 
 glm::quat Object::GetRotation() const
 {
 	return rotation;
-}
-glm::quat Object::GetLocalRotation() const
-{
-	return localRotation;
 }
 GLvoid Object::SetRotationPivot(const glm::vec3* pivot)
 {
@@ -127,14 +120,32 @@ GLvoid Object::SetRotationPivot(const glm::vec3* pivot)
 }
 
 
+
+
 GLvoid Object::SetPivot(const glm::vec3* pivot)
 {
 	this->pivot = pivot;
 }
 
+
+GLvoid Object::Look(const glm::vec3& point)
+{
+	if (pivot == nullptr)
+	{
+		this->look = glm::normalize(point - position);
+	}
+	else
+	{
+		this->look = glm::normalize(point - (position + *pivot));
+	}
+}
 GLvoid Object::SetLook(const glm::vec3& look)
 {
 	this->look = look;
+}
+GLvoid Object::ResetLook()
+{
+	look = Vector3::Look();
 }
 glm::vec3 Object::GetLook() const
 {
@@ -179,30 +190,53 @@ glm::vec3 Object::GetPosition() const
 	if (pivot) result += *pivot;
 	return result;
 }
-GLvoid Object::Move(const glm::vec3& vector)
+GLvoid Object::Move(const glm::vec3& vector, const GLboolean& applyTime)
 {
-	MoveX(vector.x);
-	MoveY(vector.y);
-	MoveZ(vector.z);
+	MoveX(vector.x, applyTime);
+	MoveY(vector.y, applyTime);
+	MoveZ(vector.z, applyTime);
 }
-GLvoid Object::MoveX(const GLfloat& amount)
+GLvoid Object::MoveX(const GLfloat& amount, const GLboolean& applyTime)
 {
 	glm::vec3 right = GetRight();
-	this->position += right * amount * timer::DeltaTime();
+	GLfloat dt = 1.0f;
+	if (applyTime)
+	{
+		dt = timer::DeltaTime();
+	}
+
+	this->position += right * amount * dt;
 }
-GLvoid Object::MoveY(const GLfloat& amount)
+GLvoid Object::MoveY(const GLfloat& amount, const GLboolean& applyTime)
 {
 	glm::vec3 up = GetUp();
-	this->position += up * amount * timer::DeltaTime();
+	GLfloat dt = 1.0f;
+	if (applyTime)
+	{
+		dt = timer::DeltaTime();
+	}
+
+	this->position += up * amount * dt;
 }
-GLvoid Object::MoveZ(const GLfloat& amount)
+GLvoid Object::MoveZ(const GLfloat& amount, const GLboolean& applyTime)
 {
 	glm::vec3 look = GetLook();
-	this->position += look * amount * timer::DeltaTime();
+	GLfloat dt = 1.0f;
+	if (applyTime)
+	{
+		dt = timer::DeltaTime();
+	}
+
+	this->position += look * amount * dt;
 }
-GLvoid Object::MoveGlobal(const glm::vec3& vector)
+GLvoid Object::MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime)
 {
-	this->position += vector * timer::DeltaTime();
+	GLfloat dt = 1.0f;
+	if (applyTime)
+	{
+		dt = timer::DeltaTime();
+	}
+	this->position += vector * dt;
 }
 
 
@@ -231,15 +265,9 @@ ShaderObject::~ShaderObject() {}
 
 GLvoid ShaderObject::InitValues()
 {
-	position = { 0.0f, 0.0f, 0.0f };
+	Object::InitValues();
 	scale = { 1.0f,1.0f,1.0f };
 	scaleOrigin = { 1.0f,1.0f,1.0f };
-
-	look = { 0.0f, 0.0f, 1.0f };
-	rotation = { 0.0f, 0.0f, 1.0f, 0.0f };
-	localRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
-
-	pivot = nullptr;
 }
 GLvoid ShaderObject::SetScale(const GLfloat& scale)
 {
@@ -300,30 +328,33 @@ glm::mat4 ShaderObject::GetTransform() const
 		transform = glm::translate(transform, { (*pivot).x, (*pivot).y, (*pivot).z });
 	}
 
-	transform *= glm::mat4_cast(rotation);
-	transform = glm::translate(transform, { -position.x, position.y, -position.z });
-
 	if (rotationPivot == nullptr)
 	{
-		transform *= glm::mat4_cast(localRotation);
+		transform *= glm::mat4_cast(rotation);
+		transform = glm::translate(transform, { -position.x, position.y, -position.z });	// T
 	}
 	else
 	{
+		transform = glm::translate(transform, { -position.x, position.y, -position.z });
 		if (pivot == nullptr)
 		{
 			transform = glm::translate(transform, -*rotationPivot);
-			transform *= glm::mat4_cast(localRotation);
+			transform *= glm::mat4_cast(rotation);
 			transform = glm::translate(transform, *rotationPivot);
 		}
 		else
 		{
 			transform = glm::translate(transform, -*rotationPivot + (*pivot));
-			transform *= glm::mat4_cast(localRotation);
+			transform *= glm::mat4_cast(rotation);
 			transform = glm::translate(transform, *rotationPivot - (*pivot));
 		}
 	}
 
-	transform = glm::scale(transform, scale);
+	//transform *= glm::mat4_cast(localRotation);	// R
+	glm::quat lookAt = glm::quatLookAt(look, Vector3::Up());
+	transform *= glm::mat4_cast(lookAt);
+
+	transform = glm::scale(transform, scale);	// S
 
 	return transform;
 }
@@ -345,6 +376,7 @@ GLvoid ShaderObject::ModelTransform() const
 
 IdentityObject::IdentityObject() : ShaderObject()
 {
+	InitValues();
 	InitBuffers();
 }
 IdentityObject::~IdentityObject()
@@ -514,12 +546,19 @@ GLvoid ModelObject::LoadModel(const Model* model)
 GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 {
 	const vector<glm::vec3> objectNormals = model->GetNormals();
+	const vector<size_t> normalIndices = model->GetNormalIndices();
+	const vector<size_t> vertexIndices = model->GetIndices();
 
-	for (size_t i = 0; i < objectNormals.size(); ++i)
+	// vertex마다 normal을 지정
+	normals.resize(model->GetVertices().size() * 3, 0);
+	size_t count = 0;
+	for (const size_t& vertexIndex : vertexIndices)
 	{
-		normals.emplace_back(objectNormals[i].x);
-		normals.emplace_back(objectNormals[i].y);
-		normals.emplace_back(objectNormals[i].z);
+		glm::vec3 normal = objectNormals[normalIndices[count]];
+		normals[(vertexIndex * 3)] = normal.x;
+		normals[(vertexIndex * 3) + 1] = normal.y;
+		normals[(vertexIndex * 3) + 2] = normal.z;
+		++count;
 	}
 }
 GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
@@ -540,7 +579,14 @@ GLvoid ModelObject::PullIndices(vector<size_t>& vertexIndices) const
 		vertexIndices.emplace_back(index);
 	}
 }
-
+GLvoid ModelObject::PullNormalIndices(vector<size_t>& normalIndices) const
+{
+	const vector<size_t> indices = model->GetNormalIndices();
+	for (const size_t& index : indices)
+	{
+		normalIndices.emplace_back(index);
+	}
+}
 
 
 ///// public /////
@@ -639,10 +685,6 @@ GLrect ModelObject::GetXZRect() const
 	Cuboid cuboid(&position, &scale, GetWidth(), GetHeight(), GetDepth());
 	return cuboid.GetXZRect();
 }
-set<glm::vec2, CompareSet> ModelObject::GetBoundings_XZ() const
-{
-	return model->GetBoundings_XZ();
-}
 
 
 
@@ -698,7 +740,10 @@ CustomObject::CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices)
 	this->indices = indices;
 	BindBuffers();
 }
-
+set<glm::vec2, CompareSet> ModelObject::GetBoundings_XZ() const
+{
+	return model->GetBoundings_XZ();
+}
 
 
 
@@ -1025,8 +1070,8 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 {
 	this->offset = offset;
 	this->radius = radius;
-	circle = new SharedObject(GetIdentityCircle());
-	circle->SetScale(radius);
+	circle = new SharedObject(GetIdentityObject(IdentityObjects::Circle));
+	circle->SetScale(radius * 2);
 	circle->SetPivot(position);
 	circle->Move(offset);
 }
@@ -1208,14 +1253,14 @@ const Line* GetIdentityLine()
 	return lineObject;
 }
 
-const ModelObject* GetIdentityCircle()
+const Sphere* GetIdentitySphere()
 {
-	if (circleObject == nullptr)
+	if (sphereObject == nullptr)
 	{
-		circleObject = new ModelObject(circleModel);
+		sphereObject = new Sphere();
 	}
 
-	return circleObject;
+	return sphereObject;
 }
 
 const Cube* GetIdentityCube()
@@ -1228,32 +1273,97 @@ const Cube* GetIdentityCube()
 	return cubeObject;
 }
 
-const Sphere* GetIdentitySphere()
+const ModelObject* GetIdentityObject(const IdentityObjects& object)
 {
-	if (sphereObject == nullptr)
+	switch (object)
 	{
-		sphereObject = new Sphere();
+	case IdentityObjects::Circle:
+		if (circleObject == nullptr)
+		{
+			circleObject = new ModelObject(circleModel);
+		}
+		return circleObject;
+	case IdentityObjects::Player:
+		if (playerObject == nullptr)
+		{
+			playerObject = new ModelObject(playerModel);
+		}
+		return playerObject;
+	case IdentityObjects::Gun:
+		if (gunObject == nullptr)
+		{
+			gunObject = new ModelObject(gunModel);
+		}
+		return gunObject;
+	default:
+		assert(0);
+		return nullptr;
 	}
-
-	return sphereObject;
 }
 
-const ModelObject* GetIdentityPlayer()
-{
-	if (playerObject == nullptr)
-	{
-		playerObject = new ModelObject(playerModel);
-	}
 
-	return playerObject;
+
+
+
+
+static vector<ShaderObject*> customObjects;
+static vector<ShaderObject*> lightObjects;
+static vector<ShaderObject*> minimapObjects;
+
+
+GLvoid AddObject(const Shader& shader, ShaderObject* object)
+{
+	switch (shader)
+	{
+	case Shader::Color:
+		customObjects.emplace_back(object);
+		break;
+	case Shader::Light:
+		lightObjects.emplace_back(object);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+}
+GLvoid ResetObjects()
+{
+	for (ShaderObject* object : customObjects)
+	{
+		delete object;
+	}
+	for (ShaderObject* object : lightObjects)
+	{
+		delete object;
+	}
+	for (ShaderObject* object : minimapObjects)
+	{
+		delete object;
+	}
+	customObjects.clear();
+	lightObjects.clear();
+	minimapObjects.clear();
 }
 
-const ModelObject* GetIdentityGun()
+
+GLvoid DrawObjects(const Shader& shader)
 {
-	if (gunObject == nullptr)
+	switch (shader)
 	{
-		gunObject = new ModelObject(gunModel);
+	case Shader::Color:
+		for (const ShaderObject* object : customObjects)
+		{
+			object->Draw();
+		}
+		break;
+	case Shader::Light:
+		for (const ShaderObject* object : lightObjects)
+		{
+			object->Draw();
+		}
+		break;
+	default:
+		break;
 	}
 
-	return gunObject;
 }

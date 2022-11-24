@@ -18,10 +18,7 @@ glm::mat4 transform::GetView(const Camera* camera)
 	const glm::vec3 up = camera->GetUp();
 	const glm::vec3 center = eye + look;
 
-	glm::mat4 transform = glm::mat4(1.0f);
-	transform *= glm::lookAt(eye, center, up);
-
-	return transform;
+	return glm::lookAt(eye, center, up);;
 }
 
 extern glm::vec3 worldPosition;
@@ -32,17 +29,14 @@ glm::mat4 transform::GetProj(const Camera* camera)
 	const glm::vec3 cameraPos = camera->GetPosition();
 	const GLfloat size = glm::length(worldPosition - cameraPos) / 2;
 
-	glm::mat4 transform = glm::mat4(1.0f);
 	if (camera->IsPersp())
 	{
-		transform = glm::perspective(glm::radians(camera->GetFovY()), 1.0f, 0.1f, farLength);
+		return glm::perspective(glm::radians(camera->GetFovY()), 1.0f, 0.1f, farLength);
 	}
 	else
 	{
-		transform = glm::ortho(-size, size, -size, size, -farLength, farLength);
+		return glm::ortho(-size, size, -size, size, -farLength, farLength);
 	}
-
-	return transform;
 }
 
 

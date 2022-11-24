@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "Shader.h"
 
-Light::Light()
+Light::Light() : Object()
 {
 	object = new SharedObject(GetIdentitySphere());
 	object->SetColor(ORANGE);
@@ -18,6 +18,7 @@ Light::Light()
 
 GLvoid Light::Draw() const
 {
-	object->SetPosition(position);
+	//object->SetPosition(position);
+	::SetShader(Shader::Light, "light.pos", position);
 	object->Draw();
 }

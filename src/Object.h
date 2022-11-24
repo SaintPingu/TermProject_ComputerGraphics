@@ -5,7 +5,7 @@
 
 class Model;
 enum class Shader;
-enum class IdentityObjects { Line = 0, Circle, Cube, Sphere, Player };
+enum class IdentityObjects { Circle, Player, Gun };
 
 /************************************************** [ TOP ROOTS ] **************************************************/
 //////////////////////////////////////// [ Object ] ////////////////////////////////////////
@@ -13,14 +13,16 @@ class Object abstract {
 protected:
 	glm::vec3 position = { 0, 0, 0 };
 
-	glm::vec3 look = { 0, 0, 0 };
-	glm::quat rotation = { 0, 0, 0, 0 };
-	glm::quat localRotation = { 0, 0, 0, 0 };
+	glm::vec3 look = { 0, 0, 0 };				// 자전
+	glm::quat rotation = { 0, 0, 0, 0 };		// 공전 -> look벡터 영향 X
 
-	const glm::vec3* rotationPivot = nullptr;
-	const glm::vec3* pivot = nullptr;
+	const glm::vec3* rotationPivot = nullptr;	// 공전 중심
+	const glm::vec3* pivot = nullptr;			// 위치 중심
 
 public:
+	Object();
+	virtual GLvoid InitValues();
+
 	// position
 	const glm::vec3* GetRefPos() const;
 	glm::vec3 GetPosition() const;
@@ -29,11 +31,11 @@ public:
 	GLvoid SetPosY(const GLfloat& amount);
 	GLvoid SetPosZ(const GLfloat& amount);
 
-	GLvoid Move(const glm::vec3& vector);
-	GLvoid MoveX(const GLfloat& amount);
-	GLvoid MoveY(const GLfloat& amount);
-	GLvoid MoveZ(const GLfloat& amount);
-	GLvoid MoveGlobal(const glm::vec3& vector);
+	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = true);
+	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = true);
 	GLvoid SetPivot(const glm::vec3* pivot);
 
 	// rotation
@@ -47,13 +49,13 @@ public:
 	GLvoid RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
 	GLvoid SetLocalRotation(const glm::vec3& axis, const GLfloat& degree);
 	GLvoid ResetRotation();
-	GLvoid ResetLocalRotation();
 	glm::quat GetRotation() const;
-	glm::quat GetLocalRotation() const;
 	GLvoid SetRotationPivot(const glm::vec3* pivot);
 
 	// direction
+	GLvoid Look(const glm::vec3& point);
 	GLvoid SetLook(const glm::vec3& look);
+	GLvoid ResetLook();
 	glm::vec3 GetLook() const;
 	glm::vec3 GetRight() const;
 	glm::vec3 GetUp() const;
@@ -71,7 +73,7 @@ protected:
 public:
 	ShaderObject();
 	~ShaderObject();
-	virtual GLvoid InitValues();
+	virtual GLvoid InitValues() override;
 	// scaling
 	GLvoid SetScale(const GLfloat& scale);
 	GLvoid SetScale(const glm::vec3& scale);
@@ -122,6 +124,7 @@ protected:
 	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
 	virtual GLvoid PullVertices(vector<GLfloat>& vertices) const abstract;
 	virtual GLvoid PullIndices(vector<size_t>& vertexIndices) const abstract;
+	virtual GLvoid PullNormalIndices(vector<size_t>& normalIndices) const abstract;
 
 	GLvoid InitValues();
 public:
@@ -193,6 +196,7 @@ protected:
 	GLvoid PullNormals(vector<GLfloat>& normals) const;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
+	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const;
 public:
 	ModelObject() {};
 	ModelObject(const Model* model);
@@ -223,6 +227,7 @@ protected:
 	GLvoid PullColors(vector<GLfloat>& colors) const;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
+	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const {};
 public:
 	CustomObject();
 	CustomObject(vector<glm::vec3>& vertices);
@@ -365,15 +370,16 @@ public:
 
 
 const Line* GetIdentityLine();
-const ModelObject* GetIdentityCircle();
 const Cube* GetIdentityCube();
 const Sphere* GetIdentitySphere();
-const ModelObject* GetIdentityPlayer();
-const ModelObject* GetIdentityGun();
+const ModelObject* GetIdentityObject(const IdentityObjects& object);
 
 
 
-
+GLvoid AddObject(const Shader& shader, ShaderObject* object);
+//GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
+GLvoid ResetObjects();
+GLvoid DrawObjects(const Shader& shader);
 
 ////////// [ DEBUG ] //////////
 GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

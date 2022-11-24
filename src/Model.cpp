@@ -102,6 +102,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 			for (size_t i = 0; i < 3; ++i)
 			{
 				vertexIndices.emplace_back(vertexIndex[i] - 1);
+				uvIndices.emplace_back(uvIndex[i] - 1);
+				normalIndices.emplace_back(normalIndex[i] - 1);
 			}
 		}
 		/*else if (strcmp(data, "f") == 0)
@@ -199,6 +201,10 @@ size_t Model::GetVertexCount() const
 const vector<size_t>& Model::GetIndices() const
 {
 	return vertexIndices;
+}
+const vector<size_t>& Model::GetNormalIndices() const
+{
+	return normalIndices;
 }
 size_t Model::GetIndexCount() const
 {

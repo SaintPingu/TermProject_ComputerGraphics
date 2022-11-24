@@ -2,6 +2,7 @@
 #include "stdafx.h"
 
 #define PLAYER_RADIUS 5 // Width = 10 : 1m -> radius = 0.5m
+#define PLAYER_HEIGHT 40 // height = 40 : 4m
 // #define PLAYER_WALK_SPEED 10 // 1 m/s
 #define PLAYER_WALK_SPEED 50 // for test
 #define PLAYER_JUMP_SPEED 30 // 3 m/s
@@ -12,6 +13,7 @@ class Cuboid;
 class Triangle;
 class Player;
 class Circle;
+class Gun;
 
 namespace playerState {
 	class PlayerState abstract {
@@ -74,9 +76,11 @@ private:
 	glm::vec3 tpCameraPosition = { 0, 0, 0 };
 	GLfloat tpCameraPitch = 0.0f;
 
-
 	SharedObject* object = nullptr;
-	SharedObject* gun = nullptr;
+	Gun* gun = nullptr;
+
+	// camera
+	const CameraMode* cameraMode = nullptr;
 	Camera* fpCamera = nullptr;
 	Camera* tpCamera = nullptr;
 
@@ -90,10 +94,13 @@ private:
 	GLfloat yTop = 0.0f;
 	GLfloat yBot = 0.0f;
 
+	GLfloat mYaw = 0.0f;
+	GLfloat mPitch = 0.0f;
+
 	Circle* boundingCircle = nullptr;
 
 public:
-	Player(const glm::vec3& position);
+	Player(const glm::vec3& position, const CameraMode* cameraMode);
 	~Player();
 
 	Cuboid* cuboid = nullptr;
@@ -104,12 +111,13 @@ public:
 
 	// Frame
 	GLvoid Update();
-	GLvoid Draw(const GLboolean& isFirstPerson) const;
+	GLvoid Draw(const CameraMode& cameraMode) const;
 	GLvoid DrawIcon() const;
 
 	// Process
 	GLvoid ProcessKeyDown(const GLint& key);
 	GLvoid ProcessKeyUp(const GLint& key);
+	GLvoid ProcessMouse(GLint button, GLint state, GLint x, GLint y);
 
 	// Movement
 	GLvoid Move();

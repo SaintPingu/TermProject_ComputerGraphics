@@ -9,6 +9,8 @@ private:
 	vector<glm::vec3> uvs;
 	vector<glm::vec3> normals;
 	vector<size_t> vertexIndices;
+	vector<size_t> uvIndices;
+	vector<size_t> normalIndices;
 	
 	set<glm::vec2, CompareSet> verticesXZ;
 
@@ -28,6 +30,7 @@ public:
 	const vector<glm::vec3>& GetVertices() const;
 	const vector<glm::vec3>& GetNormals() const;
 	const vector<size_t>& GetIndices() const;
+	const vector<size_t>& GetNormalIndices() const;
 	size_t GetVertexCount() const;
 	size_t GetIndexCount() const;
 	glm::vec3 GetVertex(const size_t& index) const;
