@@ -5,21 +5,31 @@
 class BulletManager {
 private:
 	class Bullet : public SharedObject {
-		/* 중력의 영향을 받는 정도 (n배) */
-		const GLfloat mGravityEffected = 5.0f;
+		/* 무게, 중력의 영향을 받는 정도 (n배) */
+		const GLfloat mWeight = 30.0f;
+		const GLfloat mRadius = 0.1f;
+
+		/* 발사 후 경과한 시간 */
 		GLfloat mT = 0.0f;
+
 		GLfloat mAngleY = 0.0f;
 		GLfloat mAngleZ = 0.0f;
 		GLfloat mVelocity = 0.0f;
 	public:
 		Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
 		GLvoid Update();
+
+		inline constexpr GLfloat GetRadius() const { return mRadius; }
 	};
 
 	vector<Bullet*> mBullets;
+	vector<IBulletCollisionable*> mCollisionObjects;
 public:
 	BulletManager();
 	~BulletManager();
 	GLvoid AddBullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid Draw() const;
 	GLvoid Update();
+
+	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjects.emplace_back(object); }
 };

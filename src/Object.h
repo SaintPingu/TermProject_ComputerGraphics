@@ -33,8 +33,10 @@ public:
 	/* mPosition狼 const 林家 府畔 */
 	const glm::vec3* GetRefPos() const;
 
+	/* mPosition 府畔 */
+	inline constexpr glm::vec3 GetPosition() const { return mPosition; }
 	/* pivot捞 利侩等 mPosition 府畔 */
-	glm::vec3 GetPosition() const;
+	glm::vec3 GetPviotedPosition() const;
 
 	GLvoid SetPosition(const glm::vec3& position);
 	GLvoid SetPosX(const GLfloat& x);
@@ -218,7 +220,7 @@ public:
 
 
 /************************************************** [ MINOR ROOTS ] **************************************************/
-//////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
+//////////////////////////////////////// [ ModelObject ] ////////////////////////////////////////
 class ModelObject : public IdentityObject {
 protected:
 	const Model* mModel = nullptr;
@@ -350,6 +352,12 @@ public:
 
 
 /************************************************** [ COLLISION OBJECTS ] **************************************************/
+
+class IBulletCollisionable abstract {
+public:
+	virtual GLboolean CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
+};
+
 //////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
 class Cuboid {
 private:
@@ -414,7 +422,7 @@ const ModelObject* GetIdentityObject(const IdentityObjects& object);
 
 
 GLvoid AddObject(const Shader& shader, ShaderObject* object);
-//GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
+GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
 GLvoid ResetObjects();
 GLvoid DrawObjects(const Shader& shader);
 

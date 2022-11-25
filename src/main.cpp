@@ -35,7 +35,6 @@ GLint screenPosX = DEFAULT_SCREEN_POS_X;
 GLint screenPosY = DEFAULT_SCREEN_POS_Y;
 GLint screenWidth = DEFAULT_SCREEN_WIDTH;
 GLint screenHeight = DEFAULT_SCREEN_HEIGHT;
-GLboolean isMultiWindow = false;
 
 // world
 glm::vec3 worldPosition(0.0f, 0.0f, 0.0f);
@@ -133,13 +132,13 @@ GLvoid Init()
 	crntCamera = cameraMain;
 	//********************************//
 
-	bulletManager = new BulletManager();
-
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 }
 
 GLvoid InitMeshes()
 {
+	bulletManager = new BulletManager();
+
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
 	Line* line = nullptr;
@@ -254,19 +253,20 @@ GLvoid DrawScene()
 	SetWindow(0);
 
 	Shader crntShader = Shader::Color;
-	glUseProgram(shd::GetShaderProgram(crntShader));
+	shd::Use(crntShader);
 	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
 	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
 	DrawObjects(crntShader);
 
 
 	crntShader = Shader::Light;
-	glUseProgram(shd::GetShaderProgram(crntShader));
+	shd::Use(crntShader);
 	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
 	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
-	shd::SetShader(Shader::Light, "light.pos", light->GetPosition());
-	shd::SetShader(Shader::Light, "viewPos", crntCamera->GetPosition());
+	shd::SetShader(Shader::Light, "light.pos", light->GetPviotedPosition());
+	shd::SetShader(Shader::Light, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
+	bulletManager->Draw();
 
 	crntMap->Draw();
 		
@@ -424,6 +424,10 @@ GLvoid MousePassiveMotion(GLint x, GLint y)
 	if (cameraMain == cameraFree)
 	{
 		cameraFree->RotateLocal(dy, dx, 0.0f);
+		if (cameraMode == CameraMode::Light)
+		{
+			light->RotateLocal(dy, dx, 0.0f);
+		}
 	}
 	else if(player != nullptr)
 	{
@@ -452,12 +456,6 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	switch (key)
 	{
 		// controls
-	case '[':
-		isMultiWindow = false;
-		break;
-	case ']':
-		isMultiWindow = true;
-		break;
 	case 'p':
 	case 'P':
 		cameraMain->SetPerpective(true);
@@ -473,6 +471,10 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case 'h':
 	case 'H':
 		ToggleDepthTest();
+		break;
+	case 'q':
+	case 'Q':
+		glutLeaveMainLoop();
 		break;
 
 		// camera
@@ -498,7 +500,8 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		if (light != nullptr)
 		{
 			cameraMain = cameraFree;
-			cameraMain->SetPosition(light->GetPosition());
+			cameraMain->SetPosition(light->GetPviotedPosition());
+			cameraMain->SetLook(light->GetLook());
 			cameraMode = CameraMode::Light;
 		}
 		break;
@@ -506,10 +509,6 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 
 	
 		// timers
-	case 'q':
-	case 'Q':
-		glutLeaveMainLoop();
-		break;
 	default:
 		break;
 

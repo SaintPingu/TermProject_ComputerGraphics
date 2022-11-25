@@ -21,7 +21,10 @@ GLint shd::GetShaderProgram(const Shader& shader)
 {
 	return shaders[static_cast<GLint>(shader)];
 }
-
+GLvoid shd::Use(const Shader& shader)
+{
+	glUseProgram(GetShaderProgram(shader));
+}
 GLint Make_ShaderProgram(const Shader& shader)
 {
 	string vertexShaderName;

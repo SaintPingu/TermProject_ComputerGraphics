@@ -212,7 +212,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mFpCamera->SetFovY(110.0f);
 	mFpCamera->SetLook(mObject->GetLook());
 
-	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPosition().y - 20, 0);
+	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
 	
 
@@ -320,11 +320,11 @@ GLvoid Player::Update()
 {
 	mCrntState->Update();
 
-	mPosition = mObject->GetPosition();
-	mTpCameraPosition = mObject->GetPosition();
+	mPosition = mObject->GetPviotedPosition();
+	mTpCameraPosition = mObject->GetPviotedPosition();
 	mTpCameraPosition.y += 0.5f;
 	mTpCameraPosition.z -= 0.5f;
-	RotatePosition(mTpCameraPosition, mObject->GetPosition(), mObject->GetUp(), mTpCameraPitch);
+	RotatePosition(mTpCameraPosition, mObject->GetPviotedPosition(), mObject->GetUp(), mTpCameraPitch);
 
 	mGun->Update();
 }
@@ -409,5 +409,5 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 glm::vec3 Player::GetPosition() const
 {
-	return mObject->GetPosition();
+	return mObject->GetPviotedPosition();
 }

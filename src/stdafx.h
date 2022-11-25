@@ -104,8 +104,8 @@
 #define IS_KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000 ? 0 : 1))
 
 // window
-#define DEFAULT_SCREEN_POS_X 50
-#define DEFAULT_SCREEN_POS_Y 50
+#define DEFAULT_SCREEN_POS_X 0
+#define DEFAULT_SCREEN_POS_Y 0
 #define DEFAULT_SCREEN_WIDTH 1280
 #define DEFAULT_SCREEN_HEIGHT 1024
 

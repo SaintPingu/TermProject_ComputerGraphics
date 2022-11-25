@@ -6,6 +6,7 @@ namespace shd {
 	GLvoid Init();
 
 	GLint GetShaderProgram(const Shader& shader);
+	GLvoid Use(const Shader& shader);
 
 	/* shader에 있는 name에 mat4 적용 */
 	GLvoid SetShader(const Shader& shader, const glm::mat4& transform, const GLchar* name);

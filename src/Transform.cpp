@@ -11,7 +11,7 @@ glm::mat4 xform::GetWorld()
 
 glm::mat4 xform::GetView(const Camera* camera)
 {
-	const glm::vec3 eye = camera->GetPosition();
+	const glm::vec3 eye = camera->GetPviotedPosition();
 	const glm::vec3 look = camera->GetLook();
 	const glm::vec3 up = camera->GetUp();
 	const glm::vec3 center = eye + look;
@@ -24,7 +24,7 @@ glm::mat4 xform::GetProj(const Camera* camera)
 {
 	constexpr GLfloat farLength = 1500;
 
-	const glm::vec3 cameraPos = camera->GetPosition();
+	const glm::vec3 cameraPos = camera->GetPviotedPosition();
 	const GLfloat size = glm::length(worldPosition - cameraPos) / 2;
 
 	if (camera->IsPersp())

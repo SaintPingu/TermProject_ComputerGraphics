@@ -9,7 +9,7 @@ Light::Light() : Object()
 	mObject->SetColor(ORANGE);
 	mObject->SetPivot(&mPosition);
 
-	glUseProgram(shd::GetShaderProgram(Shader::Light));
+	shd::Use(Shader::Light);
 	shd::SetShader(Shader::Light, "light.color", glm::vec3(MyColor(WHITE)));
 	shd::SetShader(Shader::Light, "light.intensity", 1.0f);
 	shd::SetShader(Shader::Light, "light.ambient", 0.3f);

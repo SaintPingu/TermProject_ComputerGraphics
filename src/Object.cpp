@@ -185,7 +185,7 @@ const glm::vec3* Object::GetRefPos() const
 {
 	return &mPosition;
 }
-glm::vec3 Object::GetPosition() const
+glm::vec3 Object::GetPviotedPosition() const
 {
 	glm::vec3 result = mPosition;
 	if (mPivot) result += *mPivot;
@@ -1089,7 +1089,7 @@ GLvoid Circle::SetColor(const COLORREF& color)
 }
 glm::vec2 Circle::GetCenter() const
 {
-	glm::vec3 pos = mCircle->GetPosition();
+	glm::vec3 pos = mCircle->GetPviotedPosition();
 	return { pos.x, pos.z };
 }
 GLfloat Circle::GetRadius() const
@@ -1320,6 +1320,10 @@ GLvoid AddObject(const Shader& shader, ShaderObject* object)
 		assert(0);
 		break;
 	}
+}
+GLvoid DeleteObject(const Shader& shader, ShaderObject* object)
+{
+
 }
 GLvoid ResetObjects()
 {

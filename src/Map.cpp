@@ -1,52 +1,89 @@
 #include "stdafx.h"
 #include "Map.h"
 #include "Model.h"
-#include "Object.h"
+#include "Bullet.h"
 
 extern const Model* mapModel;
 
 Map::Map()
 {
-	mObject = new ModelObject(mapModel);
-	mObject->SetColor(DARK_GREEN);
-	mObject->BindBuffers();
+	mMapObject = new ModelObject(mapModel);
+	mMapObject->SetColor(DARK_GREEN);
+	mMapObject->BindBuffers();
+
+	set<glm::vec2, CompareSet> boundingMap = mMapObject->GetBoundings_XZ();
+	auto iter = boundingMap.begin();
+	mLeftTop = *(iter++);
+	mLeftBottom = *(iter++);
+	mRightBottom = *(iter++);
+	mRightTop = *(iter++);
+
+	extern BulletManager* bulletManager;
+	bulletManager->AddCollisionObject(this);
 }
 
 GLvoid Map::Draw()
 {
-	mObject->Draw();
+	mMapObject->Draw();
 }
 
 GLboolean Map::CheckCollision(const Circle* boundingCircle)
 {
-	set<glm::vec2, CompareSet> boundingMap = mObject->GetBoundings_XZ();
-	auto iter = boundingMap.begin();
-	glm::vec2 leftTop = *(iter++);
-	glm::vec2 leftBottom = *(iter++);
-	glm::vec2 rightBottom = *(iter++);
-	glm::vec2 rightTop = *(iter++);
-
 	glm::vec2 center = boundingCircle->GetCenter();
 	GLfloat radius = boundingCircle->GetRadius();
 
-	if (center.y - radius <= leftTop.y)
+	if (center.y - radius <= mLeftTop.y)
 	{
 		return true;
 	}
-	if (center.y + radius >= leftBottom.y)
+	if (center.y + radius >= mLeftBottom.y)
 	{
 		return true;
 	}
-	if (center.x - radius < leftBottom.x)
+	if (center.x - radius < mLeftBottom.x)
 	{
-		if (::CheckCollision(leftTop, leftBottom, center, radius) == GL_TRUE)
+		if (::CheckCollision(mLeftTop, mLeftBottom, center, radius) == GL_TRUE)
 		{
 			return true;
 		}
 	}
-	else if (center.x + radius > rightBottom.x)
+	else if (center.x + radius > mRightBottom.x)
 	{
-		if (::CheckCollision(rightTop, rightBottom, center, radius) == GL_TRUE)
+		if (::CheckCollision(mRightTop, mRightBottom, center, radius) == GL_TRUE)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+GLboolean Map::CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
+{
+	if (bulletPos.y < 0)
+	{
+		return true;
+	}
+
+	glm::vec2 center = { bulletPos.x, bulletPos.z };
+	if (center.y - bulletRadius <= mLeftTop.y)
+	{
+		return true;
+	}
+	if (center.y + bulletRadius >= mLeftBottom.y)
+	{
+		return true;
+	}
+	if (center.x - bulletRadius < mLeftBottom.x)
+	{
+		if (::CheckCollision(mLeftTop, mLeftBottom, center, bulletRadius) == GL_TRUE)
+		{
+			return true;
+		}
+	}
+	else if (center.x + bulletRadius > mRightBottom.x)
+	{
+		if (::CheckCollision(mRightTop, mRightBottom, center, bulletRadius) == GL_TRUE)
 		{
 			return true;
 		}
