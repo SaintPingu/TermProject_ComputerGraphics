@@ -209,7 +209,6 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mFpCamera = new Camera();
 	mFpCamera->SetPivot(&mPosition);
 	mFpCamera->SetPosY(38);
-	//fpCamera->SetPosZ(10);
 	mFpCamera->SetFovY(110.0f);
 	mFpCamera->SetLook(mObject->GetLook());
 

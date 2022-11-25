@@ -6,6 +6,7 @@ const Model* mapModel = new Model("obj\\map3.obj");
 const Model* playerModel = new Model("obj\\player.obj");
 const Model* cubeModel = new Model("obj\\cube.obj");
 const Model* sphereModel = new Model("obj\\GeoSphere.obj");
+const Model* lowSphereModel = new Model("obj\\lowSphere.obj");
 const Model* circleModel = new Model("obj\\circle.obj");
 
 const Model* gunModel = new Model("obj\\gun.obj");

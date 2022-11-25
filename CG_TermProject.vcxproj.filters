@@ -109,10 +109,10 @@
     <None Include="shaders\light_vertex.glsl">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="shaders\vertex.glsl">
+    <None Include="shaders\color_fragment.glsl">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="shaders\fragment.glsl">
+    <None Include="shaders\color_vertex.glsl">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>

@@ -141,7 +141,7 @@ GLvoid Init()
 GLvoid InitMeshes()
 {
 	//********** [ Coordinate system lines ] **********//
-	constexpr GLfloat lineLength = 5.5f;
+	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
 	Line* line = nullptr;
 	Vector3 vectorLine_1, vectorLine_2;
 

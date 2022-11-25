@@ -7,6 +7,7 @@
 
 extern const Model* cubeModel;
 extern const Model* sphereModel;
+extern const Model* lowSphereModel;
 extern const Model* playerModel;
 extern const Model* circleModel;
 extern const Model* gunModel;
@@ -263,6 +264,11 @@ ShaderObject::ShaderObject()
 }
 ShaderObject::~ShaderObject() {}
 
+GLvoid ShaderObject::PrepareDraw() const
+{
+	ModelTransform();
+	shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
+}
 GLvoid ShaderObject::InitValues()
 {
 	Object::InitValues();
@@ -449,12 +455,11 @@ GLvoid IdentityObject::BindBuffers()
 	glBindVertexArray(0);
 }
 
+
 GLvoid IdentityObject::Draw() const
 {
+	ShaderObject::PrepareDraw();
 	const size_t indexCount = GetIndexCount();
-	IdentityObject::ModelTransform();
-
-	shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
 
 	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
@@ -486,10 +491,8 @@ SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 
 GLvoid SharedObject::Draw() const
 {
+	ShaderObject::PrepareDraw();
 	const size_t indexCount = mObject->GetIndexCount();
-	SharedObject::ModelTransform();
-
-	shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
 
 	glBindVertexArray(mObject->GetVAO());
 	if (indexCount > 0)
@@ -776,7 +779,7 @@ Line::Line(const glm::vec3& v1, const glm::vec3& v2) : CustomObject()
 }
 GLvoid Line::Draw() const
 {
-	IdentityObject::ModelTransform();
+	ShaderObject::PrepareDraw();
 
 	glBindVertexArray(mVAO);
 	glDrawArrays(GL_LINES, 0, 2);
@@ -801,7 +804,7 @@ Triangle::Triangle() : CustomObject()
 }
 GLvoid Triangle::Draw() const
 {
-	IdentityObject::ModelTransform();
+	ShaderObject::PrepareDraw();
 
 	glBindVertexArray(mVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -823,7 +826,7 @@ Plane::Plane() : CustomObject()
 }
 GLvoid Plane::Draw() const
 {
-	IdentityObject::ModelTransform();
+	ShaderObject::PrepareDraw();
 
 	glBindVertexArray(mVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -1237,12 +1240,13 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-static Line* lineObject = nullptr;
-static ModelObject* circleObject = nullptr;
-static Cube* cubeObject = nullptr;
-static Sphere* sphereObject = nullptr;
-static ModelObject* playerObject = nullptr;
-static ModelObject* gunObject = nullptr;
+static const Line* lineObject = nullptr;
+static const Cube* cubeObject = nullptr;
+static const Sphere* sphereObject = nullptr;
+static const ModelObject* circleObject = nullptr;
+static const ModelObject* lowSphereObject = nullptr;
+static const ModelObject* playerObject = nullptr;
+static const ModelObject* gunObject = nullptr;
 
 const Line* GetIdentityLine()
 {
@@ -1274,32 +1278,22 @@ const Cube* GetIdentityCube()
 	return cubeObject;
 }
 
+unordered_map<IdentityObjects, pair<const Model*, const ModelObject*>> modelMap{
+	{IdentityObjects::Circle, make_pair(circleModel, circleObject)},
+	{IdentityObjects::LowSphere, make_pair(lowSphereModel, lowSphereObject)},
+	{IdentityObjects::Player, make_pair(playerModel, playerObject)},
+	{IdentityObjects::Gun, make_pair(gunModel, gunObject)},
+};
 const ModelObject* GetIdentityObject(const IdentityObjects& object)
 {
-	switch (object)
+	pair<const Model*, const ModelObject*> value = modelMap[object];
+
+	if (value.second == nullptr)
 	{
-	case IdentityObjects::Circle:
-		if (circleObject == nullptr)
-		{
-			circleObject = new ModelObject(circleModel);
-		}
-		return circleObject;
-	case IdentityObjects::Player:
-		if (playerObject == nullptr)
-		{
-			playerObject = new ModelObject(playerModel);
-		}
-		return playerObject;
-	case IdentityObjects::Gun:
-		if (gunObject == nullptr)
-		{
-			gunObject = new ModelObject(gunModel);
-		}
-		return gunObject;
-	default:
-		assert(0);
-		return nullptr;
+		value.second = new ModelObject(value.first);
 	}
+
+	return value.second;
 }
 
 

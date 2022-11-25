@@ -55,13 +55,14 @@
 #define RADIAN_TO_DEGREE(radian) (GLfloat)(((180/PI) * (radian)))
 
 // values
-#define PI 3.14159265f
 #define LEFT -1
 #define RIGHT 1
 #define UP 1
 #define DOWN -1
 #define FRONT 1
 #define BACK -1
+#define PI 3.14159265f
+#define GRAVITY 9.8f
 
 // key values for window
 #define KEY_CTRL 0x11

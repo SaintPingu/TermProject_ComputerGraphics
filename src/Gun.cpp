@@ -37,7 +37,7 @@ GLvoid Gun::Update()
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
-	bulletManager->AddBullet(bulletPos, 200.0f, mYaw, mPitch);
+	bulletManager->AddBullet(bulletPos, 300.0f, mYaw, mPitch);
 }
 GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 {

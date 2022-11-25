@@ -2,19 +2,23 @@
 #include "Bullet.h"
 #include "Timer.h"
 
-BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentitySphere())
+BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityObject(IdentityObjects::LowSphere))
 {
 	SetScale(0.1f);
 	SetColor(RED);
-	mPosition = position;
-	mVelocity = velocity;
 	SetLook(Vector3::Back());
 	RotateLocal(0, pitch, 0);
-	RotateLocal(-yaw, 0, 0);
+
+	mPosition = position;
+	mVelocity = velocity;
+	mAngleY = sin(DEGREE_TO_RADIAN(yaw));
+	mAngleZ = cos(DEGREE_TO_RADIAN(yaw));
 }
 GLvoid BulletManager::Bullet::Update()
 {
-	MoveZ(-mVelocity);
+	mT += timer::DeltaTime() * 3.0f;
+	MoveZ(-mVelocity * mAngleZ);
+	MoveY(mVelocity * mAngleY - (0.5f * GRAVITY * mT * mT));
 }
 
 

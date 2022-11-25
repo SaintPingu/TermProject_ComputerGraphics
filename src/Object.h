@@ -5,7 +5,7 @@
 
 class Model;
 enum class Shader;
-enum class IdentityObjects { Circle, Player, Gun };
+enum class IdentityObjects { Circle, LowSphere, Player, Gun };
 
 /************************************************** [ TOP ROOTS ] **************************************************/
 //////////////////////////////////////// [ Object ] ////////////////////////////////////////
@@ -98,6 +98,7 @@ protected:
 	/* 원점 기준 Scale값, 현재 사용 X */
 	glm::vec3 mScaleOrigin = { 0, 0, 0 };
 
+	virtual GLvoid PrepareDraw() const;
 public:
 	ShaderObject();
 	~ShaderObject();
@@ -203,7 +204,7 @@ public:
 	GLvoid Draw() const override;
 
 	inline constexpr GLvoid SetObject(const IdentityObject* object) { mObject = object; }
-	inline constexpr const IdentityObject* GetIdentityObject() const { return mObject; }
+	inline constexpr const IdentityObject* GetObject() const { return mObject; }
 };
 
 

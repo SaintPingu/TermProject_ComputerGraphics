@@ -7,6 +7,7 @@ Light::Light() : Object()
 {
 	mObject = new SharedObject(GetIdentitySphere());
 	mObject->SetColor(ORANGE);
+	mObject->SetPivot(&mPosition);
 
 	glUseProgram(shd::GetShaderProgram(Shader::Light));
 	shd::SetShader(Shader::Light, "light.color", glm::vec3(MyColor(WHITE)));
