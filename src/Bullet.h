@@ -9,6 +9,9 @@ private:
 		const GLfloat mWeight = 30.0f;
 		const GLfloat mRadius = 0.1f;
 
+		/* 이전 좌표값 */
+		glm::vec3 mPrevPos = { 0,0,0 };
+
 		/* 발사 후 경과한 시간 */
 		GLfloat mT = 0.0f;
 
@@ -20,6 +23,7 @@ private:
 		GLvoid Update();
 
 		inline constexpr GLfloat GetRadius() const { return mRadius; }
+		inline constexpr glm::vec3 GetPrevPos() const { return mPrevPos; }
 	};
 
 	vector<Bullet*> mBullets;

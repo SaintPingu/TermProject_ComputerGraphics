@@ -58,14 +58,18 @@ GLboolean Map::CheckCollision(const Circle* boundingCircle)
 	return false;
 }
 
-GLboolean Map::CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
+GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
 {
 	if (bulletPos.y < 0)
 	{
 		return true;
 	}
 
+	// check collision with current bullet position
+	// if not : check collision with previous to current bullet position line
+
 	glm::vec2 center = { bulletPos.x, bulletPos.z };
+	glm::vec2 prevCenter = { prevPos.x, prevPos.z };
 	if (center.y - bulletRadius <= mLeftTop.y)
 	{
 		return true;
@@ -80,6 +84,10 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& b
 		{
 			return true;
 		}
+		if (::CheckCollision(mLeftTop, mLeftBottom, prevCenter, center) == GL_TRUE)
+		{
+			return true;
+		}
 	}
 	else if (center.x + bulletRadius > mRightBottom.x)
 	{
@@ -87,7 +95,14 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& b
 		{
 			return true;
 		}
+		if (::CheckCollision(mRightTop, mRightBottom, prevCenter, center) == GL_TRUE)
+		{
+			return true;
+		}
 	}
+
+	
+	
 
 	return false;
 }

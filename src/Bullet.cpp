@@ -22,6 +22,8 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 }
 GLvoid BulletManager::Bullet::Update()
 {
+	mPrevPos = GetTransformedPos();
+
 	mT += timer::DeltaTime();
 	MoveZ(-mVelocity * mAngleZ);
 	MoveY(mVelocity * mAngleY - (0.5f * GRAVITY * mT * mT * mWeight));
@@ -65,7 +67,7 @@ GLvoid BulletManager::Update()
 		GLboolean isCollision = false;
 		for (IBulletCollisionable* object : mCollisionObjects)
 		{
-			if (object->CheckCollisionBullet(bullet->GetTransformedPos(), bullet->GetRadius()) == true)
+			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius()) == GL_TRUE)
 			{
 				delete bullet;
 				iter = mBullets.erase(iter);

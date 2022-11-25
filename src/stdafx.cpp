@@ -152,7 +152,6 @@ GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm
 	else
 	{
 		// ray didn't totally miss sphere, so there is a solution to the equation.
-
 		discriminant = sqrtf(discriminant);
 
 		// either solution may be on or off the ray so need to test both
@@ -173,6 +172,23 @@ GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm
 	return false;
 }
 
+/* https://gamedev.stackexchange.com/questions/26004/how-to-detect-2d-line-on-line-collision */
+GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2)
+{
+	GLfloat denominator = ((v2.x - v1.x) * (u2.y - u1.y)) - ((v2.y - v1.y) * (u2.x - u1.x));
+	GLfloat numerator1 = ((v1.y - u1.y) * (u2.x - u1.x)) - ((v1.x - u1.x) * (u2.y - u1.y));
+	GLfloat numerator2 = ((v1.y - u1.y) * (v2.x - v1.x)) - ((v1.x - u1.x) * (v2.y - v1.y));
+
+	if (denominator == 0)
+	{
+		return (numerator1 == 0 && numerator2 == 0);
+	}
+
+	GLfloat r = numerator1 / denominator;
+	GLfloat s = numerator2 / denominator;
+
+	return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
+}
 
 void SetConsoleCursor(short x, short y)
 {

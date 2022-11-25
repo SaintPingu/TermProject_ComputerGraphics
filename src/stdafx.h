@@ -650,5 +650,8 @@ inline constexpr GLboolean IsInfinite(const GLfloat& n)
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
 
 
+/* Check Collision 2D Line-Point */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2& center, const  GLfloat& radius);
+/* Check Collision 2D Line-Line */
+GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
 void SetConsoleCursor(short x, short y);

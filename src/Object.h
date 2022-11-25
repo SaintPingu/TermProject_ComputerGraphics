@@ -355,7 +355,7 @@ public:
 
 class IBulletCollisionable abstract {
 public:
-	virtual GLboolean CheckCollisionBullet(const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
+	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
 };
 
 //////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
