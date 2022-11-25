@@ -1,5 +1,5 @@
 1 = 0.1m
 
 [ player ]
-height = 2m : 20
-radius = 0.5m : 5
+height = 40 : 4m
+radius = 10 : 1m

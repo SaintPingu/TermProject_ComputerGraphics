@@ -1,13 +1,16 @@
 #pragma once
 #include "stdafx.h"
 
+namespace shd {
+	/* 등록된 모든 Shader 생성 */
+	GLvoid Init();
 
-GLvoid InitShader();
-GLint GetShaderProgram(const Shader& shader);
-GLvoid ApplyLightColor(const glm::vec3& color);
-GLvoid ApplyLightColorRef(const COLORREF& color);
-GLvoid ApplyCameraPos(const glm::vec3& cameraPos);
-GLvoid ApplyObjectColor(const Shader& shader, const glm::vec3& color);
+	GLint GetShaderProgram(const Shader& shader);
 
-GLvoid SetShader(const Shader& shader, const GLchar* name, const glm::vec3& value);
-GLvoid SetShader(const Shader& shader, const GLchar* name, const GLfloat& value);
+	/* shader에 있는 name에 mat4 적용 */
+	GLvoid SetShader(const Shader& shader, const glm::mat4& transform, const GLchar* name);
+	/* shader에 있는 name에 vec3 적용 */
+	GLvoid SetShader(const Shader& shader, const GLchar* name, const glm::vec3& value);
+	/* shader에 있는 name에 GLfloat 적용 */
+	GLvoid SetShader(const Shader& shader, const GLchar* name, const GLfloat& value);
+}

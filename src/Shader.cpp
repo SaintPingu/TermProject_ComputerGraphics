@@ -8,7 +8,7 @@ GLint Make_ShaderProgram(const Shader& shader);
 GLint Make_VertexShaders(const string& name);
 GLint Make_FragmentShaders(const string& name);
 
-GLvoid InitShader()
+GLvoid shd::Init()
 {
 	for (GLsizei i = 0; i < NUM_OF_SHADER; ++i)
 	{
@@ -17,7 +17,7 @@ GLvoid InitShader()
 		*shaderProgram = Make_ShaderProgram(shader);
 	}
 }
-GLint GetShaderProgram(const Shader& shader)
+GLint shd::GetShaderProgram(const Shader& shader)
 {
 	return shaders[static_cast<GLint>(shader)];
 }
@@ -29,8 +29,8 @@ GLint Make_ShaderProgram(const Shader& shader)
 	switch (shader)
 	{
 	case Shader::Color:
-		vertexShaderName = "vertex.glsl";
-		fragShaderName = "fragment.glsl";
+		vertexShaderName = "color_vertex.glsl";
+		fragShaderName = "color_fragment.glsl";
 		break;
 	case Shader::Light:
 		vertexShaderName = "light_vertex.glsl";
@@ -72,7 +72,7 @@ GLint Make_VertexShaders(const string& name)
 {
 	GLchar* vertexSource = nullptr;
 
-	const string path = "E:\\University\\2-2\\Computer Graphics\\Practices\\22\\" + name;
+	const string path = "shaders\\" + name;
 
 	vertexSource = FileToBuffer(path.c_str());
 	if (vertexSource == nullptr)
@@ -102,7 +102,7 @@ GLint Make_VertexShaders(const string& name)
 GLint Make_FragmentShaders(const string& name)
 {
 	GLchar* fragmentSource = nullptr;
-	const string path = "E:\\University\\2-2\\Computer Graphics\\Practices\\22\\" + name;
+	const string path = "shaders\\" + name;
 
 	fragmentSource = FileToBuffer(path.c_str());
 	if (fragmentSource == nullptr)
@@ -131,36 +131,24 @@ GLint Make_FragmentShaders(const string& name)
 }
 
 
-GLvoid ApplyLightColor(const glm::vec3& color)
-{
-	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "light.color");
-	glUniform3f(lightPosLocation, color.r, color.g, color.b);
-}
-GLvoid ApplyLightColorRef(const COLORREF& color)
-{
-	MyColor c(color);
-	ApplyLightColor(c);
-}
-
-GLvoid ApplyCameraPos(const glm::vec3& cameraPos)
-{
-	unsigned int lightPosLocation = glGetUniformLocation(GetShaderProgram(Shader::Light), "viewPos");
-	glUniform3f(lightPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
-}
-GLvoid ApplyObjectColor(const Shader& shader, const glm::vec3& color)
-{
-	unsigned int objColorLocation = glGetUniformLocation(GetShaderProgram(shader), "objectColor");
-	glUniform3f(objColorLocation, color.r, color.g, color.b);
-}
 
 
-GLvoid SetShader(const Shader& shader, const GLchar* name, const glm::vec3& value)
+
+
+
+GLvoid shd::SetShader(const Shader& shader, const glm::mat4& transform, const GLchar* name)
 {
-	unsigned int location = glGetUniformLocation(GetShaderProgram(Shader::Light), name);
+	const GLint location = glGetUniformLocation(GetShaderProgram(shader), name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+}
+
+GLvoid shd::SetShader(const Shader& shader, const GLchar* name, const glm::vec3& value)
+{
+	unsigned int location = glGetUniformLocation(GetShaderProgram(shader), name);
 	glUniform3f(location, value.x, value.y, value.z);
 }
-GLvoid SetShader(const Shader& shader, const GLchar* name, const GLfloat& value)
+GLvoid shd::SetShader(const Shader& shader, const GLchar* name, const GLfloat& value)
 {
-	unsigned int location = glGetUniformLocation(GetShaderProgram(Shader::Light), name);
+	unsigned int location = glGetUniformLocation(GetShaderProgram(shader), name);
 	glUniform1f(location, value);
 }

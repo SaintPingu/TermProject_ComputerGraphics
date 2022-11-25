@@ -6,7 +6,7 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 {
 	SetScale(0.1f);
 	SetColor(RED);
-	this->position = position;
+	mPosition = position;
 	mVelocity = velocity;
 	SetLook(Vector3::Back());
 	RotateLocal(0, pitch, 0);
@@ -22,11 +22,11 @@ GLvoid BulletManager::Bullet::Update()
 
 BulletManager::BulletManager()
 {
-	bullets.reserve(100);
+	mBullets.reserve(100);
 }
 BulletManager::~BulletManager()
 {
-	for (Bullet* bullet : bullets)
+	for (Bullet* bullet : mBullets)
 	{
 		delete bullet;
 	}
@@ -35,13 +35,13 @@ BulletManager::~BulletManager()
 GLvoid BulletManager::AddBullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
 {
 	Bullet* bullet = new Bullet(position, velocity, yaw, pitch);
-	bullets.emplace_back(bullet);
+	mBullets.emplace_back(bullet);
 	AddObject(Shader::Light, bullet);
 }
 
 GLvoid BulletManager::Update()
 {
-	for (Bullet* bullet : bullets)
+	for (Bullet* bullet : mBullets)
 	{
 		bullet->Update();
 	}

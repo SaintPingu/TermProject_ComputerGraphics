@@ -7,19 +7,19 @@ extern const Model* mapModel;
 
 Map::Map()
 {
-	object = new ModelObject(mapModel);
-	object->SetColor(DARK_GREEN);
-	object->BindBuffers();
+	mObject = new ModelObject(mapModel);
+	mObject->SetColor(DARK_GREEN);
+	mObject->BindBuffers();
 }
 
 GLvoid Map::Draw()
 {
-	object->Draw();
+	mObject->Draw();
 }
 
 GLboolean Map::CheckCollision(const Circle* boundingCircle)
 {
-	set<glm::vec2, CompareSet> boundingMap = object->GetBoundings_XZ();
+	set<glm::vec2, CompareSet> boundingMap = mObject->GetBoundings_XZ();
 	auto iter = boundingMap.begin();
 	glm::vec2 leftTop = *(iter++);
 	glm::vec2 leftBottom = *(iter++);

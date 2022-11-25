@@ -11,51 +11,75 @@ enum class IdentityObjects { Circle, Player, Gun };
 //////////////////////////////////////// [ Object ] ////////////////////////////////////////
 class Object abstract {
 protected:
-	glm::vec3 position = { 0, 0, 0 };
+	/* Rotation, Scaling, Pivot 이전 원래 위치 */
+	glm::vec3 mPosition = { 0, 0, 0 };
 
-	glm::vec3 look = { 0, 0, 0 };				// 자전
-	glm::quat rotation = { 0, 0, 0, 0 };		// 공전 -> look벡터 영향 X
+	/* 자전, 바라보는 방향 */
+	glm::vec3 mLook = { 0, 0, 0 };
+	/* 공전, look 에 영향 X */
+	glm::quat mRotation = { 0, 0, 0, 0 };
 
-	const glm::vec3* rotationPivot = nullptr;	// 공전 중심
-	const glm::vec3* pivot = nullptr;			// 위치 중심
+	/* rotation(공전) 중심 좌표 */
+	const glm::vec3* mRotationPivot = nullptr;
+	/* position 중심 좌표 */
+	const glm::vec3* mPivot = nullptr;
 
 public:
 	Object();
+	/* 멤버변수 초기화 */
 	virtual GLvoid InitValues();
 
-	// position
+	//********** [ Position ] **********//
+	/* mPosition의 const 주소 리턴 */
 	const glm::vec3* GetRefPos() const;
+
+	/* pivot이 적용된 mPosition 리턴 */
 	glm::vec3 GetPosition() const;
+
 	GLvoid SetPosition(const glm::vec3& position);
-	GLvoid SetPosX(const GLfloat& amount);
-	GLvoid SetPosY(const GLfloat& amount);
-	GLvoid SetPosZ(const GLfloat& amount);
+	GLvoid SetPosX(const GLfloat& x);
+	GLvoid SetPosY(const GLfloat& y);
+	GLvoid SetPosZ(const GLfloat& z);
 
 	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = true);
 	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = true);
 	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = true);
 	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = true);
+	/* look벡터 영향 없는 글로벌 좌표계에서 이동 */
 	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = true);
 	GLvoid SetPivot(const glm::vec3* pivot);
 
-	// rotation
+	//********** [ Rotation ] **********//
+	/* axis를 기준으로 공전 */
 	GLvoid Rotate(const glm::vec3& axis, const GLfloat& degree);
+	/* yaw(x축), pitch(y축), roll(z축) 에 대해 공전 */
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
+	/* mRotation을 axis를 기준으로 회전하는 quaternion값으로 설정 */
 	GLvoid SetRotation(const glm::vec3& axis, const GLfloat& degree);
 	GLvoid SetRotation(const glm::quat& rotation);
+
+	/* axis를 기준으로 자전, axis는 normal */
 	GLvoid RotateLocal(const glm::vec3& axis, const GLfloat& degree);
+	/* yaw(x축), pitch(y축), roll(z축) 에 대해 자전 */
 	GLvoid RotateLocal(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
-	GLvoid RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
-	GLvoid RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
+	/* mLocalRotation을 axis를 기준으로 회전하는 quaternion값으로 설정 */
 	GLvoid SetLocalRotation(const glm::vec3& axis, const GLfloat& degree);
+
+	/* pivot 위치에 대해 axis를 기준으로 공전 */
+	GLvoid RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
+	/* pivot 위치에 대해 axis를 기준으로 위치만 공전 */
+	GLvoid RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
+	
 	GLvoid ResetRotation();
 	glm::quat GetRotation() const;
 	GLvoid SetRotationPivot(const glm::vec3* pivot);
 
-	// direction
+	//********** [ Direction ] **********//
+	/* look을 point를 바라보도록 설정 */
 	GLvoid Look(const glm::vec3& point);
 	GLvoid SetLook(const glm::vec3& look);
 	GLvoid ResetLook();
+
 	glm::vec3 GetLook() const;
 	glm::vec3 GetRight() const;
 	glm::vec3 GetUp() const;
@@ -64,42 +88,55 @@ public:
 //////////////////////////////////////// [ SharedObject ] ////////////////////////////////////////
 class ShaderObject abstract : public Object {
 protected:
-	Shader shader = Shader::None;
-	MyColor color;
+	/* 사용하는 shader */
+	Shader mShader = Shader::None;
+	/* Object Color */
+	MyColor mColor;
 
-	glm::vec3 scale = { 0, 0, 0 };
-	glm::vec3 scaleOrigin = { 0, 0, 0 };
+	/* Object 기준 Scale값 */
+	glm::vec3 mScale = { 0, 0, 0 };
+	/* 원점 기준 Scale값, 현재 사용 X */
+	glm::vec3 mScaleOrigin = { 0, 0, 0 };
 
 public:
 	ShaderObject();
 	~ShaderObject();
+	/* 멤버변수 초기화 */
 	virtual GLvoid InitValues() override;
-	// scaling
+
+	//********** [ Scaling ] **********//
 	GLvoid SetScale(const GLfloat& scale);
+	GLvoid SetScaleX(const GLfloat& scale);
+	GLvoid SetScaleY(const GLfloat& scale);
+	GLvoid SetScaleZ(const GLfloat& scale);
 	GLvoid SetScale(const glm::vec3& scale);
+
 	GLvoid ScaleOrigin(const GLfloat& scale);
+
 	GLvoid Scale(const GLfloat& scale);
 	GLvoid ScaleX(const GLfloat& amount);
 	GLvoid ScaleY(const GLfloat& amount);
 	GLvoid ScaleZ(const GLfloat& amount);
-	GLvoid SetScaleX(const GLfloat& scale);
-	GLvoid SetScaleY(const GLfloat& scale);
-	GLvoid SetScaleZ(const GLfloat& scale);
-	const glm::vec3* GetRefScale() const;
-	inline constexpr glm::vec3 GetScale() const { return scale; }
 
-	// transform
+	inline constexpr const glm::vec3* GetRefScale() const { return &mScale; };
+	inline constexpr glm::vec3 GetScale() const { return mScale; }
+
+	//********** [ Transform ] **********//
+	/* Object의 최종 Transform 리턴 */
 	glm::mat4 GetTransform() const;
+	/* Object의 최종 Transform 적용 */
 	GLvoid ModelTransform() const;
-	inline glm::vec3 GetTransformedPos() const { return glm::vec3(GetTransform() * glm::vec4(position, 1.0f)); }
 
-	// draw
+	/* Transform이 적용된 mPosition 리턴 */
+	inline glm::vec3 GetTransformedPos() const { return glm::vec3(GetTransform() * glm::vec4(mPosition, 1.0f)); }
+
+	//********** [ Draw ] **********//
 	virtual GLvoid Draw() const abstract;
-	inline GLvoid SetColor(const COLORREF& color) { this->color = MyColor(color); }
+	inline GLvoid SetColor(const COLORREF& color) { mColor = MyColor(color); }
 
-	// shader
-	inline constexpr Shader GetShader() const { return shader; }
-	inline constexpr GLvoid SetShader(const Shader& shader) { this->shader = shader; }
+	//********** [ Shader ] **********//
+	inline constexpr Shader GetShader() const { return mShader; }
+	inline constexpr GLvoid SetShader(const Shader& shader) { mShader = shader; }
 };
 
 
@@ -114,11 +151,11 @@ public:
 /************************************************** [ MAJOR ROOTS ] **************************************************/
 //////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
 // IdentityObject should BindBuffers() when generated
-class IdentityObject : public ShaderObject{
+class IdentityObject abstract : public ShaderObject{
 protected:
-	GLuint VAO = 0;
-	GLuint VBO[2] = { 0,0 };
-	GLuint EBO = 0;
+	GLuint mVAO = 0;
+	GLuint mVBO[2] = { 0,0 };
+	GLuint mEBO = 0;
 
 	virtual GLvoid PullColors(vector<GLfloat>& colors) const abstract;
 	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
@@ -126,30 +163,29 @@ protected:
 	virtual GLvoid PullIndices(vector<size_t>& vertexIndices) const abstract;
 	virtual GLvoid PullNormalIndices(vector<size_t>& normalIndices) const abstract;
 
-	GLvoid InitValues();
+	/* 멤버 변수 초기화 */
+	virtual GLvoid InitValues() override;
 public:
 	IdentityObject();
 	~IdentityObject();
-	virtual GLvoid InitBuffers();
-	virtual GLvoid BindBuffers();
-	virtual GLvoid DeleteBuffers();
+	GLvoid InitBuffers();
+	GLvoid BindBuffers();
+	GLvoid DeleteBuffers();
 
-	virtual GLfloat GetWidth() const;
-	virtual GLfloat GetHeight() const;
-	virtual GLfloat GetDepth() const;
+	// 현재 사용 X //
+	GLfloat GetWidth() const;
+	GLfloat GetHeight() const;
+	GLfloat GetDepth() const;
+	/////////////////
 
-	// buffers
+	//********** [ Buffer ] **********//
+	/* Vertex Index 개수 리턴 */
 	virtual size_t GetIndexCount() const abstract;
+	/* Vertex 개수 리턴 */
 	virtual size_t GetVertexCount() const abstract;
 
-	inline constexpr const GLuint& GetVAO() const
-	{
-		return VAO;
-	}
-	inline MyColor GetColor() const
-	{
-		return color;
-	}
+	inline constexpr const GLuint& GetVAO() const { return mVAO; }
+	inline MyColor GetColor() const { return mColor; }
 
 	// draw
 	virtual GLvoid Draw() const override;
@@ -158,22 +194,16 @@ public:
 //////////////////////////////////////// [ SharedObject ] ////////////////////////////////////////
 class SharedObject : public ShaderObject {
 protected:
-	const IdentityObject* object = nullptr;
-	GLboolean isChangeColor = false;
+	const IdentityObject* mObject = nullptr;
+	GLboolean mIsChangeColor = false;
 public:
 	SharedObject() {};
 	SharedObject(const IdentityObject* object);
-	inline constexpr GLvoid SetObject(const IdentityObject* object)
-	{
-		this->object = object;
-	}
 
 	GLvoid Draw() const override;
 
-	inline constexpr const IdentityObject* GetIdentityObject() const
-	{
-		return object;
-	}
+	inline constexpr GLvoid SetObject(const IdentityObject* object) { mObject = object; }
+	inline constexpr const IdentityObject* GetIdentityObject() const { return mObject; }
 };
 
 
@@ -190,29 +220,31 @@ public:
 //////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
 class ModelObject : public IdentityObject {
 protected:
-	const Model* model = nullptr;
+	const Model* mModel = nullptr;
 
-	GLvoid PullColors(vector<GLfloat>& colors) const {};
-	GLvoid PullNormals(vector<GLfloat>& normals) const;
-	GLvoid PullVertices(vector<GLfloat>& vertices) const;
-	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
-	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const;
+	/* ModelObject에서는 사용하지 않음 */
+	GLvoid PullColors(vector<GLfloat>& colors) const override {};
+	GLvoid PullNormals(vector<GLfloat>& normals) const override;
+	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
+	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
+	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override;
 public:
 	ModelObject() {};
 	ModelObject(const Model* model);
 	GLvoid LoadModel(const Model* model);
 
-	// buffers
+	//********** [ Buffer ] **********//
 	size_t GetIndexCount() const;
 	size_t GetVertexCount() const;
 
-	// size
+	//********** [ Size ] **********//
+	/* Side에 대한 값 리턴 (Left -> 왼쪽 경계값, Top -> 위쪽 경계값, ...) */
 	GLfloat GetSide(const Dir& dir) const;
 	GLfloat GetWidth() const;
 	GLfloat GetHeight() const;
 	GLfloat GetDepth() const;
 
-	// collision
+	//********** [ Collision ] **********//
 	GLrect GetXZRect() const;
 	set<glm::vec2, CompareSet> GetBoundings_XZ() const;
 };
@@ -220,20 +252,22 @@ public:
 //////////////////////////////////////// [ CustomObject ] ////////////////////////////////////////
 class CustomObject : public IdentityObject {
 protected:
-	vector<glm::vec3> vertices;
-	vector<size_t> indices;
+	vector<glm::vec3> mVertices;
+	vector<size_t> mIndices;
 
-	GLvoid PullNormals(vector<GLfloat>& normals) const {};
-	GLvoid PullColors(vector<GLfloat>& colors) const;
-	GLvoid PullVertices(vector<GLfloat>& vertices) const;
-	GLvoid PullIndices(vector<size_t>& vertexIndices) const;
-	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const {};
+	/* CustomObject에서는 사용하지 않음 */
+	GLvoid PullNormals(vector<GLfloat>& normals) const override {};
+	GLvoid PullColors(vector<GLfloat>& colors) const override;
+	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
+	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
+	/* CustomObject에서는 사용하지 않음 */
+	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override {};
 public:
 	CustomObject();
 	CustomObject(vector<glm::vec3>& vertices);
 	CustomObject(vector<glm::vec3>& vertices, vector<size_t>& indices);
 
-	// buffers
+	//********** [ Buffer ] **********//
 	size_t GetIndexCount() const;
 	size_t GetVertexCount() const;
 };
@@ -279,8 +313,8 @@ public:
 //////////////////////////////////////// [ Cube ] ////////////////////////////////////////
 class Cube : public ModelObject {
 private:
-	vector<Cube*> childs;
-	vector<glm::vec3> pivots;
+	vector<Cube*> mChilds;
+	vector<glm::vec3> mPivots;
 public:
 	Cube();
 	GLvoid SetChild(Cube* cube);
@@ -318,33 +352,35 @@ public:
 //////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
 class Cuboid {
 private:
-	const glm::vec3* position = nullptr;
-	const glm::vec3* scale = nullptr;
-	GLfloat halfWidth = 0.0f;
-	GLfloat height = 0.0f;
-	GLfloat halfDepth = 0.0f;
+	const glm::vec3* mPosition = nullptr;
+	const glm::vec3* mScale = nullptr;
+	GLfloat mHalfWidth = 0.0f;
+	GLfloat mHeight = 0.0f;
+	GLfloat mHalfDepth = 0.0f;
 public:
 	Cuboid(const IdentityObject* object);
 	Cuboid(const SharedObject* object, const GLfloat& width, const GLfloat& height, const GLfloat& depth);
 	Cuboid(const glm::vec3* position, const glm::vec3* scale, const GLfloat& width, const GLfloat& height, const GLfloat& depth);
 
-	GLfloat GetSide(const Dir& dir) const;
-	GLboolean CheckCollide(const glm::vec3& center, const GLfloat& radius = 0.0f) const;
-
-	// xz plane
-	GLrect GetXZRect() const;
-	GLboolean CheckCollide(const GLrect& rect) const;
 	GLvoid Draw() const;
+
+	/* Side에 대한 값 리턴 (Left -> 왼쪽 경계값, Top -> 위쪽 경계값, ...) */
+	GLfloat GetSide(const Dir& dir) const;
+	/* true if collision */
+	GLboolean CheckCollide(const glm::vec3& center, const GLfloat& radius = 0.0f) const;
+	GLboolean CheckCollide(const GLrect& rect) const;
+
+	GLrect GetXZRect() const;
 };
 
 //////////////////////////////////////// [ Circle ] ////////////////////////////////////////
 class Circle {
 private:
-	SharedObject* circle = nullptr;
+	SharedObject* mCircle = nullptr;
 
-	glm::vec3 offset = { 0,0,0 };
+	glm::vec3 mOffset = { 0,0,0 };
 
-	GLfloat radius = 0.0f;
+	GLfloat mRadius = 0.0f;
 public:
 	Circle(const glm::vec3* pivot, const GLfloat& radius, const glm::vec3 offset = { 0,0,0 });
 

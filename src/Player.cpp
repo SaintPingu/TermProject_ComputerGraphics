@@ -21,7 +21,7 @@ const set<GLint> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
 // [ IDLE ] //
 GLvoid Idle::Enter(const Event& e, const GLint& value)
 {
-	player->Stop();
+	mPlayer->Stop();
 }
 GLvoid Idle::Exit()
 {
@@ -38,17 +38,17 @@ GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 	case Event::KeyDown:
 		if(movKeys.find(key) != movKeys.end())
 		{
-			player->ChangeState(Player::State::Walk, e, key);
+			mPlayer->ChangeState(Player::State::Walk, e, key);
 		}
 		else if (key == GLUT_KEY_SPACEBAR)
 		{
-			player->ChangeState(Player::State::Jump);
+			mPlayer->ChangeState(Player::State::Jump);
 		}
 		break;
 	case Event::KeyUp:
 		if (movKeys.find(key) != movKeys.end())
 		{
-			player->ChangeState(Player::State::Walk, Event::KeyUp, key);
+			mPlayer->ChangeState(Player::State::Walk, Event::KeyUp, key);
 		}
 		break;
 	}
@@ -60,10 +60,10 @@ GLvoid Walk::Enter(const Event& e, const GLint& value)
 	switch (e)
 	{
 	case Event::KeyDown:
-		player->AddDir(value);
+		mPlayer->AddDir(value);
 		break;
 	case Event::KeyUp:
-		player->SubDir(value);
+		mPlayer->SubDir(value);
 		break;
 	default:
 		break;
@@ -74,7 +74,7 @@ GLvoid Walk::Exit()
 }
 GLvoid Walk::Update()
 {
-	player->Move();
+	mPlayer->Move();
 }
 GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 {
@@ -83,27 +83,27 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 	case Event::KeyDown:
 		if (movKeys.find(key) != movKeys.end())
 		{
-			player->AddDir(key);
+			mPlayer->AddDir(key);
 		}
 
-		if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+		if (mPlayer->GetDirX() == 0 && mPlayer->GetDirZ() == 0)
 		{
-			player->ChangeState(Player::State::Idle, e, key);
+			mPlayer->ChangeState(Player::State::Idle, e, key);
 		}
 		else if (key == GLUT_KEY_SPACEBAR)
 		{
-			player->ChangeState(Player::State::Jump);
+			mPlayer->ChangeState(Player::State::Jump);
 		}
 		break;
 	case Event::KeyUp:
 		if (movKeys.find(key) != movKeys.end())
 		{
-			player->SubDir(key);
+			mPlayer->SubDir(key);
 		}
 
-		if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+		if (mPlayer->GetDirX() == 0 && mPlayer->GetDirZ() == 0)
 		{
-			player->ChangeState(Player::State::Idle, e, key);
+			mPlayer->ChangeState(Player::State::Idle, e, key);
 		}
 		break;
 	}
@@ -114,7 +114,7 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
-	player->SetDir(GLUT_KEY_SPACEBAR, UP);
+	mPlayer->SetDir(GLUT_KEY_SPACEBAR, UP);
 }
 GLvoid Jump::Exit()
 {
@@ -124,34 +124,34 @@ GLvoid Jump::Update()
 	t += timer::DeltaTime();
 	if (t >= jumpTime)
 	{
-		if (player->GetDirY() == UP)
+		if (mPlayer->GetDirY() == UP)
 		{
 			t = 0;
-			player->SetDir(GLUT_KEY_SPACEBAR, DOWN);
+			mPlayer->SetDir(GLUT_KEY_SPACEBAR, DOWN);
 		}
 		else
 		{
 			if (isKeyUp)
 			{
-				player->SetDir(GLUT_KEY_SPACEBAR, 0);
-				if (player->GetDirX() == 0 && player->GetDirZ() == 0)
+				mPlayer->SetDir(GLUT_KEY_SPACEBAR, 0);
+				if (mPlayer->GetDirX() == 0 && mPlayer->GetDirZ() == 0)
 				{
-					player->ChangeState(Player::State::Idle);
+					mPlayer->ChangeState(Player::State::Idle);
 				}
 				else
 				{
-					player->ChangeState(Player::State::Walk);
+					mPlayer->ChangeState(Player::State::Walk);
 				}
 			}
 			else
 			{
 				t = 0;
-				player->SetDir(GLUT_KEY_SPACEBAR, UP);
+				mPlayer->SetDir(GLUT_KEY_SPACEBAR, UP);
 			}
 		}
 		return;
 	}
-	player->Move();
+	mPlayer->Move();
 }
 GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 {
@@ -173,10 +173,10 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 		switch (e)
 		{
 		case Event::KeyDown:
-			player->AddDir(key);
+			mPlayer->AddDir(key);
 			break;
 		case Event::KeyUp:
-			player->SubDir(key);
+			mPlayer->SubDir(key);
 			break;
 		}
 	}
@@ -199,32 +199,32 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 ////////////////////////////// [ Player ] //////////////////////////////
 Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 {
-	this->position = position;
-	this->tpCameraPosition = position;
-	this->cameraMode = cameraMode;
-	object = new SharedObject(GetIdentityObject(IdentityObjects::Player));
-	object->SetColor(WHITE);
+	mPosition = position;
+	mTpCameraPosition = position;
+	mCameraMode = cameraMode;
+	mObject = new SharedObject(GetIdentityObject(IdentityObjects::Player));
+	mObject->SetColor(WHITE);
 
 
-	fpCamera = new Camera();
-	fpCamera->SetPivot(&this->position);
-	fpCamera->SetPosY(38);
+	mFpCamera = new Camera();
+	mFpCamera->SetPivot(&mPosition);
+	mFpCamera->SetPosY(38);
 	//fpCamera->SetPosZ(10);
-	fpCamera->SetFovY(110.0f);
-	fpCamera->SetLook(object->GetLook());
+	mFpCamera->SetFovY(110.0f);
+	mFpCamera->SetLook(mObject->GetLook());
 
-	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS*2, fpCamera->GetPosition().y - 20, 0);
-	gun = new Gun(gunPosition, &this->position);
+	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPosition().y - 20, 0);
+	mGun = new Gun(gunPosition, &mPosition);
 	
 
-	boundingCircle = new Circle(object->GetRefPos(), PLAYER_RADIUS, { 0, 1.0f, 0 });
-	boundingCircle->SetColor(BLUE);
+	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 1.0f, 0 });
+	mBoundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
 }
 Player::~Player()
 {
-	delete object;
+	delete mObject;
 }
 
 
@@ -235,19 +235,19 @@ GLvoid Player::AddDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		dirZ += FRONT;
+		mDirZ += FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirZ += BACK;
+		mDirZ += BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirX += LEFT;
+		mDirX += LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirX += RIGHT;
+		mDirX += RIGHT;
 		break;
 	default:
 		break;
@@ -259,19 +259,19 @@ GLvoid Player::SubDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		dirZ -= FRONT;
+		mDirZ -= FRONT;
 		break;
 	case 's':
 	case 'S':
-		dirZ -= BACK;
+		mDirZ -= BACK;
 		break;
 	case 'a':
 	case 'A':
-		dirX -= LEFT;
+		mDirX -= LEFT;
 		break;
 	case 'd':
 	case 'D':
-		dirX -= RIGHT;
+		mDirX -= RIGHT;
 		break;
 	default:
 		break;
@@ -282,35 +282,35 @@ GLvoid Player::SetDir(const GLint& key, const GLint& value)
 	switch (key)
 	{
 	case GLUT_KEY_SPACEBAR:
-		dirY = value;
+		mDirY = value;
 		break;
 	}
 }
 
 GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint& value)
 {
-	if (crntState != nullptr)
+	if (mCrntState != nullptr)
 	{
-		crntState->Exit();
-		delete crntState;
+		mCrntState->Exit();
+		delete mCrntState;
 	}
 
 	switch (playerState)
 	{
 	case State::Idle:
-		crntState = new Idle(this);
+		mCrntState = new Idle(this);
 		break;
 	case State::Walk:
-		crntState = new Walk(this);
+		mCrntState = new Walk(this);
 		break;
 	case State::Jump:
-		crntState = new Jump(this);
+		mCrntState = new Jump(this);
 		break;
 	default:
 		assert(0);
 	}
 
-	crntState->Enter(e, value);
+	mCrntState->Enter(e, value);
 }
 
 
@@ -319,24 +319,26 @@ GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint
 
 GLvoid Player::Update()
 {
-	crntState->Update();
+	mCrntState->Update();
 
-	position = object->GetPosition();
-	tpCameraPosition = object->GetPosition();
-	tpCameraPosition.y += 0.5f;
-	tpCameraPosition.z -= 0.5f;
-	RotatePosition(tpCameraPosition, object->GetPosition(), object->GetUp(), tpCameraPitch);
+	mPosition = mObject->GetPosition();
+	mTpCameraPosition = mObject->GetPosition();
+	mTpCameraPosition.y += 0.5f;
+	mTpCameraPosition.z -= 0.5f;
+	RotatePosition(mTpCameraPosition, mObject->GetPosition(), mObject->GetUp(), mTpCameraPitch);
+
+	mGun->Update();
 }
 GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
-	gun->Draw();
+	mGun->Draw();
 	if (cameraMode == CameraMode::FirstPerson)
 	{
 		return;
 	}
 
-	object->Draw();
-	boundingCircle->Draw();
+	mObject->Draw();
+	mBoundingCircle->Draw();
 }
 GLvoid Player::DrawIcon() const
 {
@@ -344,11 +346,11 @@ GLvoid Player::DrawIcon() const
 
 GLvoid Player::ProcessKeyDown(const GLint& key)
 {
-	crntState->HandleEvent(Event::KeyDown, key);
+	mCrntState->HandleEvent(Event::KeyDown, key);
 }
 GLvoid Player::ProcessKeyUp(const GLint& key)
 {
-	crntState->HandleEvent(Event::KeyUp, key);
+	mCrntState->HandleEvent(Event::KeyUp, key);
 }
 GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 {
@@ -357,7 +359,11 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			gun->Fire(mYaw, mPitch);
+			mGun->StartFire();
+		}
+		else if (state == GLUT_UP)
+		{
+			mGun->StopFire();
 		}
 		break;
 	}
@@ -365,22 +371,22 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 
 GLvoid Player::Move()
 {
-	glm::vec3 prevPos = object->GetPosition();
-	if (dirX != 0.0f) object->MoveX(speed * dirX);
-	if (dirY != 0.0f) object->MoveY(jumpSpeed * dirY);
-	if (dirZ != 0.0f) object->MoveZ(speed * dirZ);
+	glm::vec3 prevPos = mObject->GetPosition();
+	if (mDirX != 0.0f) mObject->MoveX(mSpeed * mDirX);
+	if (mDirY != 0.0f) mObject->MoveY(mJumpSpeed * mDirY);
+	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ);
 
 	// xz collision
-	if (crntMap->CheckCollision(boundingCircle) == GL_TRUE)
+	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
-		object->SetPosX(prevPos.x);
-		object->SetPosZ(prevPos.z);
+		mObject->SetPosX(prevPos.x);
+		mObject->SetPosZ(prevPos.z);
 	}
 }
 GLvoid Player::Stop()
 {
-	dirX = 0;
-	dirZ = 0;
+	mDirX = 0;
+	mDirZ = 0;
 }
 
 GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll)
@@ -392,17 +398,17 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 		mYaw = 89.0f * GetSign(mYaw);
 	}
 
-	object->RotateLocal(0, pitch, 0);
+	mObject->RotateLocal(0, pitch, 0);
 
-	fpCamera->ResetLook();
-	fpCamera->SetLook(object->GetLook());
-	fpCamera->RotateLocal(mYaw, 0, 0);
+	mFpCamera->ResetLook();
+	mFpCamera->SetLook(mObject->GetLook());
+	mFpCamera->RotateLocal(mYaw, 0, 0);
 
-	gun->Rotate(mYaw, mPitch);
+	mGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
 }
 
 glm::vec3 Player::GetPosition() const
 {
-	return object->GetPosition();
+	return mObject->GetPosition();
 }

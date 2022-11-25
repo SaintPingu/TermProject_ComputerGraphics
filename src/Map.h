@@ -6,7 +6,7 @@ class Circle;
 
 class Map {
 private:
-	ModelObject* object;
+	ModelObject* mObject;
 public:
 	Map();
 

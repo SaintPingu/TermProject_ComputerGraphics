@@ -15,6 +15,7 @@ struct Light {
 	vec3 color;
 
 	// Intensity
+	float intensity;	// global intensity
 	float ambient;
 	float diffuse;
 	float specular;
@@ -38,7 +39,7 @@ void main(void)
 	specularLight = pow(specularLight, light.shininess);
 	vec3 specular = specularLight * light.color * light.specular;
 
-	vec3 result = (ambient + diffuse + specular) * objectColor;
+	vec3 result = (ambient + diffuse + specular) * objectColor * light.intensity;
 
 	FragColor = vec4(result, 1.0);
 }

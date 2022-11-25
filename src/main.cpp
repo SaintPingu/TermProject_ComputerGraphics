@@ -44,7 +44,6 @@ glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 // lights
 BulletManager* bulletManager = nullptr;
 Light* light = nullptr;
-MyColor lightColor;
 
 // objects
 Map* crntMap = nullptr;
@@ -110,19 +109,21 @@ MyColor backColor;
 GLvoid Init()
 {
 	glewInit();
-	InitShader();
+	shd::Init();
 	InitMeshes();
-
 	timer::Init();
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+
 	backColor.SetColor(CYAN);
 
+	//********** [ Camera ] **********//
 	cameraFree = new Camera({ 0, 200.0f, 100.0f });
 	cameraFree->Look({ 0,0,0 });
+	cameraFree->SetFovY(110);
 
 	cameraTop = new Camera();
 	cameraTop->RotateLocal(89.9f, 0.0f, 0.0f);
@@ -130,22 +131,20 @@ GLvoid Init()
 
 	cameraMain = cameraFree;
 	crntCamera = cameraMain;
+	//********************************//
 
 	bulletManager = new BulletManager();
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
-
-	lightColor.SetColor(WHITE);
-	ApplyLightColor(lightColor);
 }
 
 GLvoid InitMeshes()
 {
+	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = 5.5f;
 	Line* line = nullptr;
 	Vector3 vectorLine_1, vectorLine_2;
 
-	// coordinate system lines
 	vectorLine_1 = { -lineLength, 0.0f, 0.0f };
 	vectorLine_2 = { lineLength, 0.0f, 0.0f };
 	line = new Line(vectorLine_1, vectorLine_2);
@@ -166,7 +165,8 @@ GLvoid InitMeshes()
 	line->SetColor(BLUE);
 	line->MoveGlobal({ 0, 0, lineLength });
 	AddObject(Shader::Color, line);
-	//
+	//**************************************************//
+	
 
 	// light test object
 	SharedObject* temp = new SharedObject(GetIdentitySphere());
@@ -254,18 +254,18 @@ GLvoid DrawScene()
 	SetWindow(0);
 
 	Shader crntShader = Shader::Color;
-	glUseProgram(GetShaderProgram(crntShader));
-	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
-	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
+	glUseProgram(shd::GetShaderProgram(crntShader));
+	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
+	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
 	DrawObjects(crntShader);
 
 
 	crntShader = Shader::Light;
-	glUseProgram(GetShaderProgram(crntShader));
-	transform::Apply(crntShader, transform::GetView(crntCamera), "viewTransform");
-	transform::Apply(crntShader, transform::GetProj(crntCamera), "projTransform");
-	SetShader(Shader::Light, "light.pos", light->GetPosition());
-	ApplyCameraPos(crntCamera->GetPosition());
+	glUseProgram(shd::GetShaderProgram(crntShader));
+	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
+	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
+	shd::SetShader(Shader::Light, "light.pos", light->GetPosition());
+	shd::SetShader(Shader::Light, "viewPos", crntCamera->GetPosition());
 	DrawObjects(crntShader);
 
 	crntMap->Draw();
@@ -304,6 +304,11 @@ GLvoid Update()
 	timer::CalculateFPS();
 	timer::Update();
 	bulletManager->Update();
+
+	if (player != nullptr)
+	{
+		player->Update();
+	}
 
 	constexpr GLfloat cameraMovement = 100.0f;
 	GLfloat cameraSpeed = cameraMovement;
@@ -360,11 +365,6 @@ GLvoid Update()
 			}
 		}
 	}
-	if (player != nullptr)
-	{
-		player->Update();
-	}
-
 	
 	glutPostRedisplay();
 }
@@ -407,7 +407,7 @@ GLvoid Mouse(GLint button, GLint state, GLint x, GLint y)
 
 GLvoid MouseMotion(GLint x, GLint y)
 {
-
+	MousePassiveMotion(x, y);
 }
 GLvoid MousePassiveMotion(GLint x, GLint y)
 {
@@ -534,7 +534,7 @@ GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 }
 GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 {
-	// WARNING : GLUT_KEY_LEFT(100) == 'd'(100)
+	// WARNING : (GLUT_KEY_LEFT == 'd') -> 100 //
 	switch (key)
 	{
 	case GLUT_KEY_HOME:

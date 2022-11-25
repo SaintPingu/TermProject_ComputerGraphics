@@ -71,25 +71,23 @@ GLvoid Model::LoadModel(const GLchar* path)
 				back = vertex.z;
 			}
 
-			vertices.emplace_back(vertex);
+			mVertices.emplace_back(vertex);
 
-			// process of floating point precision error
-			// Bug : only insert half vertices
 			vertex.x = round(vertex.x * 100) / 100.0f;
 			vertex.z = round(vertex.z * 100) / 100.0f;
-			verticesXZ.insert(glm::vec2(vertex.x, vertex.z));
+			mVerticesXZ.insert(glm::vec2(vertex.x, vertex.z));
 		}
 		else if (strcmp(data, "vt") == 0)
 		{
 			glm::vec3 normal;
 			fscanf(objFile, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			uvs.emplace_back(normal);
+			mUVs.emplace_back(normal);
 		}
 		else if (strcmp(data, "vn") == 0)
 		{
 			glm::vec3 normal;
 			fscanf(objFile, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			normals.emplace_back(normal);
+			mNormals.emplace_back(normal);
 		}
 		else if (strcmp(data, "f") == 0)
 		{
@@ -101,123 +99,51 @@ GLvoid Model::LoadModel(const GLchar* path)
 
 			for (size_t i = 0; i < 3; ++i)
 			{
-				vertexIndices.emplace_back(vertexIndex[i] - 1);
-				uvIndices.emplace_back(uvIndex[i] - 1);
-				normalIndices.emplace_back(normalIndex[i] - 1);
+				mVertexIndices.emplace_back(vertexIndex[i] - 1);
+				mUVIndices.emplace_back(uvIndex[i] - 1);
+				mNormalIndices.emplace_back(normalIndex[i] - 1);
 			}
 		}
-		/*else if (strcmp(data, "f") == 0)
-		{
-			size_t vertexIndex[3], uvIndex[3], normalIndex[3];
-			for (size_t i = 0; i < 3; ++i)
-			{
-				fscanf(objFile, "%d//%d", &vertexIndex[i], &normalIndex[i]);
-			}
-
-			for (size_t i = 0; i < 3; ++i)
-			{
-				vertexIndices.emplace_back(vertexIndex[i] - 1);
-			}
-		}*/
 	}
-	width = right - left;
-	height = top - bottom;
-	depth = back - front;
+	mWidth = right - left;
+	mHeight = top - bottom;
+	mDepth = back - front;
 }
-//GLvoid LoadModel(const GLchar* path)
-//{
-//	ifstream file(path);
-//	if (file.fail())
-//	{
-//		printf("Can't load objFile : %s", path);
-//		assert(0);
-//		return;
-//	}
-
-//	string line;
-//	while (std::getline(file, line))
-//	{
-//		string text;
-//		istringstream iss(line);
-
-//		iss >> text;
-
-//		if (text == "v")
-//		{
-//			glm::vec4 vertex;
-//			iss >> vertex.x;
-//			iss >> vertex.y;
-//			iss >> vertex.z;
-//			vertices.emplace_back(vertex);
-//		}
-//		else if (text == "vt")
-//		{
-//			glm::vec4 uv;
-//			iss >> uv.x;
-//			iss >> uv.y;
-//			iss >> uv.z;
-//			uvs.emplace_back(uv);
-//		}
-//		else if (text == "vn")
-//		{
-//			glm::vec4 normal;
-//			iss >> normal.x;
-//			iss >> normal.y;
-//			iss >> normal.z;
-//			normals.emplace_back(normal);
-//		}
-//		else if (text == "f")
-//		{
-//			size_t vertexIndex[3], uvIndex[3], normalIndex[3];
-//			for (size_t i = 0; i < 3; ++i)
-//			{
-//				iss >> vertexIndex[i];
-//				iss >> uvIndex[i];
-//				iss >> normalIndex[i];
-//			}
-
-//			for (size_t i = 0; i < 3; ++i)
-//			{
-//				vertexIndices.emplace_back(vertexIndex[i] - 1);
-//			}
-//		}
-//	}
-//}
 
 
 
 const vector<glm::vec3>& Model::GetVertices() const
 {
-	return vertices;
+	return mVertices;
 }
 const vector<glm::vec3>& Model::GetNormals() const
 {
-	return normals;
+	return mNormals;
 }
 size_t Model::GetVertexCount() const
 {
-	return vertices.size();
+	return mVertices.size();
 }
 const vector<size_t>& Model::GetIndices() const
 {
-	return vertexIndices;
+	return mVertexIndices;
 }
 const vector<size_t>& Model::GetNormalIndices() const
 {
-	return normalIndices;
+	return mNormalIndices;
 }
 size_t Model::GetIndexCount() const
 {
-	return vertexIndices.size();
+	return mVertexIndices.size();
 }
 glm::vec3 Model::GetVertex(const size_t& index) const
 {
-	assert(index <= vertices.size());
+	assert(index <= mVertices.size());
 
-	return vertices[index];
+	return mVertices[index];
 }
 
 Cuboid* Model::GetCuboid(const glm::vec3* position, const glm::vec3* scale) const
 {
-	return new Cuboid(position, scale, width, height, depth);
+	return new Cuboid(position, scale, mWidth, mHeight, mDepth);
 }

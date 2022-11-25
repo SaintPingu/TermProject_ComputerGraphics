@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-#define PLAYER_RADIUS 5 // Width = 10 : 1m -> radius = 0.5m
+#define PLAYER_RADIUS 10 // Width = 20 : 2m -> radius = 1m
 #define PLAYER_HEIGHT 40 // height = 40 : 4m
 // #define PLAYER_WALK_SPEED 10 // 1 m/s
 #define PLAYER_WALK_SPEED 50 // for test
@@ -16,13 +16,14 @@ class Circle;
 class Gun;
 
 namespace playerState {
+	/* ±âº» State  */
 	class PlayerState abstract {
 	protected:
-		Player* player = nullptr;
+		Player* mPlayer = nullptr;
 	public:
 		PlayerState(Player* player)
 		{
-			this->player = player;
+			mPlayer = player;
 		}
 		virtual GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) abstract;
 		virtual GLvoid Exit() abstract;
@@ -67,43 +68,41 @@ namespace playerState {
 
 class Player {
 private:
-	playerState::PlayerState* crntState = nullptr;
-	GLchar dirX = 0;
-	GLchar dirY = 0;
-	GLchar dirZ = 0;
+	playerState::PlayerState* mCrntState = nullptr;
+	GLchar mDirX = 0;
+	GLchar mDirY = 0;
+	GLchar mDirZ = 0;
 
-	glm::vec3 position = { 0, 0, 0 };
-	glm::vec3 tpCameraPosition = { 0, 0, 0 };
-	GLfloat tpCameraPitch = 0.0f;
+	glm::vec3 mPosition = { 0, 0, 0 };
+	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
+	GLfloat mTpCameraPitch = 0.0f;
 
-	SharedObject* object = nullptr;
-	Gun* gun = nullptr;
+	SharedObject* mObject = nullptr;
+	Gun* mGun = nullptr;
 
 	// camera
-	const CameraMode* cameraMode = nullptr;
-	Camera* fpCamera = nullptr;
-	Camera* tpCamera = nullptr;
+	const CameraMode* mCameraMode = nullptr;
+	Camera* mFpCamera = nullptr;
+	Camera* mTpCamera = nullptr;
 
-	Triangle* icon = nullptr;
+	GLfloat mSpeed = PLAYER_WALK_SPEED;
+	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
 
-	GLfloat speed = PLAYER_WALK_SPEED;
-	GLfloat jumpSpeed = PLAYER_JUMP_SPEED;
-
-	GLfloat floor = 0.0f;
-	GLfloat top = 0.0f;
-	GLfloat yTop = 0.0f;
-	GLfloat yBot = 0.0f;
+	GLfloat mFloor = 0.0f;
+	GLfloat mTop = 0.0f;
+	GLfloat mYtop = 0.0f;
+	GLfloat mYbot = 0.0f;
 
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
 
-	Circle* boundingCircle = nullptr;
+	Circle* mBoundingCircle = nullptr;
 
 public:
 	Player(const glm::vec3& position, const CameraMode* cameraMode);
 	~Player();
 
-	Cuboid* cuboid = nullptr;
+	Cuboid* mCuboid = nullptr;
 
 	// state
 	enum class State { Idle = 0, Walk, Run, Jump };
@@ -125,9 +124,9 @@ public:
 	GLvoid AddDir(const GLint& key);
 	GLvoid SubDir(const GLint& key);
 	GLvoid SetDir(const GLint& key, const GLint& value);
-	inline constexpr GLchar GetDirX() const { return dirX; }
-	inline constexpr GLchar GetDirY() const { return dirY; }
-	inline constexpr GLchar GetDirZ() const { return dirZ; }
+	inline constexpr GLchar GetDirX() const { return mDirX; }
+	inline constexpr GLchar GetDirY() const { return mDirY; }
+	inline constexpr GLchar GetDirZ() const { return mDirZ; }
 
 	// Rotation
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
@@ -135,15 +134,15 @@ public:
 	// Variables
 	const glm::vec3* GetRefPos() const
 	{
-		return &position;
+		return &mPosition;
 	}
 	glm::vec3 GetPosition() const;
 	inline constexpr Camera* GetFirstPersonCamera()
 	{
-		return fpCamera;
+		return mFpCamera;
 	}
 	inline constexpr Camera* GetThirdPersonCamera()
 	{
-		return tpCamera;
+		return mTpCamera;
 	}
 };

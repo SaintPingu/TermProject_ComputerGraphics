@@ -2,34 +2,36 @@
 #include "stdafx.h"
 #include "Object.h"
 
+#define DEFAULT_CAMERA_SPEED 10.0f
+
 class Camera : public Object{
 private:
-	GLfloat fovY = 45.0f;
-	GLboolean isPersp = true;
+	GLfloat mFovY = 45.0f;
+	GLboolean mIsPersp = true;
+	GLfloat mSpeed = DEFAULT_CAMERA_SPEED;
 public:
-	const GLfloat speed = 10.0f;
 
 	Camera();
 	Camera(const glm::vec3& position);
 
 	inline constexpr GLvoid SetFovY(const GLfloat& fovY)
 	{
-		this->fovY = fovY;
+		mFovY = fovY;
 	}
 	inline constexpr const GLfloat& GetFovY() const
 	{
-		return fovY;
+		return mFovY;
 	}
 	inline constexpr GLvoid SetPerpective(const GLboolean& isPersp)
 	{
-		this->isPersp = isPersp;
+		mIsPersp = isPersp;
 	}
 	inline constexpr GLvoid TogglePerpective()
 	{
-		isPersp = !isPersp;
+		mIsPersp = !mIsPersp;
 	}
 	inline constexpr const GLboolean& IsPersp() const
 	{
-		return isPersp;
+		return mIsPersp;
 	}
 };

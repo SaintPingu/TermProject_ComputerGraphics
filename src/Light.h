@@ -3,7 +3,7 @@
 
 class Light : public Object{
 private:
-	SharedObject* object = nullptr;
+	SharedObject* mObject = nullptr;
 public:
 	Light();
 	GLvoid Draw() const;

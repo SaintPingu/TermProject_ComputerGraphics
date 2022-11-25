@@ -5,26 +5,26 @@ class Cuboid;
 
 class Model {
 private:
-	vector<glm::vec3> vertices;
-	vector<glm::vec3> uvs;
-	vector<glm::vec3> normals;
-	vector<size_t> vertexIndices;
-	vector<size_t> uvIndices;
-	vector<size_t> normalIndices;
+	vector<glm::vec3> mVertices;
+	vector<glm::vec3> mUVs;
+	vector<glm::vec3> mNormals;
+	vector<size_t> mVertexIndices;
+	vector<size_t> mUVIndices;
+	vector<size_t> mNormalIndices;
 	
-	set<glm::vec2, CompareSet> verticesXZ;
+	set<glm::vec2, CompareSet> mVerticesXZ;	// for XZ-collision
 
-	Cuboid* cuboid = nullptr;
-	GLfloat width = 0;
-	GLfloat height = 0;
-	GLfloat depth = 0;
+	Cuboid* mCuboid = nullptr;				// for 3D-box collision
+	GLfloat mWidth = 0;
+	GLfloat mHeight = 0;
+	GLfloat mDepth = 0;
 public:
 	Model(const GLchar* path);
 	GLvoid LoadModel(const GLchar* path);
 
 	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const
 	{
-		return verticesXZ;
+		return mVerticesXZ;
 	}
 
 	const vector<glm::vec3>& GetVertices() const;
@@ -38,14 +38,14 @@ public:
 	Cuboid* GetCuboid(const glm::vec3* position, const glm::vec3* scale) const;
 	inline GLfloat GetWidth() const
 	{
-		return width;
+		return mWidth;
 	}
 	inline GLfloat GetHeight() const
 	{
-		return height;
+		return mHeight;
 	}
 	inline GLfloat GetDepth() const
 	{
-		return depth;
+		return mDepth;
 	}
 };

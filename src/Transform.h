@@ -3,11 +3,15 @@
 
 class Camera;
 
-namespace transform {
+namespace xform {
+	/* WorldTransform을 반환, 사용 X */
 	glm::mat4 GetWorld();
+
+	/* Camera class에서 View Tansform 추출*/
 	glm::mat4 GetView(const Camera* camera);
+	/* Camera class에서 Projection Tansform 추출*/
 	glm::mat4 GetProj(const Camera* camera);
-	GLvoid Apply(const Shader& shader, const glm::mat4& transform, const GLchar* name);
-	GLvoid Apply(const Shader& shader, const glm::vec3& vector, const GLchar* name);
+
+	/* shader에 있는 name에 mat4(1.0f) 적용*/
 	GLvoid Disable(const Shader& shader, const GLchar* name);
 }

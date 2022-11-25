@@ -11,7 +11,7 @@ private:
 		GLvoid Update();
 	};
 
-	vector<Bullet*> bullets;
+	vector<Bullet*> mBullets;
 public:
 	BulletManager();
 	~BulletManager();
