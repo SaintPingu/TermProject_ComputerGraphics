@@ -345,9 +345,8 @@ glm::mat4 ShaderObject::GetTransform() const
 		}
 	}
 
-	//transform *= glm::mat4_cast(localRotation);	// R
 	glm::quat lookAt = glm::quatLookAt(mLook, Vector3::Up());
-	transform *= glm::mat4_cast(lookAt);
+	transform *= glm::mat4_cast(lookAt);		// R
 
 	transform = glm::scale(transform, mScale);	// S
 
@@ -357,7 +356,7 @@ GLvoid ShaderObject::ModelTransform() const
 {
 	glm::mat4 transform = GetTransform();
 	shd::SetShader(mShader, transform, "modelTransform");
-	shd::SetShader(mShader, glm::transpose(glm::inverse(transform)), "normalTransform");
+	shd::SetShader(mShader, transform, "normalTransform");
 }
 
 

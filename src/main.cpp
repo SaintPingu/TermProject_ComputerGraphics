@@ -135,6 +135,8 @@ GLvoid Init()
 	//********************************//
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
+
+	system("cls");
 }
 
 GLvoid InitMeshes()
@@ -185,6 +187,7 @@ GLvoid InitMeshes()
 
 	crntMap = new Map();
 	player = new Player({ 0,0,0 }, &cameraMode);
+	monsterManager->SetPlayer(player);
 }
 
 GLvoid Reset()

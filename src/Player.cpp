@@ -408,5 +408,5 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 glm::vec3 Player::GetPosition() const
 {
-	return mObject->GetPviotedPosition();
+	return mObject->GetPosition();
 }

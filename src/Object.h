@@ -132,7 +132,7 @@ public:
 	GLvoid ModelTransform() const;
 
 	/* Transform이 적용된 mPosition 리턴 */
-	inline glm::vec3 GetTransformedPos() const { return glm::vec3(GetTransform() * glm::vec4(mPosition, 1.0f)); }
+	inline glm::vec3 GetTransformedPos() const{ return glm::vec3(GetTransform() * glm::vec4(0, 0, 0, 1.0f)); }
 
 	//********** [ Draw ] **********//
 	virtual GLvoid Draw() const abstract;
