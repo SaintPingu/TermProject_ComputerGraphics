@@ -359,19 +359,6 @@ public:
 
 /************************************************** [ COLLISION OBJECTS ] **************************************************/
 
-/* 총알과 충돌하는 객체 */
-class IBulletCollisionable abstract {
-public:
-	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
-};
-
-/* 범용적으로 충돌체크를 하는 객체 */
-class IGeneralCollisionable abstract {
-public:
-	virtual GLvoid Update() abstract;
-	virtual GLboolean CheckCollision() abstract;
-};
-
 //////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
 class Cuboid {
 private:
@@ -414,7 +401,51 @@ public:
 	GLfloat GetRadius() const;
 };
 
+/* 총알과 충돌하는 객체 */
+class IBulletCollisionable abstract {
+public:
+	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
+};
 
+/* 2D 충돌체크를 하는 객체 */
+enum class CollisionType { None, Circle, Rect };
+class ICollisionable_2D abstract {
+private:
+	CollisionType mCollisionType = CollisionType::None;
+
+	GLint id = -1;
+
+	const glm::vec3* mPosition = nullptr;
+
+	GLfloat mRadius = 0.0f;
+	GLfloat mWidth = 0.0f;
+	GLfloat mDepth = 0.0f;
+public:
+	virtual GLvoid SetCollision(const glm::vec3* position, const GLfloat& radius);
+	virtual GLvoid SetCollision(const glm::vec3* position, const GLfloat& width, const GLfloat& depth);
+
+	GLfloat GetRadius() const;
+	GLfloat GetWidth() const;
+	GLfloat GetDepth() const;
+
+	inline constexpr CollisionType GetCollisionType() const{ return mCollisionType; }
+	inline constexpr GLint Get_ID() const { return id; }
+};
+
+class CollisionManager {
+private:
+	ICollisionable_2D* player = nullptr;
+	vector<ICollisionable_2D*> mMonsterList;
+	vector<ICollisionable_2D*> mObstacleList;
+public:
+	enum class Tag { Player, Monster, Obstacle };
+	CollisionManager();
+	~CollisionManager();
+
+	GLvoid CheckCollisions();
+	GLvoid AddObject(const Tag& tag, ICollisionable_2D* object);
+	GLvoid DeleteObject(ICollisionable_2D* object);
+};
 
 
 /************************************************** [ OTHER OBJECTS ] **************************************************/

@@ -10,6 +10,7 @@ private:
 	private:
 		SharedObject* mObject = nullptr;
 		GLfloat mRadius = 0.0f;
+		GLfloat mHeight = 0.0f;
 
 	public:
 		Monster(const glm::vec3& position, const MonsterType& monsterType);

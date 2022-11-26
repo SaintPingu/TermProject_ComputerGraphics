@@ -19,6 +19,7 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 	mVelocity = velocity;
 	mAngleY = sin(DEGREE_TO_RADIAN(resultYaw));
 	mAngleZ = cos(DEGREE_TO_RADIAN(resultYaw));
+
 }
 GLvoid BulletManager::Bullet::Update()
 {

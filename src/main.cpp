@@ -143,7 +143,7 @@ GLvoid InitMeshes()
 	InitObjects();
 	bulletManager = new BulletManager();
 	monsterManager = new MonsterManager();
-	monsterManager->AddMonster({ 50, 0, 50 }, MonsterType::Blooper);
+	monsterManager->AddMonster({ 50, 20, 50 }, MonsterType::Blooper);
 
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10

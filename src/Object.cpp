@@ -1173,6 +1173,70 @@ Sphere::Sphere()
 
 
 
+GLvoid ICollisionable_2D::SetCollision(const glm::vec3* position, const GLfloat& radius)
+{
+	mPosition = position;
+	mRadius = radius;
+	mCollisionType = CollisionType::Circle;
+}
+GLvoid ICollisionable_2D::SetCollision(const glm::vec3* position, const GLfloat& width, const GLfloat& depth)
+{
+	mPosition = position;
+	mWidth = width;
+	mDepth = depth;
+	mCollisionType = CollisionType::Rect;
+}
+
+GLfloat ICollisionable_2D::GetRadius() const
+{
+	assert(mCollisionType == CollisionType::Circle);
+	return mRadius;
+}
+GLfloat ICollisionable_2D::GetWidth() const
+{
+	assert(mCollisionType == CollisionType::Rect);
+	return mWidth;
+}
+GLfloat ICollisionable_2D::GetDepth() const
+{
+	assert(mCollisionType == CollisionType::Rect);
+	return mDepth;
+}
+
+
+CollisionManager::CollisionManager()
+{
+	mMonsterList.reserve(100);
+	mObstacleList.reserve(100);
+}
+CollisionManager::~CollisionManager()
+{
+
+}
+
+GLvoid CollisionManager::CheckCollisions()
+{
+	for (ICollisionable_2D* monster : mMonsterList)
+	{
+		//monster
+	}
+}
+GLvoid CollisionManager::AddObject(const Tag& tag, ICollisionable_2D* object)
+{
+}
+GLvoid CollisionManager::DeleteObject(ICollisionable_2D* object)
+{
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -16,6 +16,7 @@ MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& m
 
 	GLfloat modelWidth = modelObject->GetWidth();
 	GLfloat modelDepth = modelObject->GetDepth();
+	mHeight = modelObject->GetHeight();
 
 	(modelWidth > modelDepth) ? mRadius = modelWidth : mRadius = modelDepth;
 	mRadius /= 2;
@@ -35,6 +36,19 @@ GLvoid MonsterManager::Monster::Draw() const
 
 GLboolean MonsterManager::Monster::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
 {
+	glm::vec3 monsterPos = mObject->GetPosition();
+	glm::vec2 objectCenter = { monsterPos.x, monsterPos.z };
+	glm::vec2 bulletCenter = { bulletPos.x, bulletPos.z };
+
+	GLfloat distance = glm::length(objectCenter - bulletCenter);
+	if (distance < mRadius + bulletRadius)
+	{
+		if ((bulletPos.y <= monsterPos.y + mHeight) && (bulletPos.y >= monsterPos.y))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
