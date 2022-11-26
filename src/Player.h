@@ -21,10 +21,7 @@ namespace playerState {
 	protected:
 		Player* mPlayer = nullptr;
 	public:
-		PlayerState(Player* player)
-		{
-			mPlayer = player;
-		}
+		PlayerState(Player* player) { mPlayer = player; }
 		virtual GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) abstract;
 		virtual GLvoid Exit() abstract;
 		virtual GLvoid Update() abstract;
@@ -68,15 +65,18 @@ namespace playerState {
 
 class Player {
 private:
+	// state
 	playerState::PlayerState* mCrntState = nullptr;
+
+	// direction
 	GLchar mDirX = 0;
 	GLchar mDirY = 0;
 	GLchar mDirZ = 0;
 
+	// position
 	glm::vec3 mPosition = { 0, 0, 0 };
-	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
-	GLfloat mTpCameraPitch = 0.0f;
 
+	// childs
 	SharedObject* mObject = nullptr;
 	Gun* mGun = nullptr;
 
@@ -84,19 +84,24 @@ private:
 	const CameraMode* mCameraMode = nullptr;
 	Camera* mFpCamera = nullptr;
 	Camera* mTpCamera = nullptr;
+	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
+	GLfloat mTpCameraPitch = 0.0f;
 
+	// values
+	GLfloat mHp = 0.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
 
+	// for collision
+	Circle* mBoundingCircle = nullptr;
 	GLfloat mFloor = 0.0f;
 	GLfloat mTop = 0.0f;
 	GLfloat mYtop = 0.0f;
 	GLfloat mYbot = 0.0f;
 
+	// rotation
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
-
-	Circle* mBoundingCircle = nullptr;
 
 public:
 	Player(const glm::vec3& position, const CameraMode* cameraMode);

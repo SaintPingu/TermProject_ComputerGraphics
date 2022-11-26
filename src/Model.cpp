@@ -1,15 +1,55 @@
+#pragma warning(disable: 6031)	// 반환값이 무시되었습니다. 'fscanf'
+#pragma warning(disable: 6054)	// 데이터의 문자열이 0으로 종료되지 않을 수 있습니다.
 #include "stdafx.h"
 #include "model.h"
 #include "object.h"
 
-const Model* mapModel = new Model("obj\\map3.obj");
-const Model* playerModel = new Model("obj\\player.obj");
-const Model* cubeModel = new Model("obj\\cube.obj");
-const Model* sphereModel = new Model("obj\\GeoSphere.obj");
-const Model* lowSphereModel = new Model("obj\\lowSphere.obj");
-const Model* circleModel = new Model("obj\\circle.obj");
+// model
+Model* circleModel = nullptr;
+Model* cubeModel = nullptr;
+Model* lowSphereModel = nullptr;
+Model* sphereModel = nullptr;
+Model* mapModel = nullptr;
 
-const Model* gunModel = new Model("obj\\gun.obj");
+// player
+Model* playerModel = nullptr;
+Model* gunModel = nullptr;
+
+// monster
+Model* blooperModel = nullptr;
+
+unordered_map<Models, Model*> modelMap{
+	{Models::Circle, circleModel},
+	{Models::Cube, cubeModel},
+	{Models::LowSphere, lowSphereModel},
+	{Models::GeoSphere, sphereModel},
+	{Models::Map, mapModel},
+	{Models::Player, playerModel},
+	{Models::Gun, gunModel},
+	{Models::Blooper, blooperModel},
+};
+
+GLvoid InitModels()
+{
+	modelMap[Models::Circle] = new Model("obj\\circle.obj");
+	modelMap[Models::Cube] = new Model("obj\\cube.obj");
+	modelMap[Models::LowSphere] = new Model("obj\\low_sphere.obj");
+	modelMap[Models::GeoSphere] = new Model("obj\\geo_sphere.obj");
+	modelMap[Models::Map] = new Model("obj\\map.obj");
+
+	modelMap[Models::Player] = new Model("obj\\player.obj");
+	modelMap[Models::Gun] = new Model("obj\\gun.obj");
+
+	modelMap[Models::Blooper] = new Model("obj\\blooper.obj");;
+}
+
+const Model* GetModel(const Models& model)
+{
+	const Model* result = modelMap[model];
+	assert(result != nullptr);
+
+	return result;
+}
 
 Model::Model(const GLchar* path)
 {

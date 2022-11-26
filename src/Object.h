@@ -5,9 +5,10 @@
 
 class Model;
 enum class Shader;
-enum class IdentityObjects { Circle, LowSphere, Player, Gun };
+enum class IdentityObjects { Circle, LowSphere, Player, Gun, Blooper };
 
 /************************************************** [ TOP ROOTS ] **************************************************/
+
 //////////////////////////////////////// [ Object ] ////////////////////////////////////////
 class Object abstract {
 protected:
@@ -152,6 +153,7 @@ public:
 
 
 /************************************************** [ MAJOR ROOTS ] **************************************************/
+
 //////////////////////////////////////// [ IdentityObject ] ////////////////////////////////////////
 // IdentityObject should BindBuffers() when generated
 class IdentityObject abstract : public ShaderObject{
@@ -160,6 +162,7 @@ protected:
 	GLuint mVBO[2] = { 0,0 };
 	GLuint mEBO = 0;
 
+	/* BindBuffers()를 위한 함수들 */
 	virtual GLvoid PullColors(vector<GLfloat>& colors) const abstract;
 	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
 	virtual GLvoid PullVertices(vector<GLfloat>& vertices) const abstract;
@@ -190,7 +193,7 @@ public:
 	inline constexpr const GLuint& GetVAO() const { return mVAO; }
 	inline MyColor GetColor() const { return mColor; }
 
-	// draw
+	/* draw */
 	virtual GLvoid Draw() const override;
 };
 
@@ -220,6 +223,7 @@ public:
 
 
 /************************************************** [ MINOR ROOTS ] **************************************************/
+
 //////////////////////////////////////// [ ModelObject ] ////////////////////////////////////////
 class ModelObject : public IdentityObject {
 protected:
@@ -227,12 +231,13 @@ protected:
 
 	/* ModelObject에서는 사용하지 않음 */
 	GLvoid PullColors(vector<GLfloat>& colors) const override {};
+
 	GLvoid PullNormals(vector<GLfloat>& normals) const override;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
 	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override;
 public:
-	ModelObject() {};
+	ModelObject();
 	ModelObject(const Model* model);
 	GLvoid LoadModel(const Model* model);
 
@@ -260,11 +265,11 @@ protected:
 
 	/* CustomObject에서는 사용하지 않음 */
 	GLvoid PullNormals(vector<GLfloat>& normals) const override {};
+	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override {};
+
 	GLvoid PullColors(vector<GLfloat>& colors) const override;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
 	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
-	/* CustomObject에서는 사용하지 않음 */
-	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override {};
 public:
 	CustomObject();
 	CustomObject(vector<glm::vec3>& vertices);
@@ -286,6 +291,7 @@ public:
 
 
 /************************************************** [ BASIC OBJECTS ] **************************************************/
+
 //////////////////////////////////////// [ Line ] ////////////////////////////////////////
 class Line : public CustomObject {
 public:
@@ -353,9 +359,17 @@ public:
 
 /************************************************** [ COLLISION OBJECTS ] **************************************************/
 
+/* 총알과 충돌하는 객체 */
 class IBulletCollisionable abstract {
 public:
 	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
+};
+
+/* 범용적으로 충돌체크를 하는 객체 */
+class IGeneralCollisionable abstract {
+public:
+	virtual GLvoid Update() abstract;
+	virtual GLboolean CheckCollision() abstract;
 };
 
 //////////////////////////////////////// [ Cuboid ] ////////////////////////////////////////
@@ -413,11 +427,11 @@ public:
 
 
 
-
+GLvoid InitObjects();
 const Line* GetIdentityLine();
 const Cube* GetIdentityCube();
 const Sphere* GetIdentitySphere();
-const ModelObject* GetIdentityObject(const IdentityObjects& object);
+const ModelObject* GetIdentityModelObject(const IdentityObjects& object);
 
 
 

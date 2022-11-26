@@ -133,7 +133,7 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 
 
 
-
+/* https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm */
 GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm::vec2& center, const GLfloat& radius)
 {
 	glm::vec2 dir = end - start;	// start to end

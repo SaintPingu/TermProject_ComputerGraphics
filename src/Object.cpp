@@ -5,13 +5,6 @@
 #include "Transform.h"
 #include "Timer.h"
 
-extern const Model* cubeModel;
-extern const Model* sphereModel;
-extern const Model* lowSphereModel;
-extern const Model* playerModel;
-extern const Model* circleModel;
-extern const Model* gunModel;
-
 
 Object::Object()
 {
@@ -419,14 +412,8 @@ GLvoid IdentityObject::BindBuffers()
 
 	switch (mShader)
 	{
-	case Shader::Color:
-		PullColors(normals);
-		break;
 	case Shader::Light:
 		PullNormals(normals);
-		break;
-	default:
-		assert(0);
 		break;
 	}
 
@@ -437,10 +424,13 @@ GLvoid IdentityObject::BindBuffers()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * normals.size(), normals.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
+	if (normals.size() > 0)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, mVBO[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * normals.size(), normals.data(), GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(1);
+	}
 
 	if (indices.size() > 0)
 	{
@@ -529,6 +519,10 @@ GLvoid SharedObject::Draw() const
 
 
 ///// private /////
+ModelObject::ModelObject() : IdentityObject()
+{
+
+}
 ModelObject::ModelObject(const Model* model) : IdentityObject()
 {
 	LoadModel(model);
@@ -554,7 +548,7 @@ GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 	const vector<size_t> vertexIndices = mModel->GetIndices();
 
 	// vertex마다 normal을 지정
-	normals.resize(mModel->GetVertices().size() * 3, 0);
+	normals.resize(mModel->GetVertexCount() * 3, 0);
 	size_t count = 0;
 	for (const size_t& vertexIndex : vertexIndices)
 	{
@@ -1074,7 +1068,7 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 {
 	mOffset = offset;
 	mRadius = radius;
-	mCircle = new SharedObject(GetIdentityObject(IdentityObjects::Circle));
+	mCircle = new SharedObject(GetIdentityModelObject(IdentityObjects::Circle));
 	mCircle->SetScale(radius);
 	mCircle->SetPivot(position);
 	mCircle->Move(offset);
@@ -1101,7 +1095,7 @@ GLfloat Circle::GetRadius() const
 
 Cube::Cube() : ModelObject()
 {
-	const Model* model = cubeModel;
+	const Model* model = GetModel(Models::Cube);
 	ModelObject::LoadModel(model);
 }
 GLvoid Cube::SetChild(Cube* cube)
@@ -1167,9 +1161,9 @@ GLboolean Cube::CheckCollide(const GLrect& rect) const
 
 
 
-Sphere::Sphere() : ModelObject()
+Sphere::Sphere()
 {
-	const Model* model = sphereModel;
+	const Model* model = GetModel(Models::GeoSphere);
 	ModelObject::LoadModel(model);
 }
 
@@ -1239,61 +1233,55 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-
+// identity simple objects
 static const Line* lineObject = nullptr;
 static const Cube* cubeObject = nullptr;
 static const Sphere* sphereObject = nullptr;
+
+// identity model objects
 static const ModelObject* circleObject = nullptr;
 static const ModelObject* lowSphereObject = nullptr;
 static const ModelObject* playerObject = nullptr;
 static const ModelObject* gunObject = nullptr;
+static const ModelObject* blooperObject = nullptr;
 
+unordered_map<IdentityObjects, pair<const Models, const ModelObject*>> objectMap{
+	{IdentityObjects::Circle, make_pair(Models::Circle, circleObject)},
+	{IdentityObjects::LowSphere, make_pair(Models::LowSphere, lowSphereObject)},
+	{IdentityObjects::Player, make_pair(Models::Player, playerObject)},
+	{IdentityObjects::Gun, make_pair(Models::Gun, gunObject)},
+	{IdentityObjects::Blooper, make_pair(Models::Blooper, blooperObject)},
+};
+
+GLvoid InitObjects()
+{
+	lineObject = new Line();
+	sphereObject = new Sphere();
+	cubeObject = new Cube();
+
+	for (auto& iter : objectMap)
+	{
+		const Model* model = GetModel(iter.second.first);
+		iter.second.second = new ModelObject(model);
+	}
+}
 const Line* GetIdentityLine()
 {
-	if (lineObject == nullptr)
-	{
-		lineObject = new Line();
-	}
-
 	return lineObject;
 }
 
 const Sphere* GetIdentitySphere()
 {
-	if (sphereObject == nullptr)
-	{
-		sphereObject = new Sphere();
-	}
-
 	return sphereObject;
 }
 
 const Cube* GetIdentityCube()
 {
-	if (cubeObject == nullptr)
-	{
-		cubeObject = new Cube();
-	}
-
 	return cubeObject;
 }
-
-unordered_map<IdentityObjects, pair<const Model*, const ModelObject*>> modelMap{
-	{IdentityObjects::Circle, make_pair(circleModel, circleObject)},
-	{IdentityObjects::LowSphere, make_pair(lowSphereModel, lowSphereObject)},
-	{IdentityObjects::Player, make_pair(playerModel, playerObject)},
-	{IdentityObjects::Gun, make_pair(gunModel, gunObject)},
-};
-const ModelObject* GetIdentityObject(const IdentityObjects& object)
+const ModelObject* GetIdentityModelObject(const IdentityObjects& object)
 {
-	pair<const Model*, const ModelObject*> value = modelMap[object];
-
-	if (value.second == nullptr)
-	{
-		value.second = new ModelObject(value.first);
-	}
-
-	return value.second;
+	return objectMap[object].second;
 }
 
 

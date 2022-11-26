@@ -2,6 +2,9 @@
 #include "stdafx.h"
 
 class Cuboid;
+enum class Models { Circle, Cube, LowSphere, GeoSphere, Map, Player, Gun, Blooper, };
+
+GLvoid InitModels();
 
 class Model {
 private:
@@ -22,10 +25,7 @@ public:
 	Model(const GLchar* path);
 	GLvoid LoadModel(const GLchar* path);
 
-	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const
-	{
-		return mVerticesXZ;
-	}
+	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const { return mVerticesXZ; }
 
 	const vector<glm::vec3>& GetVertices() const;
 	const vector<glm::vec3>& GetNormals() const;
@@ -36,16 +36,9 @@ public:
 	glm::vec3 GetVertex(const size_t& index) const;
 
 	Cuboid* GetCuboid(const glm::vec3* position, const glm::vec3* scale) const;
-	inline GLfloat GetWidth() const
-	{
-		return mWidth;
-	}
-	inline GLfloat GetHeight() const
-	{
-		return mHeight;
-	}
-	inline GLfloat GetDepth() const
-	{
-		return mDepth;
-	}
+	inline GLfloat GetWidth() const { return mWidth;}
+	inline GLfloat GetHeight() const {return mHeight; }
+	inline GLfloat GetDepth() const { return mDepth; }
 };
+
+const Model* GetModel(const Models& model);

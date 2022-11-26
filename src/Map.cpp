@@ -3,11 +3,9 @@
 #include "Model.h"
 #include "Bullet.h"
 
-extern const Model* mapModel;
-
 Map::Map()
 {
-	mMapObject = new ModelObject(mapModel);
+	mMapObject = new ModelObject(GetModel(Models::Map));
 	mMapObject->SetColor(DARK_GREEN);
 	mMapObject->BindBuffers();
 
@@ -17,6 +15,12 @@ Map::Map()
 	mLeftBottom = *(iter++);
 	mRightBottom = *(iter++);
 	mRightTop = *(iter++);
+
+	SetConsoleCursor(0, 0);
+	Vector2::PrintPos(mLeftTop);
+	Vector2::PrintPos(mLeftBottom);
+	Vector2::PrintPos(mRightBottom);
+	Vector2::PrintPos(mRightTop);
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
@@ -65,8 +69,7 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 		return true;
 	}
 
-	// check collision with current bullet position
-	// if not : check collision with previous to current bullet position line
+	// check collision with previous to current bullet position line
 
 	glm::vec2 center = { bulletPos.x, bulletPos.z };
 	glm::vec2 prevCenter = { prevPos.x, prevPos.z };
@@ -80,10 +83,6 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 	}
 	if (center.x - bulletRadius < mLeftBottom.x)
 	{
-		if (::CheckCollision(mLeftTop, mLeftBottom, center, bulletRadius) == GL_TRUE)
-		{
-			return true;
-		}
 		if (::CheckCollision(mLeftTop, mLeftBottom, prevCenter, center) == GL_TRUE)
 		{
 			return true;
@@ -91,10 +90,6 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 	}
 	else if (center.x + bulletRadius > mRightBottom.x)
 	{
-		if (::CheckCollision(mRightTop, mRightBottom, center, bulletRadius) == GL_TRUE)
-		{
-			return true;
-		}
 		if (::CheckCollision(mRightTop, mRightBottom, prevCenter, center) == GL_TRUE)
 		{
 			return true;

@@ -15,6 +15,9 @@ private:
 		/* 발사 후 경과한 시간 */
 		GLfloat mT = 0.0f;
 
+		/* 탄퍼짐 */
+		GLint mSpreadAmount = 2;
+
 		GLfloat mAngleY = 0.0f;
 		GLfloat mAngleZ = 0.0f;
 		GLfloat mVelocity = 0.0f;
@@ -26,8 +29,8 @@ private:
 		inline constexpr glm::vec3 GetPrevPos() const { return mPrevPos; }
 	};
 
-	vector<Bullet*> mBullets;
-	vector<IBulletCollisionable*> mCollisionObjects;
+	vector<Bullet*> mBulletList;
+	vector<IBulletCollisionable*> mCollisionObjectList;
 public:
 	BulletManager();
 	~BulletManager();
@@ -35,5 +38,5 @@ public:
 	GLvoid Draw() const;
 	GLvoid Update();
 
-	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjects.emplace_back(object); }
+	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjectList.emplace_back(object); }
 };

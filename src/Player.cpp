@@ -202,7 +202,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mPosition = position;
 	mTpCameraPosition = position;
 	mCameraMode = cameraMode;
-	mObject = new SharedObject(GetIdentityObject(IdentityObjects::Player));
+	mObject = new SharedObject(GetIdentityModelObject(IdentityObjects::Player));
 	mObject->SetColor(WHITE);
 
 
@@ -214,7 +214,6 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
-	
 
 	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 1.0f, 0 });
 	mBoundingCircle->SetColor(BLUE);

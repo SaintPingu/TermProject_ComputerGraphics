@@ -6,7 +6,7 @@
 
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
-	mObject = new SharedObject(GetIdentityObject(IdentityObjects::Gun));
+	mObject = new SharedObject(GetIdentityModelObject(IdentityObjects::Gun));
 
 	mObject->SetColor(GRAY);
 	mObject->SetPivot(pivot);

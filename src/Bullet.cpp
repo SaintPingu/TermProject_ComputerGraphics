@@ -2,10 +2,10 @@
 #include "Bullet.h"
 #include "Timer.h"
 
-BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityObject(IdentityObjects::LowSphere))
+BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(IdentityObjects::LowSphere))
 {
-	GLfloat resultYaw = yaw + rand() % 4 - 2;
-	GLfloat resultPitch = pitch + rand() % 4 - 2;
+	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
+	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
 
 	SetScale(mRadius);
 	SetColor(RED);
@@ -24,6 +24,7 @@ GLvoid BulletManager::Bullet::Update()
 {
 	mPrevPos = GetTransformedPos();
 
+	/* https://www.101computing.net/projectile-motion-formula/ */
 	mT += timer::DeltaTime();
 	MoveZ(-mVelocity * mAngleZ);
 	MoveY(mVelocity * mAngleY - (0.5f * GRAVITY * mT * mT * mWeight));
@@ -34,11 +35,11 @@ GLvoid BulletManager::Bullet::Update()
 
 BulletManager::BulletManager()
 {
-	mBullets.reserve(100);
+	mBulletList.reserve(100);
 }
 BulletManager::~BulletManager()
 {
-	for (Bullet* bullet : mBullets)
+	for (Bullet* bullet : mBulletList)
 	{
 		delete bullet;
 	}
@@ -47,30 +48,30 @@ BulletManager::~BulletManager()
 GLvoid BulletManager::AddBullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
 {
 	Bullet* bullet = new Bullet(position, velocity, yaw, pitch);
-	mBullets.emplace_back(bullet);
+	mBulletList.emplace_back(bullet);
 }
 
 GLvoid BulletManager::Draw() const
 {
-	for (const Bullet* bullet : mBullets)
+	for (const Bullet* bullet : mBulletList)
 	{
 		bullet->Draw();
 	}
 }
 GLvoid BulletManager::Update()
 {
-	for(auto iter = mBullets.begin(); iter != mBullets.end();)
+	for(auto iter = mBulletList.begin(); iter != mBulletList.end();)
 	{
 		Bullet* bullet = (*iter);
 		bullet->Update();
 
 		GLboolean isCollision = false;
-		for (IBulletCollisionable* object : mCollisionObjects)
+		for (IBulletCollisionable* object : mCollisionObjectList)
 		{
 			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius()) == GL_TRUE)
 			{
 				delete bullet;
-				iter = mBullets.erase(iter);
+				iter = mBulletList.erase(iter);
 				isCollision = true;
 				break;
 			}

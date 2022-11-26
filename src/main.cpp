@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "Light.h"
 #include "Bullet.h"
+#include "Monster.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -42,6 +43,7 @@ glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 
 // lights
 BulletManager* bulletManager = nullptr;
+MonsterManager* monsterManager = nullptr;
 Light* light = nullptr;
 
 // objects
@@ -137,7 +139,11 @@ GLvoid Init()
 
 GLvoid InitMeshes()
 {
+	InitModels();
+	InitObjects();
 	bulletManager = new BulletManager();
+	monsterManager = new MonsterManager();
+	monsterManager->AddMonster({ 50, 0, 50 }, MonsterType::Blooper);
 
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
@@ -267,6 +273,7 @@ GLvoid DrawScene()
 	shd::SetShader(Shader::Light, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	bulletManager->Draw();
+	monsterManager->Draw();
 
 	crntMap->Draw();
 		
@@ -303,12 +310,14 @@ GLvoid Update()
 {
 	timer::CalculateFPS();
 	timer::Update();
-	bulletManager->Update();
 
 	if (player != nullptr)
 	{
 		player->Update();
 	}
+
+	bulletManager->Update();
+	monsterManager->Update();
 
 	constexpr GLfloat cameraMovement = 100.0f;
 	GLfloat cameraSpeed = cameraMovement;
