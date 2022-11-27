@@ -178,7 +178,7 @@ GLvoid InitMeshes()
 	// light test object
 	SharedObject* temp = new SharedObject(GetIdentitySphere());
 	temp->SetColor(ORANGE);
-	temp->SetPosition({ 0, 0, 20 });
+	temp->SetPosition({ 0, 20, 20 });
 	AddObject(Shader::Light, temp);
 
 	// light object
