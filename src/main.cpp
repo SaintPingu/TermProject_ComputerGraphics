@@ -10,6 +10,7 @@
 #include "Light.h"
 #include "Bullet.h"
 #include "Monster.h"
+#include "Building.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -30,6 +31,7 @@ GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y);
 GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y);
 
 GLvoid ToggleDepthTest();
+GLvoid SetCameraMode(const CameraMode& cameraMode);
 
 // values
 GLint screenPosX = DEFAULT_SCREEN_POS_X;
@@ -44,6 +46,7 @@ glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 // lights
 BulletManager* bulletManager = nullptr;
 MonsterManager* monsterManager = nullptr;
+BuildingManager* buildingManager = nullptr;
 Light* light = nullptr;
 
 // objects
@@ -145,7 +148,9 @@ GLvoid InitMeshes()
 	InitObjects();
 	bulletManager = new BulletManager();
 	monsterManager = new MonsterManager();
-	monsterManager->AddMonster({ 50, 20, 50 }, MonsterType::Blooper);
+	buildingManager = new BuildingManager();
+	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
+	buildingManager->Create(BuildingType::GuardTower, { -100,0,-100 });
 
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
@@ -176,7 +181,7 @@ GLvoid InitMeshes()
 	
 
 	// light test object
-	SharedObject* temp = new SharedObject(GetIdentitySphere());
+	SharedObject* temp = new SharedObject(GetIdentityModelObject(Models::GeoSphere));
 	temp->SetColor(ORANGE);
 	temp->SetPosition({ 0, 20, 20 });
 	AddObject(Shader::Light, temp);
@@ -212,6 +217,7 @@ GLvoid Reset()
 		delete player;
 		player = nullptr;
 	}
+	cameraMode = CameraMode::Free;
 
 	Init();
 }
@@ -277,6 +283,7 @@ GLvoid DrawScene()
 	DrawObjects(crntShader);
 	bulletManager->Draw();
 	monsterManager->Draw();
+	buildingManager->Draw();
 
 	crntMap->Draw();
 		
@@ -321,6 +328,7 @@ GLvoid Update()
 
 	bulletManager->Update();
 	monsterManager->Update();
+	buildingManager->Update();
 
 	constexpr GLfloat cameraMovement = 100.0f;
 	GLfloat cameraSpeed = cameraMovement;
@@ -468,6 +476,19 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	switch (key)
 	{
 		// controls
+	case '`':
+		Reset();
+		break;
+	case 'q':
+	case 'Q':
+		glutLeaveMainLoop();
+		break;
+	case 'h':
+	case 'H':
+		ToggleDepthTest();
+		break;
+
+		// camera
 	case 'p':
 	case 'P':
 		cameraMain->SetPerpective(true);
@@ -476,46 +497,17 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case 'O':
 		cameraMain->SetPerpective(false);
 		break;
-	case 'c':
-	case 'C':
-		Reset();
-		break;
-	case 'h':
-	case 'H':
-		ToggleDepthTest();
-		break;
-	case 'q':
-	case 'Q':
-		glutLeaveMainLoop();
-		break;
-
-		// camera
 	case '1':
-		cameraMain = cameraFree;
-		cameraMode = CameraMode::Free;
+		SetCameraMode(CameraMode::Free	);
 		break;
 	case '2':
-		if (player != nullptr)
-		{
-			cameraMain = player->GetFirstPersonCamera();
-			cameraMode = CameraMode::FirstPerson;
-		}
+		SetCameraMode(CameraMode::FirstPerson);
 		break;
 	case '3':
-		if (player != nullptr)
-		{
-			cameraMain = player->GetThirdPersonCamera();
-			cameraMode = CameraMode::ThirdPerson;
-		}
+		SetCameraMode(CameraMode::ThirdPerson);
 		break;
 	case '0':
-		if (light != nullptr)
-		{
-			cameraMain = cameraFree;
-			cameraMain->SetPosition(light->GetPviotedPosition());
-			cameraMain->SetLook(light->GetLook());
-			cameraMode = CameraMode::Light;
-		}
+		SetCameraMode(CameraMode::Light);
 		break;
 		// objects
 
@@ -555,4 +547,33 @@ GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 		isWireFrame = !isWireFrame;
 		break;
 	}
+}
+
+GLvoid SetCameraMode(const CameraMode& mode)
+{
+	switch (mode)
+	{
+	case CameraMode::Free:
+		cameraMain = cameraFree;
+		break;
+	case CameraMode::FirstPerson:
+		if (player != nullptr)
+		{
+			cameraMain = player->GetFirstPersonCamera();
+		}
+		break;
+	case CameraMode::ThirdPerson:
+		if (player != nullptr)
+		{
+			cameraMain = player->GetThirdPersonCamera();
+		}
+		break;
+	case CameraMode::Light:
+		cameraMain = cameraFree;
+		cameraMain->SetPosition(light->GetPviotedPosition());
+		cameraMain->SetLook(light->GetLook());
+		break;
+	}
+
+	cameraMode = mode;
 }

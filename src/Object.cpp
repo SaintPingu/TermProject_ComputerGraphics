@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Object.h"
-#include "Model.h"
 #include "Shader.h"
 #include "Transform.h"
 #include "Timer.h"
@@ -1067,7 +1066,7 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 {
 	mOffset = offset;
 	mRadius = radius;
-	mCircle = new SharedObject(GetIdentityModelObject(IdentityObjects::Circle));
+	mCircle = new SharedObject(GetIdentityModelObject(Models::Circle));
 	mCircle->SetScale(radius);
 	mCircle->SetPivot(position);
 	mCircle->Move(offset);
@@ -1092,79 +1091,6 @@ GLfloat Circle::GetRadius() const
 
 
 
-Cube::Cube() : ModelObject()
-{
-	const Model* model = GetModel(Models::Cube);
-	ModelObject::LoadModel(model);
-}
-GLvoid Cube::SetChild(Cube* cube)
-{
-	cube->SetPivot(&mPosition);
-	if (mPivot)
-	{
-		cube->SetPivot(mPivot);
-	}
-	mChilds.emplace_back(cube);
-}
-GLvoid Cube::AddPivot(const glm::vec3& pivot)
-{
-	mPivots.emplace_back(pivot);
-}
-const glm::vec3* Cube::GetPivot(const size_t& index)
-{
-	::CheckOutOfIndex(index, mPivots.size());
-
-	return &mPivots[index];
-}
-
-GLvoid Cube::Draw() const
-{
-	IdentityObject::Draw();
-	for (Cube* child : mChilds)
-	{
-		child->Draw();
-	}
-}
-GLvoid Cube::Move(const glm::vec3& vector)
-{
-	IdentityObject::Move(vector);
-}
-GLvoid Cube::Rotate(const glm::vec3& pivot, const GLfloat& degree)
-{
-	IdentityObject::Rotate(pivot, degree);
-	for (Cube* child : mChilds)
-	{
-		child->Rotate(pivot, degree);
-	}
-}
-GLvoid Cube::RotateLocal(const glm::vec3& pivot, const GLfloat& degree)
-{
-	IdentityObject::RotateLocal(pivot, degree);
-	for (Cube* child : mChilds)
-	{
-		child->Rotate(pivot, degree);
-	}
-}
-
-GLboolean Cube::CheckCollide(const glm::vec3& point) const
-{
-	Cuboid cuboid(this);
-	return cuboid.CheckCollide(point);
-}
-GLboolean Cube::CheckCollide(const GLrect& rect) const
-{
-	Cuboid cuboid(this);
-	return cuboid.CheckCollide(rect);
-}
-
-
-
-
-Sphere::Sphere()
-{
-	const Model* model = GetModel(Models::GeoSphere);
-	ModelObject::LoadModel(model);
-}
 
 
 
@@ -1294,57 +1220,28 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-
-
 // identity simple objects
 static const Line* lineObject = nullptr;
-static const Cube* cubeObject = nullptr;
-static const Sphere* sphereObject = nullptr;
 
-// identity model objects
-static const ModelObject* circleObject = nullptr;
-static const ModelObject* lowSphereObject = nullptr;
-static const ModelObject* playerObject = nullptr;
-static const ModelObject* gunObject = nullptr;
-static const ModelObject* blooperObject = nullptr;
-
-unordered_map<IdentityObjects, pair<const Models, const ModelObject*>> objectMap{
-	{IdentityObjects::Circle, make_pair(Models::Circle, circleObject)},
-	{IdentityObjects::LowSphere, make_pair(Models::LowSphere, lowSphereObject)},
-	{IdentityObjects::Player, make_pair(Models::Player, playerObject)},
-	{IdentityObjects::Gun, make_pair(Models::Gun, gunObject)},
-	{IdentityObjects::Blooper, make_pair(Models::Blooper, blooperObject)},
-};
+static const ModelObject* modelObjects[NUM_OF_MODELS];
 
 GLvoid InitObjects()
 {
 	lineObject = new Line();
-	sphereObject = new Sphere();
-	cubeObject = new Cube();
 
-	for (auto& iter : objectMap)
+	for (GLsizei i = 0; i < NUM_OF_MODELS; ++i)
 	{
-		const Model* model = GetModel(iter.second.first);
-		iter.second.second = new ModelObject(model);
+		const Model* model = GetModel(static_cast<Models>(i));
+		modelObjects[i] = new ModelObject(model);
 	}
 }
 const Line* GetIdentityLine()
 {
 	return lineObject;
 }
-
-const Sphere* GetIdentitySphere()
+const ModelObject* GetIdentityModelObject(const Models& model)
 {
-	return sphereObject;
-}
-
-const Cube* GetIdentityCube()
-{
-	return cubeObject;
-}
-const ModelObject* GetIdentityModelObject(const IdentityObjects& object)
-{
-	return objectMap[object].second;
+	return modelObjects[static_cast<GLint>(model)];
 }
 
 

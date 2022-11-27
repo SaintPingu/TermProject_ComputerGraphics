@@ -48,6 +48,7 @@
 #define IVORY RGB(255,255,240)
 #define LAVENDER RGB(230,230,250)
 #define CRIMSON RGB(220,20,60)
+#define WOOD RGB(93,41,6)
 
 // functions
 #define DEGREE_TO_RADIAN(degree) (GLfloat)(((PI/180) * (degree)))
@@ -116,6 +117,7 @@ enum class Event { None, KeyDown, KeyUp };
 enum class Shader { Color = 0, Light, None };	// 'None' must be positioned at last
 enum class Dir { None, Left, Right, Up, Down, Front, Back };
 enum class CameraMode { Free, FirstPerson, ThirdPerson, Light };
+enum class CollisionType { None, Circle, Rect, };
 
 static unordered_map<Dir, Dir> dir_opposite = {
 	{Dir::Left, Dir::Right},
@@ -653,4 +655,9 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2& center, const  GLfloat& radius);
 /* Check Collision 2D Line-Line */
 GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
+/* Check Collision 2D Circle-Point */
+GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius);
+/* Check Collision 3D Cylinder-Point */
+GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight);
+
 void SetConsoleCursor(short x, short y);

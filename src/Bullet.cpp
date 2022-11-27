@@ -2,7 +2,7 @@
 #include "Bullet.h"
 #include "Timer.h"
 
-BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(IdentityObjects::LowSphere))
+BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
 {
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
@@ -46,7 +46,7 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::AddBullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
+GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
 {
 	Bullet* bullet = new Bullet(position, velocity, yaw, pitch);
 	mBulletList.emplace_back(bullet);

@@ -202,7 +202,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mPosition = position;
 	mTpCameraPosition = position;
 	mCameraMode = cameraMode;
-	mObject = new SharedObject(GetIdentityModelObject(IdentityObjects::Player));
+	mObject = new SharedObject(GetIdentityModelObject(Models::Player));
 	mObject->SetColor(WHITE);
 
 

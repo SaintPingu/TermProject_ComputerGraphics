@@ -14,6 +14,7 @@ private:
 		GLfloat mRadius = 0.0f;
 		GLfloat mHeight = 0.0f;
 		GLfloat mSpeed = 0.0f;
+		CollisionType mCollisionType = CollisionType::None;
 
 		const glm::vec3* target = nullptr;
 
@@ -32,7 +33,7 @@ private:
 public:
 	MonsterManager();
 	~MonsterManager();
-	GLvoid AddMonster(const glm::vec3& position, const MonsterType& monsterType);
+	GLvoid Create(const MonsterType& monsterType, const glm::vec3& position);
 	GLvoid Update();
 	GLvoid Draw() const;
 	GLvoid SetPlayer(const Player* player);

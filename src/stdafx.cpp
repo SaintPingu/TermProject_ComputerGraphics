@@ -190,6 +190,35 @@ GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::ve
 	return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
 }
 
+GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius)
+{
+	GLfloat distance = glm::length(v - u);
+	if (distance < vRadius + uRadius)
+	{
+		return true;
+	}
+
+	return false;
+}
+GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight)
+{
+	glm::vec2 vCylinderCenter = { vCylinderPos.x, vCylinderPos.z };
+	glm::vec2 uPointCenter = { uPoint.x, uPoint.z };
+	if (CheckCollision(vCylinderCenter, uPointCenter, vRadius, uRadius) == false)
+	{
+		return false;
+	}
+
+	GLfloat minHeight = vCylinderPos.y;
+	GLfloat maxHeight = minHeight + vHeight;
+	if ((uPoint.y <= maxHeight) && (uPoint.y >= minHeight))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void SetConsoleCursor(short x, short y)
 {
 	COORD cursor = { x, y };

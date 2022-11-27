@@ -5,7 +5,7 @@
 
 Light::Light() : Object()
 {
-	mObject = new SharedObject(GetIdentitySphere());
+	mObject = new SharedObject(GetIdentityModelObject(Models::GeoSphere));
 	mObject->SetColor(ORANGE);
 	mObject->SetPivot(&mPosition);
 

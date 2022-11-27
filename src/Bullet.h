@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "Object.h"
 
+enum class BulletType { Normal };
+
 class BulletManager {
 private:
 	class Bullet : public SharedObject {
@@ -34,7 +36,7 @@ private:
 public:
 	BulletManager();
 	~BulletManager();
-	GLvoid AddBullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid Create(const BulletType& type, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
 	GLvoid Draw() const;
 	GLvoid Update();
 

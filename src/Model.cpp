@@ -18,6 +18,9 @@ Model* gunModel = nullptr;
 // monster
 Model* blooperModel = nullptr;
 
+// building
+Model* guardTowerModel = nullptr;
+
 unordered_map<Models, Model*> modelMap{
 	{Models::Circle, circleModel},
 	{Models::Cube, cubeModel},
@@ -27,6 +30,7 @@ unordered_map<Models, Model*> modelMap{
 	{Models::Player, playerModel},
 	{Models::Gun, gunModel},
 	{Models::Blooper, blooperModel},
+	{Models::GuardTower, guardTowerModel},
 };
 
 GLvoid InitModels()
@@ -41,6 +45,7 @@ GLvoid InitModels()
 	modelMap[Models::Gun] = new Model("obj\\gun.obj");
 
 	modelMap[Models::Blooper] = new Model("obj\\blooper.obj");;
+	modelMap[Models::GuardTower] = new Model("obj\\guard_tower.obj");;
 }
 
 const Model* GetModel(const Models& model)

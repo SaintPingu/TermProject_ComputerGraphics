@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Map.h"
-#include "Model.h"
 #include "Bullet.h"
 
 Map::Map()

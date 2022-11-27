@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "Monster.h"
 #include "Bullet.h"
-#include "Model.h"
 #include "Player.h"
 
-unordered_map<MonsterType, IdentityObjects> objectMap{
-	{MonsterType::Blooper, IdentityObjects::Blooper}
+unordered_map<MonsterType, Models> modelMap{
+	{MonsterType::Blooper, Models::Blooper}
 };
 
 MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& monsterType)
 {
-	const ModelObject* modelObject = GetIdentityModelObject(objectMap[monsterType]);
+	mCollisionType = CollisionType::Circle;
+
+	const ModelObject* modelObject = GetIdentityModelObject(modelMap[monsterType]);
 	mObject = new SharedObject(modelObject);
 	mObject->SetColor(BLUE);
 	mObject->SetPosition(position);
@@ -46,17 +47,16 @@ GLvoid MonsterManager::Monster::Draw() const
 
 GLboolean MonsterManager::Monster::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
 {
-	glm::vec3 monsterPos = mObject->GetTransformedPos();
-	glm::vec2 monsterCenter = { monsterPos.x, monsterPos.z };
-	glm::vec2 bulletCenter = { bulletPos.x, bulletPos.z };
-
-	GLfloat distance = glm::length(monsterCenter - bulletCenter);
-	if (distance < mRadius + bulletRadius)
+	switch (mCollisionType)
 	{
-		if ((bulletPos.y <= monsterPos.y + mHeight) && (bulletPos.y >= monsterPos.y))
-		{
-			return true;
-		}
+	case CollisionType::Circle:
+	{
+		glm::vec3 monsterPos = mObject->GetTransformedPos();
+		return ::CheckCollision(monsterPos, bulletPos, mRadius, bulletRadius, mHeight);
+	}
+	default:
+		assert(0);
+		break;
 	}
 
 	return false;
@@ -81,7 +81,7 @@ MonsterManager::~MonsterManager()
 		delete monster;
 	}
 }
-GLvoid MonsterManager::AddMonster(const glm::vec3& position, const MonsterType& monsterType)
+GLvoid MonsterManager::Create(const MonsterType& monsterType, const glm::vec3& position)
 {
 	Monster* monster = new Monster(position, monsterType);
 	mMonsterList.emplace_back(monster);

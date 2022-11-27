@@ -6,7 +6,7 @@
 
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
-	mObject = new SharedObject(GetIdentityModelObject(IdentityObjects::Gun));
+	mObject = new SharedObject(GetIdentityModelObject(Models::Gun));
 
 	mObject->SetColor(GRAY);
 	mObject->SetPivot(pivot);
@@ -37,7 +37,7 @@ GLvoid Gun::Update()
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
-	bulletManager->AddBullet(bulletPos, 300.0f, mYaw, mPitch);
+	bulletManager->Create(BulletType::Normal, bulletPos, 300.0f, mYaw, mPitch);
 }
 GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 {

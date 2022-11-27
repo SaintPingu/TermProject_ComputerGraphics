@@ -1,11 +1,10 @@
 #pragma once
 #include "stdafx.h"
+#include "Model.h"
 
 #define DEFAULT_OBJECT_COLOR GRAY
 
-class Model;
 enum class Shader;
-enum class IdentityObjects { Circle, LowSphere, Player, Gun, Blooper };
 
 /************************************************** [ TOP ROOTS ] **************************************************/
 
@@ -319,36 +318,6 @@ public:
 };
 
 
-//////////////////////////////////////// [ Cube ] ////////////////////////////////////////
-class Cube : public ModelObject {
-private:
-	vector<Cube*> mChilds;
-	vector<glm::vec3> mPivots;
-public:
-	Cube();
-	GLvoid SetChild(Cube* cube);
-	GLvoid AddPivot(const glm::vec3& pivot);
-	const glm::vec3* GetPivot(const size_t& index);
-
-	GLvoid Draw() const;
-	GLvoid Move(const glm::vec3& vector);
-	GLvoid Rotate(const glm::vec3& pivot, const GLfloat& degree);
-	GLvoid RotateLocal(const glm::vec3& pivot, const GLfloat& degree);
-
-	// xz plane
-	GLboolean CheckCollide(const glm::vec3& point) const;
-	GLboolean CheckCollide(const GLrect& rect) const;
-};
-
-
-//////////////////////////////////////// [ Sphere ] ////////////////////////////////////////
-class Sphere : public ModelObject {
-public:
-	Sphere();
-};
-
-
-
 
 
 
@@ -408,7 +377,6 @@ public:
 };
 
 /* 2D 충돌체크를 하는 객체 */
-enum class CollisionType { None, Circle, Rect };
 class ICollisionable_2D abstract {
 private:
 	CollisionType mCollisionType = CollisionType::None;
@@ -460,9 +428,7 @@ public:
 
 GLvoid InitObjects();
 const Line* GetIdentityLine();
-const Cube* GetIdentityCube();
-const Sphere* GetIdentitySphere();
-const ModelObject* GetIdentityModelObject(const IdentityObjects& object);
+const ModelObject* GetIdentityModelObject(const Models& model);
 
 
 

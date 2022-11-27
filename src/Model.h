@@ -2,7 +2,8 @@
 #include "stdafx.h"
 
 class Cuboid;
-enum class Models { Circle, Cube, LowSphere, GeoSphere, Map, Player, Gun, Blooper, };
+enum class Models { Circle = 0, Cube, LowSphere, GeoSphere, Map, Player, Gun, Blooper, GuardTower, _count };
+constexpr GLint NUM_OF_MODELS = static_cast<GLint>(Models::_count);
 
 GLvoid InitModels();
 
