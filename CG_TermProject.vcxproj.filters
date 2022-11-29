@@ -115,16 +115,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\light_fragment.glsl">
+    <None Include="shaders\color_frag.glsl">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="shaders\light_vertex.glsl">
+    <None Include="shaders\color_vert.glsl">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="shaders\color_fragment.glsl">
+    <None Include="shaders\light_frag.glsl">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="shaders\color_vertex.glsl">
+    <None Include="shaders\light_vert.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\texture_frag.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\texture_vert.glsl">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>

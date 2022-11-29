@@ -9,7 +9,7 @@ namespace shd {
 	GLvoid Use(const Shader& shader);
 
 	/* shader에 있는 name에 mat4 적용 */
-	GLvoid SetShader(const Shader& shader, const glm::mat4& transform, const GLchar* name);
+	GLvoid SetShader(const Shader& shader, const GLchar* name, const glm::mat4& transform);
 	/* shader에 있는 name에 vec3 적용 */
 	GLvoid SetShader(const Shader& shader, const GLchar* name, const glm::vec3& value);
 	/* shader에 있는 name에 GLfloat 적용 */

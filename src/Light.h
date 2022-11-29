@@ -8,3 +8,5 @@ public:
 	Light();
 	GLvoid Draw() const;
 };
+
+GLvoid InitLight();

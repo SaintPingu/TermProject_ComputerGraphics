@@ -4,6 +4,8 @@
 #include "Transform.h"
 #include "Timer.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <myGL/stb_image.h>
 
 Object::Object()
 {
@@ -354,8 +356,8 @@ glm::mat4 ShaderObject::GetTransform() const
 GLvoid ShaderObject::ModelTransform() const
 {
 	glm::mat4 transform = GetTransform();
-	shd::SetShader(mShader, transform, "modelTransform");
-	shd::SetShader(mShader, transform, "normalTransform");
+	shd::SetShader(mShader, "modelTransform", transform);
+	shd::SetShader(mShader, "normalTransform", transform);
 }
 
 
@@ -382,34 +384,45 @@ GLvoid IdentityObject::InitValues()
 	mVAO = 0;
 	mVBO[0] = 0;
 	mVBO[1] = 0;
+	mVBO[2] = 0;
 	mEBO = 0;
+	mTexture = 0;
 
 	SetShader(Shader::Light);
 }
 GLvoid IdentityObject::InitBuffers()
 {
 	glGenVertexArrays(1, &mVAO);
-	glGenBuffers(2, &mVBO[0]);
+	glGenBuffers(3, &mVBO[0]);
 	glGenBuffers(1, &mEBO);
+	glGenTextures(1, &mTexture);
 }
 GLvoid IdentityObject::DeleteBuffers()
 {
-	glDeleteBuffers(2, &mVBO[0]);
+	glDeleteBuffers(3, &mVBO[0]);
 	glDeleteBuffers(1, &mEBO);
 	glDeleteVertexArrays(1, &mVAO);
+	glDeleteTextures(1, &mTexture);
 }
 
 GLvoid IdentityObject::BindBuffers()
 {
 	vector<GLfloat> vertices;
 	vector<GLfloat> normals;
+	vector<GLfloat> uvs;
 	vector<size_t> indices;
 
 	PullVertices(vertices);
-	PullIndices(indices);
+	Pull_Indices_Vertex(indices);
 
+	shd::Use(mShader);
 	switch (mShader)
 	{
+	case Shader::Texture:
+		PullUVs(uvs);
+		//[[fallthrough]];
+		PullNormals(normals);
+		break;
 	case Shader::Light:
 		PullNormals(normals);
 		break;
@@ -428,6 +441,48 @@ GLvoid IdentityObject::BindBuffers()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * normals.size(), normals.data(), GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
+	}
+
+	if (uvs.size() > 0)
+	{
+		int imageWidth, imageHeight, numOfChannel;
+		
+		stbi_set_flip_vertically_on_load(true);
+		const GLchar* fileName = "textures\\box4.png";
+		unsigned char* data = stbi_load(fileName, &imageWidth, &imageHeight, &numOfChannel, 0);
+		if (stbi_failure_reason())
+		{
+			cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
+			assert(0);
+		}
+
+		if (data && data[0] != '\0')
+		{
+			cout << "load texture : " << fileName << endl;
+
+			glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * uvs.size(), uvs.data(), GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glEnableVertexAttribArray(2);
+
+			glBindTexture(GL_TEXTURE_2D, mTexture);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+		else
+		{
+			cout << "Failed to load texture : " << fileName << endl;
+			assert(0);
+		}
+		stbi_image_free(data);
+	}
+	else
+	{
+		glDeleteBuffers(1, &mTexture);
 	}
 
 	if (indices.size() > 0)
@@ -521,11 +576,11 @@ ModelObject::ModelObject() : IdentityObject()
 {
 
 }
-ModelObject::ModelObject(const Model* model) : IdentityObject()
+ModelObject::ModelObject(const Model* model, const Shader& shader) : IdentityObject()
 {
-	LoadModel(model);
+	LoadModel(model, shader);
 }
-GLvoid ModelObject::LoadModel(const Model* model)
+GLvoid ModelObject::LoadModel(const Model* model, const Shader& shader)
 {
 	if (mModel != nullptr)
 	{
@@ -536,26 +591,35 @@ GLvoid ModelObject::LoadModel(const Model* model)
 	InitBuffers();
 	mModel = model;
 
-	SetShader(Shader::Light);
+	SetShader(shader);
+	
 	BindBuffers();
 }
 GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 {
 	const vector<glm::vec3> objectNormals = mModel->GetNormals();
-	const vector<size_t> normalIndices = mModel->GetNormalIndices();
-	const vector<size_t> vertexIndices = mModel->GetIndices();
+	const vector<size_t> indices_normal = mModel->GetIndices_Normal();
+	const vector<size_t> indices_vertex = mModel->GetIndices_Vertex();
 
 	// vertex마다 normal을 지정
 	normals.resize(mModel->GetVertexCount() * 3, 0);
 	size_t count = 0;
-	for (const size_t& vertexIndex : vertexIndices)
+	for (const size_t& vertexIndex : indices_vertex)
 	{
-		glm::vec3 normal = objectNormals[normalIndices[count]];
+		glm::vec3 normal = objectNormals[indices_normal[count]];
 		normals[(vertexIndex * 3)] = normal.x;
 		normals[(vertexIndex * 3) + 1] = normal.y;
 		normals[(vertexIndex * 3) + 2] = normal.z;
 		++count;
 	}
+	/*for (const size_t& vertexIndex : indices_vertex)
+	{
+		glm::vec3 normal = objectNormals[indices_normal[count]];
+		normals[(vertexIndex * 3)] = normal.x;
+		normals[(vertexIndex * 3) + 1] = normal.y;
+		normals[(vertexIndex * 3) + 2] = normal.z;
+		++count;
+	}*/
 }
 GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
 {
@@ -567,20 +631,45 @@ GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
 		vertices.emplace_back(objectVertices[i].z);
 	}
 }
-GLvoid ModelObject::PullIndices(vector<size_t>& vertexIndices) const
+GLvoid ModelObject::Pull_Indices_Vertex(vector<size_t>& indices_vertex) const
 {
-	const vector<size_t> objectIndices = mModel->GetIndices();
+	const vector<size_t> objectIndices = mModel->GetIndices_Vertex();
 	for (const size_t& index : objectIndices)
 	{
-		vertexIndices.emplace_back(index);
+		indices_vertex.emplace_back(index);
 	}
 }
-GLvoid ModelObject::PullNormalIndices(vector<size_t>& normalIndices) const
+GLvoid ModelObject::Pull_Indices_Normal(vector<size_t>& indices_normal) const
 {
-	const vector<size_t> indices = mModel->GetNormalIndices();
+	const vector<size_t> indices = mModel->GetIndices_Normal();
 	for (const size_t& index : indices)
 	{
-		normalIndices.emplace_back(index);
+		indices_normal.emplace_back(index);
+	}
+}
+GLvoid ModelObject::PullUVs(vector<GLfloat>& uvs) const
+{
+	const vector<glm::vec2> objectUVs = mModel->GetUVs();
+	const vector<size_t> indices_uv = mModel->GetIndices_UV();
+	const vector<size_t> indices_vertex = mModel->GetIndices_Vertex();
+
+	// vertex마다 uv를 지정
+	uvs.resize(mModel->GetVertexCount() * 2, 0);
+	size_t count = 0;
+	for (const size_t& vertexIndex : indices_vertex)
+	{
+		glm::vec2 uv = objectUVs[indices_uv[count]];
+		uvs[(vertexIndex * 2)] = uv.x;
+		uvs[(vertexIndex * 2) + 1] = uv.y;
+		++count;
+	}
+}
+GLvoid ModelObject::Pull_Indices_UV(vector<size_t>& indices_uv) const
+{
+	const vector<size_t> indices = mModel->GetIndices_UV();
+	for (const size_t& index : indices)
+	{
+		indices_uv.emplace_back(index);
 	}
 }
 
@@ -703,11 +792,11 @@ GLvoid CustomObject::PullVertices(vector<GLfloat>& vertices) const
 		vertices.emplace_back(mVertices[i].z);
 	}
 }
-GLvoid CustomObject::PullIndices(vector<size_t>& vertexIndices) const
+GLvoid CustomObject::Pull_Indices_Vertex(vector<size_t>& indices_vertex) const
 {
 	for (const size_t& index : mIndices)
 	{
-		vertexIndices.emplace_back(index);
+		indices_vertex.emplace_back(index);
 	}
 }
 size_t CustomObject::GetIndexCount() const
@@ -1232,7 +1321,12 @@ GLvoid InitObjects()
 	for (GLsizei i = 0; i < NUM_OF_MODELS; ++i)
 	{
 		const Model* model = GetModel(static_cast<Models>(i));
-		modelObjects[i] = new ModelObject(model);
+		Shader shader = Shader::Light;
+		if (static_cast<Models>(i) == Models::Cube)
+		{
+			shader = Shader::Texture;
+		}
+		modelObjects[i] = new ModelObject(model, shader);
 	}
 }
 const Line* GetIdentityLine()
@@ -1251,6 +1345,7 @@ const ModelObject* GetIdentityModelObject(const Models& model)
 
 static vector<ShaderObject*> customObjects;
 static vector<ShaderObject*> lightObjects;
+static vector<ShaderObject*> textureObjects;
 static vector<ShaderObject*> minimapObjects;
 
 
@@ -1263,6 +1358,9 @@ GLvoid AddObject(const Shader& shader, ShaderObject* object)
 		break;
 	case Shader::Light:
 		lightObjects.emplace_back(object);
+		break;
+	case Shader::Texture:
+		textureObjects.emplace_back(object);
 		break;
 	default:
 		assert(0);
@@ -1283,12 +1381,17 @@ GLvoid ResetObjects()
 	{
 		delete object;
 	}
+	for (ShaderObject* object : textureObjects)
+	{
+		delete object;
+	}
 	for (ShaderObject* object : minimapObjects)
 	{
 		delete object;
 	}
 	customObjects.clear();
 	lightObjects.clear();
+	textureObjects.clear();
 	minimapObjects.clear();
 }
 
@@ -1305,6 +1408,12 @@ GLvoid DrawObjects(const Shader& shader)
 		break;
 	case Shader::Light:
 		for (const ShaderObject* object : lightObjects)
+		{
+			object->Draw();
+		}
+		break;
+	case Shader::Texture:
+		for (const ShaderObject* object : textureObjects)
 		{
 			object->Draw();
 		}

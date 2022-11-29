@@ -35,10 +35,12 @@ GLvoid BuildingManager::Building::Update()
 
 GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
 {
+	const glm::vec3 buildingPos = mObject->GetTransformedPos();
+	const glm::vec2 buildingCenter = { buildingPos.x, buildingPos.z };
 	switch(mCollisionType)
 	{
 	case CollisionType::Rect:
-
+		//::CheckCollision()
 		break;
 	default:
 		assert(0);

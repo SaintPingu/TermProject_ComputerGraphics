@@ -4,7 +4,7 @@
 
 Map::Map()
 {
-	mMapObject = new ModelObject(GetModel(Models::Map));
+	mMapObject = new ModelObject(GetModel(Models::Map), Shader::Light);
 	mMapObject->SetColor(DARK_GREEN);
 	mMapObject->BindBuffers();
 
@@ -14,12 +14,6 @@ Map::Map()
 	mLeftBottom = *(iter++);
 	mRightBottom = *(iter++);
 	mRightTop = *(iter++);
-
-	SetConsoleCursor(0, 0);
-	Vector2::PrintPos(mLeftTop);
-	Vector2::PrintPos(mLeftBottom);
-	Vector2::PrintPos(mRightBottom);
-	Vector2::PrintPos(mRightTop);
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
@@ -70,8 +64,8 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 
 	// check collision with previous to current bullet position line
 
-	glm::vec2 center = { bulletPos.x, bulletPos.z };
-	glm::vec2 prevCenter = { prevPos.x, prevPos.z };
+	const glm::vec2 center = Get2D(bulletPos);
+	const glm::vec2 prevCenter = Get2D(prevPos);
 	if (center.y - bulletRadius <= mLeftTop.y)
 	{
 		return true;

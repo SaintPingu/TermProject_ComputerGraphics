@@ -158,15 +158,18 @@ public:
 class IdentityObject abstract : public ShaderObject{
 protected:
 	GLuint mVAO = 0;
-	GLuint mVBO[2] = { 0,0 };
+	GLuint mVBO[3] = { 0,0,0 };
 	GLuint mEBO = 0;
+	GLuint mTexture = 0;
 
 	/* BindBuffers()를 위한 함수들 */
+	virtual GLvoid PullVertices(vector<GLfloat>& vertices) const abstract;
+	virtual GLvoid Pull_Indices_Vertex(vector<size_t>& indices_vertex) const abstract;
 	virtual GLvoid PullColors(vector<GLfloat>& colors) const abstract;
 	virtual GLvoid PullNormals(vector<GLfloat>& normals) const abstract;
-	virtual GLvoid PullVertices(vector<GLfloat>& vertices) const abstract;
-	virtual GLvoid PullIndices(vector<size_t>& vertexIndices) const abstract;
-	virtual GLvoid PullNormalIndices(vector<size_t>& normalIndices) const abstract;
+	virtual GLvoid Pull_Indices_Normal(vector<size_t>& indices_normal) const abstract;
+	virtual GLvoid PullUVs(vector<GLfloat>& uvs) const abstract;
+	virtual GLvoid Pull_Indices_UV(vector<size_t>& indices_uv) const abstract;
 
 	/* 멤버 변수 초기화 */
 	virtual GLvoid InitValues() override;
@@ -233,12 +236,14 @@ protected:
 
 	GLvoid PullNormals(vector<GLfloat>& normals) const override;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
-	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
-	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override;
+	GLvoid Pull_Indices_Vertex(vector<size_t>& indices_vertex) const override;
+	GLvoid Pull_Indices_Normal(vector<size_t>& indices_normal) const override;
+	GLvoid PullUVs(vector<GLfloat>& textures) const override;
+	GLvoid Pull_Indices_UV(vector<size_t>& indices_uv) const override;
 public:
 	ModelObject();
-	ModelObject(const Model* model);
-	GLvoid LoadModel(const Model* model);
+	ModelObject(const Model* model, const Shader& shader);
+	GLvoid LoadModel(const Model* model, const Shader& shader);
 
 	//********** [ Buffer ] **********//
 	size_t GetIndexCount() const;
@@ -264,11 +269,13 @@ protected:
 
 	/* CustomObject에서는 사용하지 않음 */
 	GLvoid PullNormals(vector<GLfloat>& normals) const override {};
-	GLvoid PullNormalIndices(vector<size_t>& normalIndices) const override {};
+	GLvoid Pull_Indices_Normal(vector<size_t>& indices_normal) const override {};
+	GLvoid PullUVs(vector<GLfloat>& textures) const {};
+	GLvoid Pull_Indices_UV(vector<size_t>& indices_uv) const {};
 
 	GLvoid PullColors(vector<GLfloat>& colors) const override;
 	GLvoid PullVertices(vector<GLfloat>& vertices) const override;
-	GLvoid PullIndices(vector<size_t>& vertexIndices) const override;
+	GLvoid Pull_Indices_Vertex(vector<size_t>& indices_vertex) const override;
 public:
 	CustomObject();
 	CustomObject(vector<glm::vec3>& vertices);

@@ -114,6 +114,7 @@ GLvoid Init()
 {
 	glewInit();
 	shd::Init();
+	InitLight();
 	InitMeshes();
 	timer::Init();
 
@@ -139,7 +140,7 @@ GLvoid Init()
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
-	system("cls");
+	//system("cls");
 }
 
 GLvoid InitMeshes()
@@ -180,11 +181,11 @@ GLvoid InitMeshes()
 	//**************************************************//
 	
 
-	// light test object
-	SharedObject* temp = new SharedObject(GetIdentityModelObject(Models::GeoSphere));
+	// test object
+	SharedObject* temp = new SharedObject(GetIdentityModelObject(Models::Cube));
 	temp->SetColor(ORANGE);
 	temp->SetPosition({ 0, 20, 20 });
-	AddObject(Shader::Light, temp);
+	AddObject(Shader::Texture, temp);
 
 	// light object
 	light = new Light();
@@ -269,17 +270,17 @@ GLvoid DrawScene()
 
 	Shader crntShader = Shader::Color;
 	shd::Use(crntShader);
-	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
-	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
+	shd::SetShader(crntShader, "viewTransform", xform::GetView(crntCamera));
+	shd::SetShader(crntShader, "projTransform", xform::GetProj(crntCamera));
 	DrawObjects(crntShader);
 
 
 	crntShader = Shader::Light;
 	shd::Use(crntShader);
-	shd::SetShader(crntShader, xform::GetView(crntCamera), "viewTransform");
-	shd::SetShader(crntShader, xform::GetProj(crntCamera), "projTransform");
-	shd::SetShader(Shader::Light, "light.pos", light->GetPviotedPosition());
-	shd::SetShader(Shader::Light, "viewPos", crntCamera->GetPviotedPosition());
+	shd::SetShader(crntShader, "viewTransform", xform::GetView(crntCamera));
+	shd::SetShader(crntShader, "projTransform", xform::GetProj(crntCamera));
+	shd::SetShader(crntShader, "light.pos", light->GetPviotedPosition());
+	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	bulletManager->Draw();
 	monsterManager->Draw();
@@ -293,6 +294,14 @@ GLvoid DrawScene()
 	}
 
 	light->Draw();
+
+	crntShader = Shader::Texture;
+	shd::Use(crntShader);
+	shd::SetShader(crntShader, "viewTransform", xform::GetView(crntCamera));
+	shd::SetShader(crntShader, "projTransform", xform::GetProj(crntCamera));
+	shd::SetShader(crntShader, "light.pos", light->GetPviotedPosition());
+	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
+	DrawObjects(crntShader);
 
 	glBindVertexArray(0);
 	glutSwapBuffers();
@@ -327,7 +336,7 @@ GLvoid Update()
 	}
 
 	bulletManager->Update();
-	monsterManager->Update();
+	//monsterManager->Update();
 	buildingManager->Update();
 
 	constexpr GLfloat cameraMovement = 100.0f;

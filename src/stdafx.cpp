@@ -133,6 +133,9 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 
 
 
+
+
+
 /* https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm */
 GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm::vec2& center, const GLfloat& radius)
 {
@@ -200,10 +203,17 @@ GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& 
 
 	return false;
 }
+/* https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection */
+GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius)
+{
+	//glm::vec2 circleDistance;
+	//circleDistance.x = fabs()
+	return false;
+}
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight)
 {
-	glm::vec2 vCylinderCenter = { vCylinderPos.x, vCylinderPos.z };
-	glm::vec2 uPointCenter = { uPoint.x, uPoint.z };
+	const glm::vec2 vCylinderCenter = Get2D(vCylinderPos);
+	const glm::vec2 uPointCenter = Get2D(uPoint);
 	if (CheckCollision(vCylinderCenter, uPointCenter, vRadius, uRadius) == false)
 	{
 		return false;

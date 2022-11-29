@@ -53,7 +53,7 @@ GLvoid timer::CalculateFPS()
 	}
 
 	lastTime = crntTime;
-	PrintFPS(fps);
+	//PrintFPS(fps);
 }
 GLfloat timer::DeltaTime()
 {

@@ -32,17 +32,24 @@ GLint Make_ShaderProgram(const Shader& shader)
 	switch (shader)
 	{
 	case Shader::Color:
-		vertexShaderName = "color_vertex.glsl";
-		fragShaderName = "color_fragment.glsl";
+		vertexShaderName = "color";
+		fragShaderName = "color";
 		break;
 	case Shader::Light:
-		vertexShaderName = "light_vertex.glsl";
-		fragShaderName = "light_fragment.glsl";
+		vertexShaderName = "light";
+		fragShaderName = "light";
+		break;
+	case Shader::Texture:
+		vertexShaderName = "texture";
+		fragShaderName = "texture";
 		break;
 	default:
 		assert(0);
 		break;
 	}
+
+	vertexShaderName += "_vert.glsl";
+	fragShaderName += "_frag.glsl";
 
 	GLint vertexShader = Make_VertexShaders(vertexShaderName);
 	GLint fragShader = Make_FragmentShaders(fragShaderName);
@@ -139,7 +146,7 @@ GLint Make_FragmentShaders(const string& name)
 
 
 
-GLvoid shd::SetShader(const Shader& shader, const glm::mat4& transform, const GLchar* name)
+GLvoid shd::SetShader(const Shader& shader, const GLchar* name, const glm::mat4& transform)
 {
 	const GLint location = glGetUniformLocation(GetShaderProgram(shader), name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));

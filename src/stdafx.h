@@ -22,7 +22,6 @@
 #include <myGL/glm/ext.hpp>
 #include <myGL/glm/gtc/matrix_transform.hpp>
 
-
 // colors
 #define BLACK RGB(0, 0, 0)
 #define WHITE RGB(255, 255, 255)
@@ -109,15 +108,19 @@
 #define DEFAULT_SCREEN_WIDTH 1280
 #define DEFAULT_SCREEN_HEIGHT 1024
 
-#define NUM_OF_SHADER 2
 
 using namespace std;
 
 enum class Event { None, KeyDown, KeyUp };
-enum class Shader { Color = 0, Light, None };	// 'None' must be positioned at last
+enum class Shader { Color = 0, Light, Texture, None, _count };
 enum class Dir { None, Left, Right, Up, Down, Front, Back };
 enum class CameraMode { Free, FirstPerson, ThirdPerson, Light };
 enum class CollisionType { None, Circle, Rect, };
+
+
+constexpr GLint NUM_OF_SHADER = static_cast<GLint>(Shader::_count) - 1;	// exclusive Shader::None
+
+
 
 static unordered_map<Dir, Dir> dir_opposite = {
 	{Dir::Left, Dir::Right},
@@ -568,12 +571,24 @@ typedef struct MyColor {
 
 
 
-typedef struct GLrect {
+class GLrect {
+public:
 	GLfloat left = 0.0f;
 	GLfloat top = 0.0f;
 	GLfloat right = 0.0f;
 	GLfloat bottom = 0.0f;
-}GLrect;
+
+
+	//GLrect();
+	//GLrect(const GLfloat& left, const GLfloat& top, const GLfloat& right, const GLfloat& bottom);
+	//GLrect(const glm::vec2& center, const GLfloat& width, const GLfloat& height);
+	//glm::vec2 GetCenter() const
+	//{
+	//	GLfloat x = left + (right - left);
+	//	GLfloat y = top + (top - bottom);
+	//	return { x,y };
+	//}
+};
 
 typedef struct GLpoint {
 	GLint x = 0;
@@ -647,8 +662,13 @@ inline constexpr GLboolean IsInfinite(const GLfloat& n)
 {
 	return ((n + 1) != n) && (n == n);
 }
+inline constexpr glm::vec2 Get2D(const glm::vec3& position)
+{
+	return { position.x, position.z };
+}
 
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
+
 
 
 /* Check Collision 2D Line-Point */
@@ -657,6 +677,8 @@ GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2
 GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
 /* Check Collision 2D Circle-Point */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius);
+/* Check Collision 2D Rect-Point */
+GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius);
 /* Check Collision 3D Cylinder-Point */
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight);
 
