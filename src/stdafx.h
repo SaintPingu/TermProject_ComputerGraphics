@@ -579,15 +579,29 @@ public:
 	GLfloat bottom = 0.0f;
 
 
-	//GLrect();
-	//GLrect(const GLfloat& left, const GLfloat& top, const GLfloat& right, const GLfloat& bottom);
-	//GLrect(const glm::vec2& center, const GLfloat& width, const GLfloat& height);
-	//glm::vec2 GetCenter() const
-	//{
-	//	GLfloat x = left + (right - left);
-	//	GLfloat y = top + (top - bottom);
-	//	return { x,y };
-	//}
+	GLrect() {};
+	GLrect(const GLfloat& left, const GLfloat& top, const GLfloat& right, const GLfloat& bottom)
+	{
+		this->left = left;
+		this->top = top;
+		this->right = right;
+		this->bottom = bottom;
+	}
+	GLrect(const glm::vec2& center, const GLfloat& width, const GLfloat& height)
+	{
+		this->left = center.x - width/2;
+		this->top = center.y - height/2;
+		this->right = center.x + width/2;
+		this->bottom = center.y + height/2;
+	}
+	glm::vec2 GetCenter() const
+	{
+		GLfloat x = left + GetWidth() / 2;
+		GLfloat y = top + GetHeight() / 2;
+		return { x,y };
+	}
+	inline constexpr GLfloat GetWidth() const { return (right - left); }
+	inline constexpr GLfloat GetHeight() const { return (bottom - top); }
 };
 
 typedef struct GLpoint {

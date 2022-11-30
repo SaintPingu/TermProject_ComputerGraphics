@@ -124,11 +124,17 @@ public:
 	GLvoid ScaleX(const GLfloat& amount);
 	GLvoid ScaleY(const GLfloat& amount);
 	GLvoid ScaleZ(const GLfloat& amount);
-	//
-
 
 	inline constexpr const glm::vec3* GetRefScale() const { return &mScale; };
 	inline constexpr glm::vec3 GetScale() const { return mScale; }
+	//
+
+	//********** [ Size ] **********//
+	virtual GLfloat GetWidth() const abstract;
+	virtual GLfloat GetHeight() const abstract;
+	virtual GLfloat GetDepth() const abstract;
+	/* Object의 2D Rect (collision-box) 반환 */
+	GLrect GetRect() const;
 
 	//********** [ Transform ] **********//
 	/* Object의 최종 Transform 리턴 */
@@ -188,9 +194,9 @@ public:
 	GLvoid DeleteBuffers();
 
 	// 현재 사용 X //
-	GLfloat GetWidth() const;
-	GLfloat GetHeight() const;
-	GLfloat GetDepth() const;
+	GLfloat GetWidth() const override;
+	GLfloat GetHeight() const override;
+	GLfloat GetDepth() const override;
 	/////////////////
 
 	//********** [ Buffer ] **********//
@@ -217,6 +223,10 @@ public:
 	SharedObject(const IdentityObject* object);
 
 	GLvoid Draw() const override;
+
+	inline GLfloat GetWidth() const override { return mObject->GetWidth(); }
+	inline GLfloat GetHeight() const override { return mObject->GetHeight(); }
+	inline GLfloat GetDepth() const override { return mObject->GetDepth(); }
 
 	inline constexpr GLvoid SetObject(const IdentityObject* object) { mObject = object; }
 	inline constexpr const IdentityObject* GetObject() const { return mObject; }
@@ -260,9 +270,9 @@ public:
 	//********** [ Size ] **********//
 	/* Side에 대한 값 리턴 (Left -> 왼쪽 경계값, Top -> 위쪽 경계값, ...) */
 	GLfloat GetSide(const Dir& dir) const;
-	GLfloat GetWidth() const;
-	GLfloat GetHeight() const;
-	GLfloat GetDepth() const;
+	GLfloat GetWidth() const override;
+	GLfloat GetHeight() const override;
+	GLfloat GetDepth() const override;
 
 	//********** [ Collision ] **********//
 	GLrect GetXZRect() const;

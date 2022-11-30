@@ -329,6 +329,21 @@ GLvoid ShaderObject::SetScaleZ(const GLfloat& scale)
 	mScale.z = scale;
 }
 
+GLrect ShaderObject::GetRect() const
+{
+	GLfloat halfWidth = GetWidth() / 2;
+	GLfloat halfDepth = GetDepth() / 2;
+
+	glm::vec3 pos = GetTransformedPos();
+
+	GLrect result;
+	result.left = pos.x - halfWidth;
+	result.right = pos.x + halfWidth;
+	result.top = pos.z - halfDepth;
+	result.bottom = pos.z + halfDepth;
+
+	return result;
+}
 
 glm::mat4 ShaderObject::GetTransform() const
 {
@@ -513,6 +528,7 @@ GLvoid IdentityObject::InitTextures(const GLchar* fileName) const
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);
 }

@@ -203,12 +203,42 @@ GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& 
 
 	return false;
 }
+
 /* https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection */
 GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius)
 {
-	//glm::vec2 circleDistance;
-	//circleDistance.x = fabs()
-	return false;
+	glm::vec2 rectCenter = rect.GetCenter();
+	GLfloat rectHalfWidth = rect.GetWidth() / 2;
+	GLfloat rectHalfHeight = rect.GetHeight() / 2;
+
+	glm::vec2 circleDistance;
+
+	circleDistance.x = fabs(v.x - rectCenter.x);
+	circleDistance.y = fabs(v.y - rectCenter.y);
+
+	if (circleDistance.x > rectHalfWidth + vRadius)
+	{
+		return false;
+	}
+	if (circleDistance.y > rectHalfHeight + vRadius)
+	{
+		return false;
+	}
+
+	if (circleDistance.x <= rectHalfWidth)
+	{
+		return true;
+	}
+	if (circleDistance.y <= rectHalfHeight)
+	{
+		return true;
+	}
+
+	GLfloat a = (v.x - rectHalfWidth);
+	GLfloat b = (v.y - rectHalfHeight);
+	GLfloat cornerDistance_sq = (a * a) + (b * b);
+
+	return cornerDistance_sq <= (vRadius * vRadius);
 }
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight)
 {

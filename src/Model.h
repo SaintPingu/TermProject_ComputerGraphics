@@ -40,7 +40,7 @@ public:
 	glm::vec3 GetVertex(const size_t& index) const;
 
 	Cuboid* GetCuboid(const glm::vec3* position, const glm::vec3* scale) const;
-	inline GLfloat GetWidth() const { return mWidth;}
+	inline GLfloat GetWidth() const { return mWidth; }
 	inline GLfloat GetHeight() const {return mHeight; }
 	inline GLfloat GetDepth() const { return mDepth; }
 
