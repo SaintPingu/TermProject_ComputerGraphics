@@ -104,22 +104,28 @@ protected:
 public:
 	ShaderObject();
 	~ShaderObject();
+
+	/* 카메라와 멀리 있는 순서대로 정렬 */
+	static bool CompareBlendObject(const ShaderObject* lhs, const ShaderObject* rhs);
+
 	/* 멤버변수 초기화 */
 	virtual GLvoid InitValues() override;
 
 	//********** [ Scaling ] **********//
+	GLvoid Scale(const GLfloat& scale);
 	GLvoid SetScale(const GLfloat& scale);
+	GLvoid ScaleOrigin(const GLfloat& scale);
+
+	// 비균등 scale은 모델변환의 역행렬의 전치행렬을 계산해야 하는 연산이 필요하므로 조명 계산 등의 "노멀 벡터를 사용할 경우" 사용하지 않도록 함.
 	GLvoid SetScaleX(const GLfloat& scale);
 	GLvoid SetScaleY(const GLfloat& scale);
 	GLvoid SetScaleZ(const GLfloat& scale);
 	GLvoid SetScale(const glm::vec3& scale);
-
-	GLvoid ScaleOrigin(const GLfloat& scale);
-
-	GLvoid Scale(const GLfloat& scale);
 	GLvoid ScaleX(const GLfloat& amount);
 	GLvoid ScaleY(const GLfloat& amount);
 	GLvoid ScaleZ(const GLfloat& amount);
+	//
+
 
 	inline constexpr const glm::vec3* GetRefScale() const { return &mScale; };
 	inline constexpr glm::vec3 GetScale() const { return mScale; }
@@ -178,6 +184,7 @@ public:
 	~IdentityObject();
 	GLvoid InitBuffers();
 	GLvoid BindBuffers();
+	GLvoid InitTextures(const GLchar* fileName) const;
 	GLvoid DeleteBuffers();
 
 	// 현재 사용 X //
@@ -193,6 +200,7 @@ public:
 	virtual size_t GetVertexCount() const abstract;
 
 	inline constexpr const GLuint& GetVAO() const { return mVAO; }
+	inline constexpr const GLuint& GetTexture() const { return mTexture; }
 	inline MyColor GetColor() const { return mColor; }
 
 	/* draw */
@@ -388,7 +396,7 @@ class ICollisionable_2D abstract {
 private:
 	CollisionType mCollisionType = CollisionType::None;
 
-	GLint id = -1;
+	GLint mID = -1;
 
 	const glm::vec3* mPosition = nullptr;
 
@@ -404,7 +412,7 @@ public:
 	GLfloat GetDepth() const;
 
 	inline constexpr CollisionType GetCollisionType() const{ return mCollisionType; }
-	inline constexpr GLint Get_ID() const { return id; }
+	inline constexpr GLint Get_ID() const { return mID; }
 };
 
 class CollisionManager {
@@ -431,18 +439,19 @@ public:
 
 
 
-
-
-GLvoid InitObjects();
+GLvoid InitObject();
 const Line* GetIdentityLine();
 const ModelObject* GetIdentityModelObject(const Models& model);
+const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel);
 
 
 
 GLvoid AddObject(const Shader& shader, ShaderObject* object);
+GLvoid AddBlendObject(ShaderObject* object);
 GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
 GLvoid ResetObjects();
 GLvoid DrawObjects(const Shader& shader);
+GLvoid DrawBlendObjects();
 
 ////////// [ DEBUG ] //////////
 GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color = RED, const glm::vec3* pivot = nullptr);

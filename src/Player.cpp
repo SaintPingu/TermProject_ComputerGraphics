@@ -329,7 +329,6 @@ GLvoid Player::Update()
 }
 GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
-	mGun->Draw();
 	if (cameraMode == CameraMode::FirstPerson)
 	{
 		return;

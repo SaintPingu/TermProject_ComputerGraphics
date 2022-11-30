@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Transform.h"
 #include "Timer.h"
+#include "Camera.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
@@ -261,8 +262,22 @@ ShaderObject::~ShaderObject() {}
 GLvoid ShaderObject::PrepareDraw() const
 {
 	ModelTransform();
-	shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
+	if (mShader != Shader::Texture)
+	{
+		shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
+	}
 }
+
+bool ShaderObject::CompareBlendObject(const ShaderObject* lhs, const ShaderObject* rhs)
+{
+	extern const Camera* crntCamera;
+	glm::vec3 cameraPos = crntCamera->GetPosition();
+	GLfloat distanceLHS = glm::length(cameraPos - lhs->GetTransformedPos());
+	GLfloat distanceRHS = glm::length(cameraPos - rhs->GetTransformedPos());
+
+	return distanceLHS > distanceRHS;
+}
+
 GLvoid ShaderObject::InitValues()
 {
 	Object::InitValues();
@@ -275,10 +290,6 @@ GLvoid ShaderObject::SetScale(const GLfloat& scale)
 	mScale.y = scale;
 	mScale.z = scale;
 }
-GLvoid ShaderObject::SetScale(const glm::vec3& scale)
-{
-	mScale = scale;
-}
 GLvoid ShaderObject::ScaleOrigin(const GLfloat& scale)
 {
 	Scale(scale);
@@ -288,6 +299,10 @@ GLvoid ShaderObject::ScaleOrigin(const GLfloat& scale)
 GLvoid ShaderObject::Scale(const GLfloat& scale)
 {
 	mScale *= scale;
+}
+GLvoid ShaderObject::SetScale(const glm::vec3& scale)
+{
+	mScale = scale;
 }
 GLvoid ShaderObject::ScaleX(const GLfloat& amount)
 {
@@ -357,7 +372,6 @@ GLvoid ShaderObject::ModelTransform() const
 {
 	glm::mat4 transform = GetTransform();
 	shd::SetShader(mShader, "modelTransform", transform);
-	shd::SetShader(mShader, "normalTransform", transform);
 }
 
 
@@ -418,9 +432,9 @@ GLvoid IdentityObject::BindBuffers()
 	shd::Use(mShader);
 	switch (mShader)
 	{
+	case Shader::Back:
 	case Shader::Texture:
 		PullUVs(uvs);
-		//[[fallthrough]];
 		PullNormals(normals);
 		break;
 	case Shader::Light:
@@ -443,46 +457,17 @@ GLvoid IdentityObject::BindBuffers()
 		glEnableVertexAttribArray(1);
 	}
 
-	if (uvs.size() > 0)
+	if (mShader == Shader::Texture || mShader == Shader::Back)
 	{
-		int imageWidth, imageHeight, numOfChannel;
-		
-		stbi_set_flip_vertically_on_load(true);
-		const GLchar* fileName = "textures\\box4.png";
-		unsigned char* data = stbi_load(fileName, &imageWidth, &imageHeight, &numOfChannel, 0);
-		if (stbi_failure_reason())
-		{
-			cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
-			assert(0);
-		}
-
-		if (data && data[0] != '\0')
-		{
-			cout << "load texture : " << fileName << endl;
-
-			glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * uvs.size(), uvs.data(), GL_DYNAMIC_DRAW);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(2);
-
-			glBindTexture(GL_TEXTURE_2D, mTexture);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		}
-		else
-		{
-			cout << "Failed to load texture : " << fileName << endl;
-			assert(0);
-		}
-		stbi_image_free(data);
+		glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * uvs.size(), uvs.data(), GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(2);
 	}
 	else
 	{
-		glDeleteBuffers(1, &mTexture);
+		glDeleteBuffers(1, &mVBO[2]);
+		glDeleteTextures(1, &mTexture);
 	}
 
 	if (indices.size() > 0)
@@ -497,6 +482,40 @@ GLvoid IdentityObject::BindBuffers()
 
 	glBindVertexArray(0);
 }
+GLvoid IdentityObject::InitTextures(const GLchar* fileName) const
+{
+	string path = "textures\\";
+	path += fileName;
+
+	GLint imageWidth, imageHeight, numOfChannel;
+
+	GLubyte* data = stbi_load(path.c_str(), &imageWidth, &imageHeight, &numOfChannel, 0);
+
+	if (stbi_failure_reason())
+	{
+		cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
+		cout << "[ path ] : " << path << endl;
+		assert(0);
+	}
+
+	if (!data)
+	{
+		cout << "Failed to load texture : " << path << endl;
+		assert(0);
+	}
+
+	cout << "load texture : " << path << endl;
+
+	glBindTexture(GL_TEXTURE_2D, mTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	stbi_image_free(data);
+}
 
 
 GLvoid IdentityObject::Draw() const
@@ -505,6 +524,10 @@ GLvoid IdentityObject::Draw() const
 	const size_t indexCount = GetIndexCount();
 
 	glBindVertexArray(mVAO);
+	if (mShader == Shader::Texture || mShader == Shader::Back)
+	{
+		glBindTexture(GL_TEXTURE_2D, mTexture);
+	}
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
@@ -531,7 +554,6 @@ SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 	SetObject(object);
 	SetShader(object->GetShader());
 }
-
 GLvoid SharedObject::Draw() const
 {
 	ShaderObject::PrepareDraw();
@@ -540,6 +562,10 @@ GLvoid SharedObject::Draw() const
 	glBindVertexArray(mObject->GetVAO());
 	if (indexCount > 0)
 	{
+		if (GetShader() == Shader::Texture)
+		{
+			glBindTexture(GL_TEXTURE_2D, mObject->GetTexture());
+		}
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	}
 	else
@@ -560,7 +586,6 @@ GLvoid SharedObject::Draw() const
 	}
 	glBindVertexArray(0);
 }
-
 
 
 
@@ -612,14 +637,6 @@ GLvoid ModelObject::PullNormals(vector<GLfloat>& normals) const
 		normals[(vertexIndex * 3) + 2] = normal.z;
 		++count;
 	}
-	/*for (const size_t& vertexIndex : indices_vertex)
-	{
-		glm::vec3 normal = objectNormals[indices_normal[count]];
-		normals[(vertexIndex * 3)] = normal.x;
-		normals[(vertexIndex * 3) + 1] = normal.y;
-		normals[(vertexIndex * 3) + 2] = normal.z;
-		++count;
-	}*/
 }
 GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
 {
@@ -1309,24 +1326,52 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // identity simple objects
 static const Line* lineObject = nullptr;
 
-static const ModelObject* modelObjects[NUM_OF_MODELS];
+static const ModelObject* modelObjects[NUM_OF_MODEL];
+static const ModelObject* textureModelObjects[NUM_OF_TEXTURE_MODEL];
 
-GLvoid InitObjects()
+GLvoid InitObject()
 {
+	stbi_set_flip_vertically_on_load(true);
+
 	lineObject = new Line();
 
-	for (GLsizei i = 0; i < NUM_OF_MODELS; ++i)
+	for (GLsizei i = 0; i < NUM_OF_MODEL; ++i)
 	{
 		const Model* model = GetModel(static_cast<Models>(i));
-		Shader shader = Shader::Light;
-		if (static_cast<Models>(i) == Models::Cube)
-		{
-			shader = Shader::Texture;
-		}
-		modelObjects[i] = new ModelObject(model, shader);
+		modelObjects[i] = new ModelObject(model, Shader::Light);
+	}
+
+	for (GLsizei i = 0; i < NUM_OF_TEXTURE_MODEL; ++i)
+	{
+		TextureModels textureModel = static_cast<TextureModels>(i);
+		const Model* model = GetTextureModel(textureModel);
+		textureModelObjects[i] = new ModelObject(model, Shader::Texture);
+		textureModelObjects[i]->InitTextures(GetTexturePath(textureModel));
 	}
 }
 const Line* GetIdentityLine()
@@ -1337,7 +1382,10 @@ const ModelObject* GetIdentityModelObject(const Models& model)
 {
 	return modelObjects[static_cast<GLint>(model)];
 }
-
+const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel)
+{
+	return textureModelObjects[static_cast<GLint>(textureModel)];
+}
 
 
 
@@ -1346,6 +1394,7 @@ const ModelObject* GetIdentityModelObject(const Models& model)
 static vector<ShaderObject*> customObjects;
 static vector<ShaderObject*> lightObjects;
 static vector<ShaderObject*> textureObjects;
+static vector<ShaderObject*> blendObjects;
 static vector<ShaderObject*> minimapObjects;
 
 
@@ -1366,6 +1415,10 @@ GLvoid AddObject(const Shader& shader, ShaderObject* object)
 		assert(0);
 		break;
 	}
+}
+GLvoid AddBlendObject(ShaderObject* object)
+{
+	blendObjects.emplace_back(object);
 }
 GLvoid DeleteObject(const Shader& shader, ShaderObject* object)
 {
@@ -1422,4 +1475,19 @@ GLvoid DrawObjects(const Shader& shader)
 		break;
 	}
 
+}
+
+GLvoid DrawBlendObjects()
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	sort(blendObjects.begin(), blendObjects.end(), ShaderObject::CompareBlendObject);
+
+	for (const ShaderObject* object : blendObjects)
+	{
+		object->Draw();
+	}
+
+	glDisable(GL_BLEND);
 }

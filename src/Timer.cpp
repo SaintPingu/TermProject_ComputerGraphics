@@ -2,16 +2,17 @@
 #include "Timer.h"
 #include "Object.h"
 #include "Camera.h"
+#include "Light.h"
 
 #define EXIT -1
 #define INIT -2
 #define READY -3
 
 
-GLboolean CameraRotation_YAxis(GLint value);
+GLboolean LightRotation_Y(GLint value);
 
 static unordered_map<Timer, GLboolean(*)(GLint)> timerTable = {
-	{ Timer::WolrdRotation_Y, CameraRotation_YAxis },
+	{ Timer::LightRotation_Y, LightRotation_Y },
 };
 
 static set<GLboolean(*)(GLint)> timers;
@@ -180,7 +181,7 @@ GLvoid timer::DisableTimer(GLboolean(*timerFunc)(GLint))
 
 
 // timers
-GLboolean CameraRotation_YAxis(GLint value)
+GLboolean LightRotation_Y(GLint value)
 {
 	static GLint dir = 0;
 	switch (value)
@@ -196,6 +197,9 @@ GLboolean CameraRotation_YAxis(GLint value)
 	default:
 		break;
 	}
+
+	extern Light* light;
+	light->RotatePosition({ 0, 0, 0 }, Vector3::Up(), 100 * timer::DeltaTime() * dir);
 
 	return true;
 }

@@ -16,6 +16,24 @@ GLvoid Light::Draw() const
 	shd::SetShader(Shader::Light, "light.pos", mPosition);
 	mObject->Draw();
 }
+GLvoid Light::ToggleLight()
+{
+	if (isLightOn)
+	{
+		shd::Use(Shader::Light);
+		shd::SetShader(Shader::Light, "light.color", glm::vec3(MyColor(BLACK)));
+		shd::Use(Shader::Texture);
+		shd::SetShader(Shader::Texture, "light.color", glm::vec3(MyColor(BLACK)));
+	}
+	else
+	{
+		shd::Use(Shader::Light);
+		shd::SetShader(Shader::Light, "light.color", glm::vec3(MyColor(WHITE)));
+		shd::Use(Shader::Texture);
+		shd::SetShader(Shader::Texture, "light.color", glm::vec3(MyColor(WHITE)));
+	}
+	isLightOn = !isLightOn;
+}
 
 GLvoid InitLight()
 {

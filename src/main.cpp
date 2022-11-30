@@ -64,6 +64,9 @@ GLpoint crntPos = { 0,0 };
 GLboolean isLeftDown = false;
 GLboolean isRightDown = false;
 
+// temp
+ModelObject* cubeMap = nullptr;
+
 // extern
 
 GLint main(GLint argc, GLchar** argv)
@@ -146,7 +149,7 @@ GLvoid Init()
 GLvoid InitMeshes()
 {
 	InitModels();
-	InitObjects();
+	InitObject();
 	bulletManager = new BulletManager();
 	monsterManager = new MonsterManager();
 	buildingManager = new BuildingManager();
@@ -180,12 +183,12 @@ GLvoid InitMeshes()
 	AddObject(Shader::Color, line);
 	//**************************************************//
 	
-
 	// test object
-	SharedObject* temp = new SharedObject(GetIdentityModelObject(Models::Cube));
-	temp->SetColor(ORANGE);
-	temp->SetPosition({ 0, 20, 20 });
-	AddObject(Shader::Texture, temp);
+	const Model* cubeMapModel = GetTextureModel(TextureModels::CubeBackground);
+	cubeMap = new ModelObject(cubeMapModel, Shader::Texture);
+	cubeMap->InitTextures(GetTexturePath(TextureModels::CubeBackground));
+	cubeMap->Scale(150);
+	cubeMap->SetPosY(-cubeMap->GetHeight() / 2);
 
 	// light object
 	light = new Light();
@@ -274,7 +277,6 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "projTransform", xform::GetProj(crntCamera));
 	DrawObjects(crntShader);
 
-
 	crntShader = Shader::Light;
 	shd::Use(crntShader);
 	shd::SetShader(crntShader, "viewTransform", xform::GetView(crntCamera));
@@ -285,8 +287,6 @@ GLvoid DrawScene()
 	bulletManager->Draw();
 	monsterManager->Draw();
 	buildingManager->Draw();
-
-	crntMap->Draw();
 		
 	if (player != nullptr)
 	{
@@ -302,6 +302,11 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "light.pos", light->GetPviotedPosition());
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
+	DrawBlendObjects();
+
+	glCullFace(GL_FRONT);
+	cubeMap->Draw();
+	glCullFace(GL_BACK);
 
 	glBindVertexArray(0);
 	glutSwapBuffers();
@@ -496,6 +501,10 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case 'H':
 		ToggleDepthTest();
 		break;
+	case 'm':
+	case 'M':
+		light->ToggleLight();
+		break;
 
 		// camera
 	case 'p':
@@ -507,7 +516,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		cameraMain->SetPerpective(false);
 		break;
 	case '1':
-		SetCameraMode(CameraMode::Free	);
+		SetCameraMode(CameraMode::Free);
 		break;
 	case '2':
 		SetCameraMode(CameraMode::FirstPerson);
@@ -522,6 +531,10 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 
 	
 		// timers
+	case 'z':
+	case 'Z':
+		timer::ToggleTimer(Timer::LightRotation_Y);
+		break;
 	default:
 		break;
 

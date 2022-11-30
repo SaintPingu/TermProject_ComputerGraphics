@@ -133,5 +133,11 @@
     <None Include="shaders\texture_vert.glsl">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="shaders\back_vert.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="shaders\back_frag.glsl">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

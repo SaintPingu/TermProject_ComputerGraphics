@@ -43,6 +43,10 @@ GLint Make_ShaderProgram(const Shader& shader)
 		vertexShaderName = "texture";
 		fragShaderName = "texture";
 		break;
+	case Shader::Back:
+		vertexShaderName = "back";
+		fragShaderName = "back";
+		break;
 	default:
 		assert(0);
 		break;

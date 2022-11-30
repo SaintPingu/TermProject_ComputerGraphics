@@ -2,7 +2,7 @@
 #include "stdafx.h"
 
 enum class Timer : GLint {
-	WolrdRotation_Y = 0,
+	LightRotation_Y,
 };
 
 namespace timer {

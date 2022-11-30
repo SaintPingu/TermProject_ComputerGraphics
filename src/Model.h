@@ -2,10 +2,10 @@
 #include "stdafx.h"
 
 class Cuboid;
-enum class Models { Circle = 0, Cube, LowSphere, GeoSphere, Map, Player, Gun, Blooper, GuardTower, _count };
-constexpr GLint NUM_OF_MODELS = static_cast<GLint>(Models::_count);
-
-GLvoid InitModels();
+enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, Blooper, GuardTower, _count };
+enum class TextureModels { Gun, Map, CubeBackground, _count };
+constexpr GLint NUM_OF_MODEL = static_cast<GLint>(Models::_count);
+constexpr GLint NUM_OF_TEXTURE_MODEL = static_cast<GLint>(TextureModels::_count);
 
 class Model {
 private:
@@ -22,9 +22,10 @@ private:
 	GLfloat mWidth = 0;
 	GLfloat mHeight = 0;
 	GLfloat mDepth = 0;
+
+	GLvoid LoadModel(const GLchar* path);
 public:
 	Model(const GLchar* path);
-	GLvoid LoadModel(const GLchar* path);
 
 	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const { return mVerticesXZ; }
 
@@ -42,6 +43,11 @@ public:
 	inline GLfloat GetWidth() const { return mWidth;}
 	inline GLfloat GetHeight() const {return mHeight; }
 	inline GLfloat GetDepth() const { return mDepth; }
+
+	GLvoid ReverseNormal();
 };
 
+GLvoid InitModels();
+const GLchar* GetTexturePath(const TextureModels& textureModel);
 const Model* GetModel(const Models& model);
+const Model* GetTextureModel(const TextureModels& textureModel);

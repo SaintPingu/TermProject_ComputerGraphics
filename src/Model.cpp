@@ -4,65 +4,19 @@
 #include "model.h"
 #include "object.h"
 
-// model
-static const Model* circleModel = nullptr;
-static const Model* cubeModel = nullptr;
-static const Model* lowSphereModel = nullptr;
-static const Model* sphereModel = nullptr;
-static const Model* mapModel = nullptr;
-
-// player
-static const Model* playerModel = nullptr;
-static const Model* gunModel = nullptr;
-
-// monster
-static const Model* blooperModel = nullptr;
-
-// building
-static const Model* guardTowerModel = nullptr;
-
-unordered_map<Models, const Model*> modelMap{
-	{Models::Circle, circleModel},
-	{Models::Cube, cubeModel},
-	{Models::LowSphere, lowSphereModel},
-	{Models::GeoSphere, sphereModel},
-	{Models::Map, mapModel},
-	{Models::Player, playerModel},
-	{Models::Gun, gunModel},
-	{Models::Blooper, blooperModel},
-	{Models::GuardTower, guardTowerModel},
-};
-
-GLvoid InitModels()
-{
-	modelMap[Models::Circle] = new Model("obj\\circle.obj");
-	modelMap[Models::Cube] = new Model("obj\\cube.obj");
-	modelMap[Models::LowSphere] = new Model("obj\\low_sphere.obj");
-	modelMap[Models::GeoSphere] = new Model("obj\\geo_sphere.obj");
-	modelMap[Models::Map] = new Model("obj\\map.obj");
-
-	modelMap[Models::Player] = new Model("obj\\player.obj");
-	modelMap[Models::Gun] = new Model("obj\\gun.obj");
-
-	modelMap[Models::Blooper] = new Model("obj\\blooper.obj");;
-	modelMap[Models::GuardTower] = new Model("obj\\guard_tower3.obj");;
-}
-
-const Model* GetModel(const Models& model)
-{
-	const Model* result = modelMap[model];
-	assert(result != nullptr);
-
-	return result;
-}
-
 Model::Model(const GLchar* path)
 {
 	LoadModel(path);
 }
+
+
+/* Warning : 법선 벡터가 unify되어있지 않을 경우 제대로 그려지지 않을 수 있음 */
 GLvoid Model::LoadModel(const GLchar* path)
 {
-	FILE* objFile = fopen(path, "r");
+	string objPath = "obj\\";
+	objPath += path;
+
+	FILE* objFile = fopen(objPath.c_str(), "r");
 	if (objFile == nullptr)
 	{
 		printf("Can't load objFile : %s", path);
@@ -207,6 +161,98 @@ GLvoid Model::LoadModel(const GLchar* path)
 	mHeight = top - bottom;
 	mDepth = back - front;
 }
+GLvoid Model::ReverseNormal()
+{
+	for (glm::vec3& normal : mNormals)
+	{
+		normal.x *= -1;
+		normal.y *= -1;
+		normal.z *= -1;
+	}
+}
+
+
+
+
+
+
+// model
+static Model* planeModel = nullptr;
+static Model* circleModel = nullptr;
+static Model* cubeModel = nullptr;
+static Model* lowSphereModel = nullptr;
+static Model* sphereModel = nullptr;
+
+// player
+static Model* playerModel = nullptr;
+static Model* gunModel = nullptr;
+
+// monster
+static Model* blooperModel = nullptr;
+
+// building
+static Model* guardTowerModel = nullptr;
+
+
+// [ texture models ] //
+static Model* mapModel = nullptr;
+static Model* cubeBackgroundModel = nullptr;
+
+unordered_map<Models, Model*> modelMap{
+	{Models::Plane, planeModel},
+	{Models::Circle, circleModel},
+	{Models::Cube, cubeModel},
+	{Models::LowSphere, lowSphereModel},
+	{Models::GeoSphere, sphereModel},
+	{Models::Player, playerModel},
+	{Models::Blooper, blooperModel},
+	{Models::GuardTower, guardTowerModel},
+};
+unordered_map<TextureModels, Model*> textureModelMap{
+	{TextureModels::Gun, gunModel },
+	{TextureModels::Map, mapModel },
+	{TextureModels::CubeBackground, cubeBackgroundModel },
+};
+unordered_map<TextureModels, const GLchar*> textureMap{
+	{TextureModels::Gun, "gun.png" },
+	{TextureModels::Map, "map.png" },
+	{TextureModels::CubeBackground, "cubemap.png" },
+};
+
+GLvoid InitModels()
+{
+	modelMap[Models::Plane] = new Model("plane.obj");
+	modelMap[Models::Circle] = new Model("circle.obj");
+	modelMap[Models::Cube] = new Model("cube.obj");
+	modelMap[Models::LowSphere] = new Model("low_sphere.obj");
+	modelMap[Models::GeoSphere] = new Model("geo_sphere.obj");
+
+	modelMap[Models::Player] = new Model("player.obj");
+
+	modelMap[Models::Blooper] = new Model("blooper.obj");;
+	modelMap[Models::GuardTower] = new Model("guard_tower.obj");;
+
+
+	textureModelMap[TextureModels::Gun] = new Model("gun.obj");
+	textureModelMap[TextureModels::Map] = new Model("map.obj");
+	textureModelMap[TextureModels::CubeBackground] = new Model("cube.obj");
+	textureModelMap[TextureModels::CubeBackground]->ReverseNormal();
+}
+
+const Model* GetModel(const Models& model)
+{
+	const Model* result = modelMap[model];
+	assert(result != nullptr);
+
+	return result;
+}
+const Model* GetTextureModel(const TextureModels& textureModel)
+{
+	const Model* result = textureModelMap[textureModel];
+	assert(result != nullptr);
+
+	return result;
+}
 
 
 
@@ -221,4 +267,10 @@ glm::vec3 Model::GetVertex(const size_t& index) const
 Cuboid* Model::GetCuboid(const glm::vec3* position, const glm::vec3* scale) const
 {
 	return new Cuboid(position, scale, mWidth, mHeight, mDepth);
+}
+
+
+const GLchar* GetTexturePath(const TextureModels& textureModel)
+{
+	return textureMap[textureModel];
 }

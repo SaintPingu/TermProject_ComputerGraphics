@@ -4,9 +4,9 @@
 
 Map::Map()
 {
-	mMapObject = new ModelObject(GetModel(Models::Map), Shader::Light);
-	mMapObject->SetColor(DARK_GREEN);
-	mMapObject->BindBuffers();
+	mMapObject = new ModelObject(GetTextureModel(TextureModels::Map), Shader::Texture);
+	mMapObject->InitTextures(GetTexturePath(TextureModels::Map));
+	AddObject(Shader::Texture, mMapObject);
 
 	set<glm::vec2, CompareSet> boundingMap = mMapObject->GetBoundings_XZ();
 	auto iter = boundingMap.begin();

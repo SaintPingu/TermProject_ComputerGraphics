@@ -112,7 +112,7 @@
 using namespace std;
 
 enum class Event { None, KeyDown, KeyUp };
-enum class Shader { Color = 0, Light, Texture, None, _count };
+enum class Shader { Color = 0, Light, Texture, Back, None, _count };
 enum class Dir { None, Left, Right, Up, Down, Front, Back };
 enum class CameraMode { Free, FirstPerson, ThirdPerson, Light };
 enum class CollisionType { None, Circle, Rect, };
