@@ -2,9 +2,7 @@
 #include "stdafx.h"
 #include "Model.h"
 
-#define DEFAULT_OBJECT_COLOR GRAY
-
-enum class Shader;
+#define DEFAULT_OBJECT_COLOR WHITE
 
 /************************************************** [ TOP ROOTS ] **************************************************/
 
@@ -31,17 +29,17 @@ public:
 
 	//********** [ Position ] **********//
 	/* mPosition의 const 주소 리턴 */
-	const glm::vec3* GetRefPos() const;
+	inline constexpr const glm::vec3* GetRefPos() const { return &mPosition; }
 
 	/* mPosition 리턴 */
 	inline constexpr glm::vec3 GetPosition() const { return mPosition; }
 	/* pivot이 적용된 mPosition 리턴 */
 	glm::vec3 GetPviotedPosition() const;
 
-	GLvoid SetPosition(const glm::vec3& position);
-	GLvoid SetPosX(const GLfloat& x);
-	GLvoid SetPosY(const GLfloat& y);
-	GLvoid SetPosZ(const GLfloat& z);
+	inline constexpr GLvoid SetPosition(const glm::vec3& position) { mPosition = position; }
+	inline constexpr GLvoid SetPosX(const GLfloat& x) { mPosition.x = x; }
+	inline constexpr GLvoid SetPosY(const GLfloat& y) { mPosition.y = y; }
+	inline constexpr GLvoid SetPosZ(const GLfloat& z) { mPosition.z = z; }
 
 	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = true);
 	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = true);
@@ -116,6 +114,7 @@ public:
 	GLvoid SetScale(const GLfloat& scale);
 	GLvoid ScaleOrigin(const GLfloat& scale);
 
+	// [ WARNING ] //
 	// 비균등 scale은 모델변환의 역행렬의 전치행렬을 계산해야 하는 연산이 필요하므로 조명 계산 등의 "노멀 벡터를 사용할 경우" 사용하지 않도록 함.
 	GLvoid SetScaleX(const GLfloat& scale);
 	GLvoid SetScaleY(const GLfloat& scale);
@@ -124,6 +123,7 @@ public:
 	GLvoid ScaleX(const GLfloat& amount);
 	GLvoid ScaleY(const GLfloat& amount);
 	GLvoid ScaleZ(const GLfloat& amount);
+	//
 
 	inline constexpr const glm::vec3* GetRefScale() const { return &mScale; };
 	inline constexpr glm::vec3 GetScale() const { return mScale; }
@@ -190,8 +190,8 @@ public:
 	~IdentityObject();
 	GLvoid InitBuffers();
 	GLvoid BindBuffers();
-	GLvoid InitTextures(const GLchar* fileName) const;
 	GLvoid DeleteBuffers();
+	GLvoid SetTexture(const TextureModels& textureModel);
 
 	// 현재 사용 X //
 	GLfloat GetWidth() const override;
@@ -317,33 +317,30 @@ public:
 /************************************************** [ BASIC OBJECTS ] **************************************************/
 
 //////////////////////////////////////// [ Line ] ////////////////////////////////////////
-class Line : public CustomObject {
+class LineObject : public CustomObject {
 public:
-	Line();
-	Line(const glm::vec3& v1, const glm::vec3& v2);
+	LineObject();
+	LineObject(const glm::vec3& v1, const glm::vec3& v2);
 	GLvoid Draw() const;
 	GLvoid SetVertex(const GLboolean& index, const glm::vec3& pos);
 };
 
 //////////////////////////////////////// [ Triangle ] ////////////////////////////////////////
-class Triangle : public CustomObject {
+class TriangleObject : public CustomObject {
 public:
-	Triangle();
-	Triangle(vector<glm::vec3>& vertices) : CustomObject(vertices) { if (vertices.size() != 3) assert(0); }
+	TriangleObject();
+	TriangleObject(vector<glm::vec3>& vertices) : CustomObject(vertices) { if (vertices.size() != 3) assert(0); }
 	GLvoid Draw() const;
 };
 
 //////////////////////////////////////// [ Plane ] ////////////////////////////////////////
-class Plane : public CustomObject {
+class PlaneObject : public CustomObject {
 public:
-	Plane();
+	PlaneObject();
 	GLvoid Draw() const;
 	glm::vec3 GetNormal() const;
 	GLfloat CheckCollision(const glm::vec3& point, const GLfloat& radius) const;
 };
-
-
-
 
 
 
@@ -396,9 +393,10 @@ public:
 };
 
 /* 총알과 충돌하는 객체 */
+class PaintPlane;
 class IBulletCollisionable abstract {
 public:
-	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr) abstract;
+	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal) abstract;
 };
 
 /* 2D 충돌체크를 하는 객체 */
@@ -442,15 +440,19 @@ public:
 
 
 /************************************************** [ OTHER OBJECTS ] **************************************************/
-
-
+class PaintPlane : public ModelObject {
+	GLfloat dt = 0.0f;
+public:
+	PaintPlane(const glm::vec3& pos, const glm::vec3& normal);
+	GLboolean Update();
+};
 
 
 
 
 
 GLvoid InitObject();
-const Line* GetIdentityLine();
+const LineObject* GetIdentityLine();
 const ModelObject* GetIdentityModelObject(const Models& model);
 const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel);
 

@@ -6,7 +6,8 @@
 #include "Map.h"
 #include "Gun.h"
 
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
 

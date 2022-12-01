@@ -8,7 +8,6 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
 	mObject = new SharedObject(GetIdentityTextureObject(TextureModels::Gun));
 
-	mObject->SetColor(GRAY);
 	mObject->SetPivot(pivot);
 	mObject->SetPosition(gunPosition);
 

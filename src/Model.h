@@ -3,7 +3,7 @@
 
 class Cuboid;
 enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, Blooper, GuardTower, _count };
-enum class TextureModels { Gun, Map, CubeBackground, _count };
+enum class TextureModels { Gun, Map, CubeBackground, Paint, _count };
 constexpr GLint NUM_OF_MODEL = static_cast<GLint>(Models::_count);
 constexpr GLint NUM_OF_TEXTURE_MODEL = static_cast<GLint>(TextureModels::_count);
 
@@ -51,3 +51,4 @@ GLvoid InitModels();
 const GLchar* GetTexturePath(const TextureModels& textureModel);
 const Model* GetModel(const Models& model);
 const Model* GetTextureModel(const TextureModels& textureModel);
+GLuint GetTexture(const TextureModels& textureModel);

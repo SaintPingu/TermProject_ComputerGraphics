@@ -4,9 +4,10 @@
 #include "Transform.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "Bullet.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <myGL/stb_image.h>
+#define PAINT_DISAPEAR_TIME 10.0f
+
 
 Object::Object()
 {
@@ -160,26 +161,7 @@ glm::vec3 Object::GetUp() const
 }
 
 
-GLvoid Object::SetPosition(const glm::vec3& position)
-{
-	mPosition = position;
-}
-GLvoid Object::SetPosX(const GLfloat& x)
-{
-	mPosition.x = x;
-}
-GLvoid Object::SetPosY(const GLfloat& y)
-{
-	mPosition.y = y;
-}
-GLvoid Object::SetPosZ(const GLfloat& z)
-{
-	mPosition.z = z;
-}
-const glm::vec3* Object::GetRefPos() const
-{
-	return &mPosition;
-}
+
 glm::vec3 Object::GetPviotedPosition() const
 {
 	glm::vec3 result = mPosition;
@@ -262,10 +244,7 @@ ShaderObject::~ShaderObject() {}
 GLvoid ShaderObject::PrepareDraw() const
 {
 	ModelTransform();
-	if (mShader != Shader::Texture)
-	{
-		shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
-	}
+	shd::SetShader(mShader, "objectColor", glm::vec3(mColor));
 }
 
 bool ShaderObject::CompareBlendObject(const ShaderObject* lhs, const ShaderObject* rhs)
@@ -283,6 +262,7 @@ GLvoid ShaderObject::InitValues()
 	Object::InitValues();
 	mScale = { 1.0f,1.0f,1.0f };
 	mScaleOrigin = { 1.0f,1.0f,1.0f };
+	mColor = DEFAULT_OBJECT_COLOR;
 }
 GLvoid ShaderObject::SetScale(const GLfloat& scale)
 {
@@ -424,14 +404,12 @@ GLvoid IdentityObject::InitBuffers()
 	glGenVertexArrays(1, &mVAO);
 	glGenBuffers(3, &mVBO[0]);
 	glGenBuffers(1, &mEBO);
-	glGenTextures(1, &mTexture);
 }
 GLvoid IdentityObject::DeleteBuffers()
 {
 	glDeleteBuffers(3, &mVBO[0]);
 	glDeleteBuffers(1, &mEBO);
 	glDeleteVertexArrays(1, &mVAO);
-	glDeleteTextures(1, &mTexture);
 }
 
 GLvoid IdentityObject::BindBuffers()
@@ -482,7 +460,6 @@ GLvoid IdentityObject::BindBuffers()
 	else
 	{
 		glDeleteBuffers(1, &mVBO[2]);
-		glDeleteTextures(1, &mTexture);
 	}
 
 	if (indices.size() > 0)
@@ -497,42 +474,10 @@ GLvoid IdentityObject::BindBuffers()
 
 	glBindVertexArray(0);
 }
-GLvoid IdentityObject::InitTextures(const GLchar* fileName) const
+GLvoid IdentityObject::SetTexture(const TextureModels& textureModel)
 {
-	string path = "textures\\";
-	path += fileName;
-
-	GLint imageWidth, imageHeight, numOfChannel;
-
-	GLubyte* data = stbi_load(path.c_str(), &imageWidth, &imageHeight, &numOfChannel, 0);
-
-	if (stbi_failure_reason())
-	{
-		cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
-		cout << "[ path ] : " << path << endl;
-		assert(0);
-	}
-
-	if (!data)
-	{
-		cout << "Failed to load texture : " << path << endl;
-		assert(0);
-	}
-
-	cout << "load texture : " << path << endl;
-
-	glBindTexture(GL_TEXTURE_2D, mTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
+	mTexture = ::GetTexture(textureModel);
 }
-
 
 GLvoid IdentityObject::Draw() const
 {
@@ -877,7 +822,7 @@ set<glm::vec2, CompareSet> ModelObject::GetBoundings_XZ() const
 ////////// [ BASIC OBJECTS ] //////////
 
 // Line
-Line::Line() : CustomObject()
+LineObject::LineObject() : CustomObject()
 {
 	glm::vec3 v1 = { 0, 0, 1.0f };
 	glm::vec3 v2 = { 0, 0, -1.0f };
@@ -885,13 +830,13 @@ Line::Line() : CustomObject()
 	mVertices.emplace_back(v2);
 	BindBuffers();
 }
-Line::Line(const glm::vec3& v1, const glm::vec3& v2) : CustomObject()
+LineObject::LineObject(const glm::vec3& v1, const glm::vec3& v2) : CustomObject()
 {
 	mVertices.emplace_back(v1);
 	mVertices.emplace_back(v2);
 	BindBuffers();
 }
-GLvoid Line::Draw() const
+GLvoid LineObject::Draw() const
 {
 	ShaderObject::PrepareDraw();
 
@@ -899,13 +844,13 @@ GLvoid Line::Draw() const
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 }
-GLvoid Line::SetVertex(const GLboolean& index, const glm::vec3& pos)
+GLvoid LineObject::SetVertex(const GLboolean& index, const glm::vec3& pos)
 {
 	mVertices[index] = pos;
 }
 
 // Triangle
-Triangle::Triangle() : CustomObject()
+TriangleObject::TriangleObject() : CustomObject()
 {
 	const vector<glm::vec3> defaultTriangle = {
 		{  0, 0, -1},
@@ -916,7 +861,7 @@ Triangle::Triangle() : CustomObject()
 
 	BindBuffers();
 }
-GLvoid Triangle::Draw() const
+GLvoid TriangleObject::Draw() const
 {
 	ShaderObject::PrepareDraw();
 
@@ -926,7 +871,7 @@ GLvoid Triangle::Draw() const
 }
 
 // Plane
-Plane::Plane() : CustomObject()
+PlaneObject::PlaneObject() : CustomObject()
 {
 	const vector<glm::vec3> defaultPlane = {
 		{-1, 0, -1},
@@ -938,7 +883,7 @@ Plane::Plane() : CustomObject()
 
 	BindBuffers();
 }
-GLvoid Plane::Draw() const
+GLvoid PlaneObject::Draw() const
 {
 	ShaderObject::PrepareDraw();
 
@@ -946,7 +891,7 @@ GLvoid Plane::Draw() const
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
-glm::vec3 Plane::GetNormal() const
+glm::vec3 PlaneObject::GetNormal() const
 {
 	glm::vec3 vertices[3] = { mVertices[0],mVertices[1] ,mVertices[2] };
 
@@ -962,7 +907,7 @@ glm::vec3 Plane::GetNormal() const
 
 	return glm::normalize(glm::cross(v3 - v2, v1 - v2));
 }
-GLfloat Plane::CheckCollision(const glm::vec3& center, const GLfloat& radius) const
+GLfloat PlaneObject::CheckCollision(const glm::vec3& center, const GLfloat& radius) const
 {
 	glm::vec3 vertices[3] = { mVertices[0],mVertices[1] ,mVertices[2] };
 
@@ -1113,7 +1058,7 @@ GLvoid Cuboid::Draw() const
 	const GLfloat h = (mHeight/2) * mScale->y;
 	const GLfloat d = mHalfDepth * mScale->z;
 
-	const Line* identityLine = GetIdentityLine();
+	const LineObject* identityLine = GetIdentityLine();
 	SharedObject line(identityLine);
 
 	// z
@@ -1298,6 +1243,7 @@ GLvoid CollisionManager::DeleteObject(ICollisionable_2D* object)
 
 
 
+
 // Bug : does not work correctly when a vertices size is large
 GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos, const COLORREF& color, const glm::vec3* pivot)
 {
@@ -1306,7 +1252,7 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 		yPos += pivot->y;
 	}
 
-	Line* line = nullptr;
+	LineObject* line = nullptr;
 
 	for (glm::vec2 v1 : vertices)
 	{
@@ -1327,7 +1273,7 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 				v2.y += pivot->z;
 			}
 
-			line = new Line({ v1.x , yPos, v1.y }, { v2.x , yPos, v2.y });
+			line = new LineObject({ v1.x , yPos, v1.y }, { v2.x , yPos, v2.y });
 			line->SetColor(color);
 			line->BindBuffers();
 			line->Draw();
@@ -1341,7 +1287,25 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
+PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(TextureModels::Paint), Shader::Texture)
+{
+	SetTexture(TextureModels::Paint);
+	SetPosition(pos);
+	SetLook(normal);
+	Scale(0.5f);
+	GLfloat randZ = ((rand() % 1000)*0.001f) + 0.001f;	// 0.001 ~ 0.999
+	MoveZ(randZ, false);
+}
+GLboolean PaintPlane::Update()
+{
+	dt += timer::DeltaTime();
+	if (dt >= PAINT_DISAPEAR_TIME)
+	{
+		return false;
+	}
 
+	return true;
+}
 
 
 
@@ -1365,16 +1329,14 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 // identity simple objects
-static const Line* lineObject = nullptr;
+static const LineObject* lineObject = nullptr;
 
-static const ModelObject* modelObjects[NUM_OF_MODEL];
-static const ModelObject* textureModelObjects[NUM_OF_TEXTURE_MODEL];
+static ModelObject* modelObjects[NUM_OF_MODEL];
+static ModelObject* textureModelObjects[NUM_OF_TEXTURE_MODEL];
 
 GLvoid InitObject()
 {
-	stbi_set_flip_vertically_on_load(true);
-
-	lineObject = new Line();
+	lineObject = new LineObject();
 
 	for (GLsizei i = 0; i < NUM_OF_MODEL; ++i)
 	{
@@ -1387,10 +1349,10 @@ GLvoid InitObject()
 		TextureModels textureModel = static_cast<TextureModels>(i);
 		const Model* model = GetTextureModel(textureModel);
 		textureModelObjects[i] = new ModelObject(model, Shader::Texture);
-		textureModelObjects[i]->InitTextures(GetTexturePath(textureModel));
+		textureModelObjects[i]->SetTexture(textureModel);
 	}
 }
-const Line* GetIdentityLine()
+const LineObject* GetIdentityLine()
 {
 	return lineObject;
 }
@@ -1498,11 +1460,27 @@ GLvoid DrawBlendObjects()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	sort(blendObjects.begin(), blendObjects.end(), ShaderObject::CompareBlendObject);
+	extern const Camera* crntCamera;
+	glm::vec3 cameraPos = crntCamera->GetPosition();
 
-	for (const ShaderObject* object : blendObjects)
+	map<GLfloat, ShaderObject*> sorted;
+	for (auto it = blendObjects.begin(); it != blendObjects.end(); ++it)
 	{
-		object->Draw();
+		GLfloat distance = glm::length(cameraPos - (*it)->GetTransformedPos());
+		sorted[distance] = *it;
+	}
+
+	extern BulletManager* bulletManager;
+	const vector<PaintPlane*>& paints = bulletManager->GetPaints();
+	for (auto it = paints.begin(); it != paints.end(); ++it)
+	{
+		GLfloat distance = glm::length(cameraPos - (*it)->GetTransformedPos());
+		sorted[distance] = *it;
+	}
+
+	for (map<GLfloat, ShaderObject*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+	{
+		(*it).second->Draw();
 	}
 
 	glDisable(GL_BLEND);

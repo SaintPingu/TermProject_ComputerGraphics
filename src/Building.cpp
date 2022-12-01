@@ -33,7 +33,7 @@ GLvoid BuildingManager::Building::Update()
 
 }
 
-GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
+GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch(mCollisionType)
 	{
@@ -41,9 +41,32 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevP
 	{
 		GLrect rect = mObject->GetRect();
 		const glm::vec2 bulletCenter = { bulletPos.x, bulletPos.z };
-		if (::CheckCollision(rect, bulletCenter, bulletRadius) == GL_TRUE)
+		if (::CheckCollision(rect, bulletCenter, bulletRadius) == GL_TRUE && bulletPos.y - bulletRadius <= mObject->GetTransformedPos().y + mObject->GetHeight())
 		{
+			const glm::vec2 prevBulletCenter = { prevPos.x, prevPos.z };
+
+			glm::vec2 leftTop = { rect.left, rect.top };
+			glm::vec2 leftBottom = { rect.left,rect.bottom };
+			glm::vec2 rightTop = { rect.right , rect.top };
+			glm::vec2 rightBottom = { rect.right ,rect.bottom };
+
+			vector<Line> lines;
+			lines.emplace_back(Line(leftTop, leftBottom));
+			lines.emplace_back(Line(leftBottom, rightBottom));
+			lines.emplace_back(Line(rightBottom, rightTop));
+			lines.emplace_back(Line(rightTop, leftTop));
+			for (const Line& line : lines)
+			{
+				if (CheckCollision(line.v, line.u, prevBulletCenter, bulletCenter) == GL_TRUE)
+				{
+					glm::vec2 point = GetLineIntersection(line.v, line.u, prevBulletCenter, bulletCenter);
+					hitPoint = { point.x, prevPos.y, point.y };
+					normal = Vector3::Look();
+					return true;
+				}
+			}
 			return true;
+			assert(0); // didn't find line intersection
 		}
 	}
 		break;
@@ -89,3 +112,7 @@ GLvoid BuildingManager::Create(const BuildingType& type, const glm::vec3& positi
 	Building* building = new Building(type, position, look);
 	buildings.emplace_back(building);
 }
+//vector<const SharedObject*> BuildingManager::GetBuilngObjects() const
+//{
+//	for()
+//}

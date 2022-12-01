@@ -32,6 +32,7 @@ private:
 	};
 
 	vector<Bullet*> mBulletList;
+	vector<PaintPlane*> mPaints;
 	vector<IBulletCollisionable*> mCollisionObjectList;
 public:
 	BulletManager();
@@ -39,6 +40,9 @@ public:
 	GLvoid Create(const BulletType& type, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
 	GLvoid Draw() const;
 	GLvoid Update();
+
+	/* Read only */
+	inline constexpr const vector<PaintPlane*>& GetPaints() const { return mPaints; }
 
 	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjectList.emplace_back(object); }
 };

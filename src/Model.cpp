@@ -4,6 +4,8 @@
 #include "model.h"
 #include "object.h"
 
+#include <myGL/stb_image.h>
+
 Model::Model(const GLchar* path)
 {
 	LoadModel(path);
@@ -197,6 +199,9 @@ static Model* guardTowerModel = nullptr;
 // [ texture models ] //
 static Model* mapModel = nullptr;
 static Model* cubeBackgroundModel = nullptr;
+static Model* paintModel = nullptr;
+
+static GLuint textures[NUM_OF_TEXTURE_MODEL];
 
 unordered_map<Models, Model*> modelMap{
 	{Models::Plane, planeModel},
@@ -217,6 +222,7 @@ unordered_map<TextureModels, const GLchar*> textureMap{
 	{TextureModels::Gun, "gun.png" },
 	{TextureModels::Map, "map.png" },
 	{TextureModels::CubeBackground, "cubemap.png" },
+	{TextureModels::Paint, "paint.png" },
 };
 
 GLvoid InitModels()
@@ -230,13 +236,54 @@ GLvoid InitModels()
 	modelMap[Models::Player] = new Model("player.obj");
 
 	modelMap[Models::Blooper] = new Model("blooper.obj");;
-	modelMap[Models::GuardTower] = new Model("guard_tower.obj");;
+	modelMap[Models::GuardTower] = new Model("guard_tower_test.obj");;
 
 
 	textureModelMap[TextureModels::Gun] = new Model("gun.obj");
 	textureModelMap[TextureModels::Map] = new Model("map.obj");
 	textureModelMap[TextureModels::CubeBackground] = new Model("cube.obj");
 	textureModelMap[TextureModels::CubeBackground]->ReverseNormal();
+	textureModelMap[TextureModels::Paint] = modelMap[Models::Plane];
+
+	stbi_set_flip_vertically_on_load(true);
+
+	glGenTextures(NUM_OF_TEXTURE_MODEL, textures);
+	for (GLsizei i = 0; i < NUM_OF_TEXTURE_MODEL; ++i)
+	{
+		TextureModels textureModel = static_cast<TextureModels>(i);
+		string path = "textures\\";
+		path += textureMap[textureModel];
+
+		GLint imageWidth, imageHeight, numOfChannel;
+
+		GLubyte* data = stbi_load(path.c_str(), &imageWidth, &imageHeight, &numOfChannel, 0);
+
+		if (stbi_failure_reason())
+		{
+			cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
+			cout << "[ path ] : " << path << endl;
+			assert(0);
+		}
+
+		if (!data)
+		{
+			cout << "Failed to load texture : " << path << endl;
+			assert(0);
+		}
+
+		cout << "load texture : " << path << endl;
+
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		stbi_image_free(data);
+	}
 }
 
 const Model* GetModel(const Models& model)
@@ -252,6 +299,10 @@ const Model* GetTextureModel(const TextureModels& textureModel)
 	assert(result != nullptr);
 
 	return result;
+}
+GLuint GetTexture(const TextureModels& textureModel)
+{
+	return textures[static_cast<GLint>(textureModel)];
 }
 
 

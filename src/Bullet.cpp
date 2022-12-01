@@ -34,6 +34,20 @@ GLvoid BulletManager::Bullet::Update()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 BulletManager::BulletManager()
 {
 	mBulletList.reserve(100);
@@ -69,16 +83,37 @@ GLvoid BulletManager::Update()
 		GLboolean isCollision = false;
 		for (IBulletCollisionable* object : mCollisionObjectList)
 		{
-			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius()) == GL_TRUE)
+			glm::vec3 hitPoint;
+			glm::vec3 normal;
+			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius(), hitPoint, normal) == GL_TRUE)
 			{
 				delete bullet;
 				iter = mBulletList.erase(iter);
 				isCollision = true;
+				if (normal.x != 9)
+				{
+					PaintPlane* plane = new PaintPlane(hitPoint, normal);
+					mPaints.emplace_back(plane);
+				}
 				break;
 			}
 		}
 
 		if (isCollision == false)
+		{
+			++iter;
+		}
+	}
+
+	for (auto iter = mPaints.begin(); iter != mPaints.end();)
+	{
+		PaintPlane* paint = *iter;
+		if (paint->Update() == false)
+		{
+			delete paint;
+			iter = mPaints.erase(iter);
+		}
+		else
 		{
 			++iter;
 		}

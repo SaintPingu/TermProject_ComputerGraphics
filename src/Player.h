@@ -10,7 +10,7 @@
 class SharedObject;
 class Camera;
 class Cuboid;
-class Triangle;
+class TriangleObject;
 class Player;
 class Circle;
 class Gun;

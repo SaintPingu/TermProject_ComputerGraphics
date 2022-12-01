@@ -24,12 +24,14 @@ private:
 		GLvoid Update(const glm::vec3* target);
 		GLvoid Draw() const;
 
-		GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr);
+		GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal);
 		glm::vec3 GetPosition() const;
 	};
 
 	vector<Monster*> mMonsterList;
 	const Player* mPlayer = nullptr;
+
+	const glm::vec3* FindTargetPos(const glm::vec3& monsterPos) const;
 public:
 	MonsterManager();
 	~MonsterManager();

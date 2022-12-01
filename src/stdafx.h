@@ -13,6 +13,7 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 #include <myGL/glew.h>
@@ -570,7 +571,17 @@ typedef struct MyColor {
 }MyColor;
 
 
+class Line {
+public:
+	glm::vec2 v = { 0,0 };
+	glm::vec2 u = { 0,0 };
 
+	Line(const glm::vec2& v, const glm::vec2 u)
+	{
+		this->v = v;
+		this->u = u;
+	}
+};
 class GLrect {
 public:
 	GLfloat left = 0.0f;
@@ -687,12 +698,18 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 
 /* Check Collision 2D Line-Point */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2& center, const  GLfloat& radius);
+
 /* Check Collision 2D Line-Line */
 GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
+/* Must be call when collisioned */
+glm::vec2 GetLineIntersection(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
+
 /* Check Collision 2D Circle-Point */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius);
+
 /* Check Collision 2D Rect-Point */
 GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius);
+
 /* Check Collision 3D Cylinder-Point */
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight);
 

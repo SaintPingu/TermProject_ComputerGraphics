@@ -192,6 +192,25 @@ GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::ve
 
 	return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
 }
+/* https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/ */
+glm::vec2 GetLineIntersection(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2)
+{
+	// Line AB represented as a1x + b1y = c1
+	GLfloat a1 = v2.y - v1.y;
+	GLfloat b1 = v1.x - v2.x;
+	GLfloat c1 = a1 * (v1.x) + b1 * (v1.y);
+
+	// Line CD represented as a2x + b2y = c2
+	GLfloat a2 = u2.y - u1.y;
+	GLfloat b2 = u1.x - u2.x;
+	GLfloat c2 = a2 * (u1.x) + b2 * (u1.y);
+
+	GLfloat determinant = a1 * b2 - a2 * b1;
+
+	GLfloat x = (b2 * c1 - b1 * c2) / determinant;
+	GLfloat y = (a1 * c2 - a2 * c1) / determinant;
+	return glm::vec2(x, y);
+}
 
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius)
 {
@@ -240,6 +259,8 @@ GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& 
 
 	return cornerDistance_sq <= (vRadius * vRadius);
 }
+
+
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight)
 {
 	const glm::vec2 vCylinderCenter = Get2D(vCylinderPos);

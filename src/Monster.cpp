@@ -45,8 +45,9 @@ GLvoid MonsterManager::Monster::Draw() const
 	mObject->Draw();
 }
 
-GLboolean MonsterManager::Monster::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
+GLboolean MonsterManager::Monster::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
 {
+	normal.x = -9;
 	switch (mCollisionType)
 	{
 	case CollisionType::Circle:
@@ -70,6 +71,22 @@ glm::vec3 MonsterManager::Monster::GetPosition() const
 
 
 
+const glm::vec3* MonsterManager::FindTargetPos(const glm::vec3& monsterPos) const
+{
+	const glm::vec3* target = nullptr;
+
+	glm::vec2 playerCenter = { mPlayer->GetPosition().x , mPlayer->GetPosition().z };
+	glm::vec2 monsterCenter = { monsterPos.x, monsterPos.z };
+	GLfloat minDistance = glm::length(playerCenter - monsterCenter);
+
+
+
+	target = mPlayer->GetRefPos();
+
+	return target;
+}
+
+
 MonsterManager::MonsterManager()
 {
 	mMonsterList.reserve(100);
@@ -90,12 +107,7 @@ GLvoid MonsterManager::Update()
 {
 	for (Monster* monster : mMonsterList)
 	{
-		const glm::vec3* target = nullptr;
-		
-		glm::vec2 playerCenter = { mPlayer->GetPosition().x , mPlayer->GetPosition().z };
-		glm::vec2 monsterCenter = { monster->GetPosition().x, monster->GetPosition().z };
-		GLfloat minDistance = glm::length(playerCenter - monsterCenter);
-		target = mPlayer->GetRefPos();
+		const glm::vec3* target = FindTargetPos(monster->GetPosition());
 
 		monster->Update(target);
 	}

@@ -154,30 +154,30 @@ GLvoid InitMeshes()
 	monsterManager = new MonsterManager();
 	buildingManager = new BuildingManager();
 	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
-	buildingManager->Create(BuildingType::GuardTower, { -100,0,-100 });
+	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });
 
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
-	Line* line = nullptr;
+	LineObject* line = nullptr;
 	Vector3 vectorLine_1, vectorLine_2;
 
 	vectorLine_1 = { -lineLength, 0.0f, 0.0f };
 	vectorLine_2 = { lineLength, 0.0f, 0.0f };
-	line = new Line(vectorLine_1, vectorLine_2);
+	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(RED);
 	line->MoveGlobal({ lineLength, 0, 0 });
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
 	vectorLine_2 = { 0.0f, lineLength, 0.0f };
-	line = new Line(vectorLine_1, vectorLine_2);
+	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(GREEN);
 	line->MoveGlobal({ 0, lineLength, 0 });
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
 	vectorLine_2 = { 0.0f, 0.0f, lineLength };
-	line = new Line(vectorLine_1, vectorLine_2);
+	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(BLUE);
 	line->MoveGlobal({ 0, 0, lineLength });
 	AddObject(Shader::Color, line);
@@ -186,7 +186,7 @@ GLvoid InitMeshes()
 	// test object
 	const Model* cubeMapModel = GetTextureModel(TextureModels::CubeBackground);
 	cubeMap = new ModelObject(cubeMapModel, Shader::Texture);
-	cubeMap->InitTextures(GetTexturePath(TextureModels::CubeBackground));
+	cubeMap->SetTexture(TextureModels::CubeBackground);
 	cubeMap->Scale(150);
 	cubeMap->SetPosY(-cubeMap->GetHeight() / 2);
 

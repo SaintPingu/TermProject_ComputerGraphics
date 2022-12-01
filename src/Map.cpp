@@ -5,7 +5,7 @@
 Map::Map()
 {
 	mMapObject = new ModelObject(GetTextureModel(TextureModels::Map), Shader::Texture);
-	mMapObject->InitTextures(GetTexturePath(TextureModels::Map));
+	mMapObject->SetTexture(TextureModels::Map);
 	AddObject(Shader::Texture, mMapObject);
 
 	set<glm::vec2, CompareSet> boundingMap = mMapObject->GetBoundings_XZ();
@@ -55,8 +55,9 @@ GLboolean Map::CheckCollision(const Circle* boundingCircle)
 	return false;
 }
 
-GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint)
+GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
 {
+	normal.x = -9;
 	if (bulletPos.y < 0)
 	{
 		return true;

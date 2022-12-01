@@ -18,5 +18,5 @@ public:
 
 	GLvoid Draw();
 	GLboolean CheckCollision(const Circle* boundingCircle);
-	GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, const glm::vec3* hitPoint = nullptr);
+	GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal);
 };
