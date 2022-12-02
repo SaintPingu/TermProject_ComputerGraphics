@@ -323,11 +323,6 @@ GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id
 GLvoid InitModels()
 {
 	auto start = chrono::high_resolution_clock::now();
-	//for (GLuint i = 0; i < NUM_OBJ; ++i)
-	//{
-	//	ObjList obj = static_cast<ObjList>(i);
-	//	objMap[obj].first->LoadModel(objMap[obj].second);
-	//}
 
 	mutex m;
 	vector<thread*> threads;
@@ -411,12 +406,12 @@ GLvoid InitModels()
 		stbi_image_free(data);
 	}
 
-	auto duration = chrono::high_resolution_clock::now() - start;
-	cout << "RunTime : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
-
 	textureModelMap[TextureModels::CubeMap] = cubeModel;
 	textureModelMap[TextureModels::CubeMap]->ReverseNormal();
 	textureModelMap[TextureModels::Paint] = planeModel;
+
+	auto duration = chrono::high_resolution_clock::now() - start;
+	cout << "Model loading time : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
 }
 
 const Model* GetModel(const Models& model)

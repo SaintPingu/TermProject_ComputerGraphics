@@ -61,8 +61,8 @@
 #define RADIAN_TO_DEGREE(radian) (GLfloat)(((180/PI) * (radian)))
 
 // values
-#define LEFT -1
-#define RIGHT 1
+#define LEFT 1
+#define RIGHT -1
 #define UP 1
 #define DOWN -1
 #define FRONT 1

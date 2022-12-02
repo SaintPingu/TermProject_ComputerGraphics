@@ -17,7 +17,7 @@ GLvoid Object::InitValues()
 {
 	mPosition = Vector3::Zero();
 
-	mLook = Vector3::Look();
+	mLook = Vector3::Back();
 	mRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
 
 	mPivot = nullptr;
@@ -95,7 +95,7 @@ GLvoid Object::RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, con
 }
 GLvoid Object::SetLocalRotation(const glm::vec3& axis, const GLfloat& degree)
 {
-	mLook = Vector3::Look();
+	mLook = Vector3::Back();
 
 	if (axis == Vector3::Up() || axis == Vector3::Right())
 	{
@@ -139,14 +139,19 @@ GLvoid Object::Look(const glm::vec3& point)
 GLvoid Object::SetLook(const glm::vec3& look)
 {
 	mLook = look;
+	if (look.x == 1.0f || look.y == 1.0f || look.z == 1.0f)
+	{
+		// vector cross 시 0이 되는 문제 해결 (nan)
+		mLook = glm::normalize(mLook + 0.0001f);
+	}
 }
 GLvoid Object::RotateLook(const glm::vec3& look)
 {
-	RotateLocal(look.y * 90, look.x * 90, look.z * 90);
+	RotateLocal(look.y * 90, look.x * 90, 0);
 }
 GLvoid Object::ResetLook()
 {
-	mLook = Vector3::Look();
+	mLook = Vector3::Back();
 }
 glm::vec3 Object::GetLook() const
 {
@@ -155,7 +160,6 @@ glm::vec3 Object::GetLook() const
 glm::vec3 Object::GetRight() const
 {
 	glm::vec3 right = glm::cross(mLook, Vector3::Up());
-
 	return right;
 }
 glm::vec3 Object::GetUp() const
@@ -1295,15 +1299,11 @@ PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObj
 {
 	SetTexture(TextureModels::Paint);
 	SetPosition(pos);
-	glm::vec3 n = normal;
-	n.y *= -1;
-	RotateLook(n);
+	
+	SetLook(normal);
+
 	Scale(0.5f);
-	GLfloat randZ = ((rand() % 1000)*0.001f) + 0.01f;	// 0.01 ~ 0.999
-	if (normal == Vector3::Up() || normal == Vector3::Down())
-	{
-		randZ *= -1; 
-	}
+	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.01f;	// 0.01 ~ 0.0999 + 0.01
 	MoveZ(randZ, false);
 }
 GLboolean PaintPlane::Update()

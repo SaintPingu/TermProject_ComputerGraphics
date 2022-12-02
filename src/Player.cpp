@@ -234,11 +234,11 @@ GLvoid Player::AddDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		mDirZ += FRONT;
+		mDirZ += BACK;
 		break;
 	case 's':
 	case 'S':
-		mDirZ += BACK;
+		mDirZ += FRONT;
 		break;
 	case 'a':
 	case 'A':
@@ -258,11 +258,11 @@ GLvoid Player::SubDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		mDirZ -= FRONT;
+		mDirZ -= BACK;
 		break;
 	case 's':
 	case 'S':
-		mDirZ -= BACK;
+		mDirZ -= FRONT;
 		break;
 	case 'a':
 	case 'A':
@@ -398,9 +398,8 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 	mObject->RotateLocal(0, pitch, 0);
 
-	mFpCamera->ResetLook();
-	mFpCamera->SetLook(mObject->GetLook());
-	mFpCamera->RotateLocal(mYaw, 0, 0);
+	mFpCamera->SetLook(-mObject->GetLook());
+	mFpCamera->RotateLocal(-mYaw, 0, 0);
 
 	mGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);

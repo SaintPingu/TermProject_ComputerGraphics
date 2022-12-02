@@ -35,7 +35,7 @@ GLvoid Gun::Update()
 
 	mCrntDelay = 0.0f;
 	extern BulletManager* bulletManager;
-	glm::vec3 bulletPos = { 0, 9, 38 };
+	glm::vec3 bulletPos = { 0, 9, -38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	bulletManager->Create(BulletType::Normal, bulletPos, 300.0f, mYaw, mPitch);
@@ -48,7 +48,7 @@ GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 	mObject->ResetRotation();
 	mObject->ResetLook();
 	mObject->SetPosition(mGunPosition);
-	mObject->RotatePosition({ mGunPosition.x , mGunPosition.y + 20 , 0 }, Vector3::Right(), -yaw);
+	mObject->RotatePosition({ mGunPosition.x , mGunPosition.y + 20 , 0 }, Vector3::Right(), yaw);
 
 	mObject->Rotate(Vector3::Up(), mPitch);
 	mObject->RotateLocal(-mYaw, 0, 0);

@@ -465,7 +465,7 @@ GLvoid MousePassiveMotion(GLint x, GLint y)
 	}
 	else if(player != nullptr)
 	{
-		player->Rotate(dy, dx, 0.0f);
+		player->Rotate(-dy, dx, 0.0f);
 	}
 
 	SetCursorPos(mouseCenter.x, mouseCenter.y);
