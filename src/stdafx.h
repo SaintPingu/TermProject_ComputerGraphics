@@ -1,7 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <set>
+
 #include <cmath>
 #include <random>
 #include <vector>
@@ -13,8 +13,14 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <chrono>
+
+#include <mutex>
+#include <thread>
 #include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 
 #include <myGL/glew.h>
 #include <myGL/freeglut.h>
@@ -118,7 +124,7 @@ enum class Dir { None, Left, Right, Up, Down, Front, Back };
 enum class CameraMode { Free, FirstPerson, ThirdPerson, Light };
 enum class CollisionType { None, Circle, Rect, };
 
-
+const GLuint NUM_CORE = thread::hardware_concurrency();
 constexpr GLint NUM_OF_SHADER = static_cast<GLint>(Shader::_count) - 1;	// exclusive Shader::None
 
 
@@ -661,7 +667,12 @@ GLboolean IsOutOfIndex(const size_t& index, const size_t& size);
 GLvoid ToggleDepthTest();
 GLvoid SetDepthTest(const GLboolean& isDepthTest);
 
-
+template<typename T>
+inline GLvoid CopyVector(vector<T>& dst, const vector<T>& src)
+{
+	dst.resize(src.size());
+	std::copy(src.begin(), src.end(), dst.begin());
+}
 
 
 

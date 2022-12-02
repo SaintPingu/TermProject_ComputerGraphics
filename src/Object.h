@@ -77,7 +77,11 @@ public:
 	//********** [ Direction ] **********//
 	/* look을 point를 바라보도록 설정 */
 	GLvoid Look(const glm::vec3& point);
+	/* look을 해당 값으로 설정 */
 	GLvoid SetLook(const glm::vec3& look);
+	/* look을 해당 look만큼 회전(Vector3::Up() 문제 해결) */
+	GLvoid RotateLook(const glm::vec3& look);
+		
 	GLvoid ResetLook();
 
 	glm::vec3 GetLook() const;

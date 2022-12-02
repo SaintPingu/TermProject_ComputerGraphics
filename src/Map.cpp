@@ -60,6 +60,8 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 	normal.x = -9;
 	if (bulletPos.y < 0)
 	{
+		hitPoint = { prevPos.x, 0, prevPos.z };
+		normal = Vector3::Up();
 		return true;
 	}
 

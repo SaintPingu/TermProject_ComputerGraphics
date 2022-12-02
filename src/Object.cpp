@@ -140,6 +140,10 @@ GLvoid Object::SetLook(const glm::vec3& look)
 {
 	mLook = look;
 }
+GLvoid Object::RotateLook(const glm::vec3& look)
+{
+	RotateLocal(look.y * 90, look.x * 90, look.z * 90);
+}
 GLvoid Object::ResetLook()
 {
 	mLook = Vector3::Look();
@@ -1291,9 +1295,15 @@ PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObj
 {
 	SetTexture(TextureModels::Paint);
 	SetPosition(pos);
-	SetLook(normal);
+	glm::vec3 n = normal;
+	n.y *= -1;
+	RotateLook(n);
 	Scale(0.5f);
-	GLfloat randZ = ((rand() % 1000)*0.001f) + 0.001f;	// 0.001 ~ 0.999
+	GLfloat randZ = ((rand() % 1000)*0.001f) + 0.01f;	// 0.01 ~ 0.999
+	if (normal == Vector3::Up() || normal == Vector3::Down())
+	{
+		randZ *= -1; 
+	}
 	MoveZ(randZ, false);
 }
 GLboolean PaintPlane::Update()
@@ -1331,20 +1341,20 @@ GLboolean PaintPlane::Update()
 // identity simple objects
 static const LineObject* lineObject = nullptr;
 
-static ModelObject* modelObjects[NUM_OF_MODEL];
-static ModelObject* textureModelObjects[NUM_OF_TEXTURE_MODEL];
+static ModelObject* modelObjects[NUM_MODEL];
+static ModelObject* textureModelObjects[NUM_TEXTURE_MODEL];
 
 GLvoid InitObject()
 {
 	lineObject = new LineObject();
 
-	for (GLsizei i = 0; i < NUM_OF_MODEL; ++i)
+	for (GLsizei i = 0; i < NUM_MODEL; ++i)
 	{
 		const Model* model = GetModel(static_cast<Models>(i));
 		modelObjects[i] = new ModelObject(model, Shader::Light);
 	}
 
-	for (GLsizei i = 0; i < NUM_OF_TEXTURE_MODEL; ++i)
+	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
 	{
 		TextureModels textureModel = static_cast<TextureModels>(i);
 		const Model* model = GetTextureModel(textureModel);

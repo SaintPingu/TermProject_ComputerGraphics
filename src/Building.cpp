@@ -61,7 +61,23 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevP
 				{
 					glm::vec2 point = GetLineIntersection(line.v, line.u, prevBulletCenter, bulletCenter);
 					hitPoint = { point.x, prevPos.y, point.y };
-					normal = Vector3::Look();
+					if (line.v == leftTop)
+					{
+						normal = Vector3::Left();
+					}
+					else if (line.v == leftBottom)
+					{
+						normal = Vector3::Look();
+					}
+					else if (line.v == rightBottom)
+					{
+						normal = Vector3::Right();
+					}
+					else
+					{
+						normal = Vector3::Back();
+					}
+
 					return true;
 				}
 			}

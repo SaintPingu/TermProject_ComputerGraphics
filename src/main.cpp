@@ -184,9 +184,9 @@ GLvoid InitMeshes()
 	//**************************************************//
 	
 	// test object
-	const Model* cubeMapModel = GetTextureModel(TextureModels::CubeBackground);
+	const Model* cubeMapModel = GetTextureModel(TextureModels::CubeMap);
 	cubeMap = new ModelObject(cubeMapModel, Shader::Texture);
-	cubeMap->SetTexture(TextureModels::CubeBackground);
+	cubeMap->SetTexture(TextureModels::CubeMap);
 	cubeMap->Scale(150);
 	cubeMap->SetPosY(-cubeMap->GetHeight() / 2);
 

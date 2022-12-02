@@ -10,7 +10,25 @@ Model::Model(const GLchar* path)
 {
 	LoadModel(path);
 }
+Model::Model(const Model& origin)
+{
+	CopyVector(mVertices, origin.mVertices);
+	CopyVector(mNormals, origin.mNormals);
+	CopyVector(mUVs, origin.mUVs);
+	CopyVector(mIndices_vertex, origin.mIndices_vertex);
+	CopyVector(mIndices_normal, origin.mIndices_normal);
+	CopyVector(mIndices_uv, origin.mIndices_uv);
+	mVerticesXZ = origin.mVerticesXZ;
 
+	if (origin.mCuboid != nullptr)
+	{
+		mCuboid = new Cuboid(*origin.mCuboid);
+	}
+
+	mWidth = origin.mWidth;
+	mHeight = origin.mHeight;
+	mDepth = origin.mDepth;
+}
 
 /* Warning : 법선 벡터가 unify되어있지 않을 경우 제대로 그려지지 않을 수 있음 */
 GLvoid Model::LoadModel(const GLchar* path)
@@ -176,39 +194,37 @@ GLvoid Model::ReverseNormal()
 
 
 
-
-
 // model
-static Model* planeModel = nullptr;
-static Model* circleModel = nullptr;
-static Model* cubeModel = nullptr;
-static Model* lowSphereModel = nullptr;
-static Model* sphereModel = nullptr;
+static Model* planeModel = new Model();
+static Model* circleModel = new Model();
+static Model* cubeModel = new Model();
+static Model* lowSphereModel = new Model();
+static Model* geoSphereModel = new Model();
 
 // player
-static Model* playerModel = nullptr;
-static Model* gunModel = nullptr;
+static Model* playerModel = new Model();
+static Model* gunModel = new Model();
 
 // monster
-static Model* blooperModel = nullptr;
+static Model* blooperModel = new Model();
 
 // building
-static Model* guardTowerModel = nullptr;
+static Model* guardTowerModel = new Model();
 
 
 // [ texture models ] //
-static Model* mapModel = nullptr;
-static Model* cubeBackgroundModel = nullptr;
-static Model* paintModel = nullptr;
+static Model* mapModel = new Model();
+static Model* cubeMapModel = new Model();
+static Model* paintModel = new Model();
 
-static GLuint textures[NUM_OF_TEXTURE_MODEL];
+static GLuint textures[NUM_TEXTURE_MODEL];
 
 unordered_map<Models, Model*> modelMap{
 	{Models::Plane, planeModel},
 	{Models::Circle, circleModel},
 	{Models::Cube, cubeModel},
 	{Models::LowSphere, lowSphereModel},
-	{Models::GeoSphere, sphereModel},
+	{Models::GeoSphere, geoSphereModel},
 	{Models::Player, playerModel},
 	{Models::Blooper, blooperModel},
 	{Models::GuardTower, guardTowerModel},
@@ -216,74 +232,191 @@ unordered_map<Models, Model*> modelMap{
 unordered_map<TextureModels, Model*> textureModelMap{
 	{TextureModels::Gun, gunModel },
 	{TextureModels::Map, mapModel },
-	{TextureModels::CubeBackground, cubeBackgroundModel },
+	{TextureModels::CubeMap, cubeMapModel },
 };
 unordered_map<TextureModels, const GLchar*> textureMap{
 	{TextureModels::Gun, "gun.png" },
 	{TextureModels::Map, "map.png" },
-	{TextureModels::CubeBackground, "cubemap.png" },
+	{TextureModels::CubeMap, "cubemap.png" },
 	{TextureModels::Paint, "paint.png" },
 };
 
+/* Should be arrange by obj file size (faster) */
+enum class ObjList { Gun, Blooper, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, _count };
+constexpr GLuint NUM_OBJ = static_cast<GLuint>(ObjList::_count);
+
+unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
+	{ObjList::Gun, make_pair(gunModel, "gun.obj")},
+	{ObjList::Blooper, make_pair(blooperModel, "blooper.obj")},
+	{ObjList::Player, make_pair(playerModel, "player.obj")},
+	{ObjList::GuardTower, make_pair(guardTowerModel, "guard_tower_test.obj")},
+	{ObjList::GeoSphere, make_pair(geoSphereModel, "geo_sphere.obj")},
+	{ObjList::Circle, make_pair(circleModel, "circle.obj")},
+	{ObjList::LowSphere, make_pair(lowSphereModel, "low_sphere.obj")},
+	{ObjList::Cube, make_pair(cubeModel, "cube.obj")},
+	{ObjList::Map, make_pair(mapModel, "map.obj")},
+	{ObjList::Plane, make_pair(planeModel, "plane.obj")},
+};
+
+
+
+GLvoid ImportObj(mutex& m, unordered_set<GLuint>& emptyCore, const GLuint& id, const ObjList& obj)
+{
+	Model* model = objMap[obj].first;
+	const GLchar* path = objMap[obj].second;
+	model->LoadModel(path);
+
+	m.lock();
+	emptyCore.insert(id);
+	m.unlock();
+}
+
+typedef struct ImageData {
+	GLint width, height, numOfChannel;
+}ImageData;
+GLvoid ImportTextureData(mutex& m, unordered_set<GLuint>& emptyCore, const GLuint& id, const TextureModels& textureModel, ImageData& imageData, GLubyte*& data)
+{
+	string path = "textures\\";
+	path += textureMap[textureModel];
+
+	data = stbi_load(path.c_str(), &imageData.width, &imageData.height, &imageData.numOfChannel, 0);
+
+	if (stbi_failure_reason())
+	{
+		cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
+		cout << "[ path ] : " << path << endl;
+		assert(0);
+	}
+
+	if (!data)
+	{
+		cout << "Failed to load texture : " << path << endl;
+		assert(0);
+	}
+
+	m.lock();
+	emptyCore.insert(id);
+	m.unlock();
+}
+
+
+GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id)
+{
+	if (emptyCore.empty() == false)
+	{
+		m.lock();
+		id = *emptyCore.begin();
+		emptyCore.erase(id);
+		m.unlock();
+		return true;
+	}
+
+	this_thread::yield();
+	return false;
+}
+
+// 12-02 benchmark
+// [ obj loading ]
+// core 1	: 6900ms
+// core 2	: 4100ms
+// core 16	: 4100ms
 GLvoid InitModels()
 {
-	modelMap[Models::Plane] = new Model("plane.obj");
-	modelMap[Models::Circle] = new Model("circle.obj");
-	modelMap[Models::Cube] = new Model("cube.obj");
-	modelMap[Models::LowSphere] = new Model("low_sphere.obj");
-	modelMap[Models::GeoSphere] = new Model("geo_sphere.obj");
+	auto start = chrono::high_resolution_clock::now();
+	//for (GLuint i = 0; i < NUM_OBJ; ++i)
+	//{
+	//	ObjList obj = static_cast<ObjList>(i);
+	//	objMap[obj].first->LoadModel(objMap[obj].second);
+	//}
 
-	modelMap[Models::Player] = new Model("player.obj");
+	mutex m;
+	vector<thread*> threads;
+	unordered_set<GLuint> emptyCore;
+	threads.resize(NUM_CORE);
 
-	modelMap[Models::Blooper] = new Model("blooper.obj");;
-	modelMap[Models::GuardTower] = new Model("guard_tower_test.obj");;
+	for (size_t i = 0; i < threads.size(); ++i)
+	{
+		emptyCore.insert(i);
+	}
 
+	/* Import obj */
+	for (GLuint i = 0; i < NUM_OBJ; ++i)
+	{
+		// find empty core id
+		GLuint id = -1;
+		while(true)
+		{
+			if (FindEmptyCoreID(m, emptyCore, id) == GL_TRUE)
+			{
+				break;
+			}
+		}
 
-	textureModelMap[TextureModels::Gun] = new Model("gun.obj");
-	textureModelMap[TextureModels::Map] = new Model("map.obj");
-	textureModelMap[TextureModels::CubeBackground] = new Model("cube.obj");
-	textureModelMap[TextureModels::CubeBackground]->ReverseNormal();
-	textureModelMap[TextureModels::Paint] = modelMap[Models::Plane];
+		if (threads[id] != nullptr)
+		{
+			threads[id]->join();
+		}
+		ObjList obj = static_cast<ObjList>(i);
+		threads[id] = new thread(ref(ImportObj), ref(m), ref(emptyCore), id, obj);
+	}
 
 	stbi_set_flip_vertically_on_load(true);
 
-	glGenTextures(NUM_OF_TEXTURE_MODEL, textures);
-	for (GLsizei i = 0; i < NUM_OF_TEXTURE_MODEL; ++i)
+	glGenTextures(NUM_TEXTURE_MODEL, textures);
+	GLubyte* textureDataList[NUM_TEXTURE_MODEL];
+	ImageData imageDataList[NUM_TEXTURE_MODEL];
+
+	/* Import texture */
+	cout << "load textures..." << endl;
+	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
 	{
+		// find empty core id
+		GLuint id = -1;
+		while (true)
+		{
+			if (FindEmptyCoreID(m, emptyCore, id) == GL_TRUE)
+			{
+				break;
+			}
+		}
+
+		if (threads[id] != nullptr)
+		{
+			threads[id]->join();
+		}
 		TextureModels textureModel = static_cast<TextureModels>(i);
-		string path = "textures\\";
-		path += textureMap[textureModel];
+		threads[id] = new thread(ref(ImportTextureData), ref(m), ref(emptyCore), id, textureModel, ref(imageDataList[i]), ref(textureDataList[i]));
+	}
 
-		GLint imageWidth, imageHeight, numOfChannel;
-
-		GLubyte* data = stbi_load(path.c_str(), &imageWidth, &imageHeight, &numOfChannel, 0);
-
-		if (stbi_failure_reason())
+	for (thread* t : threads)
+	{
+		if (t != nullptr)
 		{
-			cout << "[ stbi_failure ] : " << stbi_failure_reason() << endl;
-			cout << "[ path ] : " << path << endl;
-			assert(0);
+			t->join();
 		}
+	}
 
-		if (!data)
-		{
-			cout << "Failed to load texture : " << path << endl;
-			assert(0);
-		}
-
-		cout << "load texture : " << path << endl;
-
+	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
+	{
+		GLubyte* data = textureDataList[i];
 		glBindTexture(GL_TEXTURE_2D, textures[i]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageDataList[i].width, imageDataList[i].height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(data);
 	}
+
+	auto duration = chrono::high_resolution_clock::now() - start;
+	cout << "RunTime : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
+
+	textureModelMap[TextureModels::CubeMap] = cubeModel;
+	textureModelMap[TextureModels::CubeMap]->ReverseNormal();
+	textureModelMap[TextureModels::Paint] = planeModel;
 }
 
 const Model* GetModel(const Models& model)
@@ -302,7 +435,7 @@ const Model* GetTextureModel(const TextureModels& textureModel)
 }
 GLuint GetTexture(const TextureModels& textureModel)
 {
-	return textures[static_cast<GLint>(textureModel)];
+	return textures[static_cast<GLuint>(textureModel)];
 }
 
 

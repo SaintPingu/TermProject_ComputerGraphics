@@ -3,9 +3,10 @@
 
 class Cuboid;
 enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, Blooper, GuardTower, _count };
-enum class TextureModels { Gun, Map, CubeBackground, Paint, _count };
-constexpr GLint NUM_OF_MODEL = static_cast<GLint>(Models::_count);
-constexpr GLint NUM_OF_TEXTURE_MODEL = static_cast<GLint>(TextureModels::_count);
+enum class TextureModels { Gun, Map, CubeMap, Paint, _count };
+constexpr GLuint NUM_MODEL = static_cast<GLuint>(Models::_count);
+constexpr GLuint NUM_TEXTURE_MODEL = static_cast<GLuint>(TextureModels::_count);
+
 
 class Model {
 private:
@@ -23,9 +24,11 @@ private:
 	GLfloat mHeight = 0;
 	GLfloat mDepth = 0;
 
-	GLvoid LoadModel(const GLchar* path);
 public:
+	Model() {};
 	Model(const GLchar* path);
+	Model(const Model& origin);
+	GLvoid LoadModel(const GLchar* path);
 
 	inline set<glm::vec2, CompareSet> GetBoundings_XZ() const { return mVerticesXZ; }
 
