@@ -82,14 +82,16 @@ GLvoid BulletManager::Update()
 		GLboolean isCollision = false;
 		for (IBulletCollisionable* object : mCollisionObjectList)
 		{
+			constexpr GLfloat noNormal = 9;
 			glm::vec3 hitPoint;
-			glm::vec3 normal;
+			glm::vec3 normal = { noNormal, noNormal, noNormal };
+
 			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius(), hitPoint, normal) == GL_TRUE)
 			{
 				delete bullet;
 				iter = mBulletList.erase(iter);
 				isCollision = true;
-				if (normal.x != 9)
+				if (normal.x != noNormal)
 				{
 					PaintPlane* plane = new PaintPlane(hitPoint, normal);
 					mPaints.emplace_back(plane);

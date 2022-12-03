@@ -57,7 +57,6 @@ GLboolean Map::CheckCollision(const Circle* boundingCircle)
 
 GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
 {
-	normal.x = -9;
 	if (bulletPos.y < 0)
 	{
 		hitPoint = { prevPos.x, 0, prevPos.z };
@@ -67,33 +66,51 @@ GLboolean Map::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& b
 
 	// check collision with previous to current bullet position line
 
-	const glm::vec2 center = Get2D(bulletPos);
-	const glm::vec2 prevCenter = Get2D(prevPos);
+	const glm::vec2 center = ConvertVec2(bulletPos);
+	const glm::vec2 prevCenter = ConvertVec2(prevPos);
+	glm::vec2 intersection = { 0,0 };
+
 	if (center.y - bulletRadius <= mLeftTop.y)
 	{
-		return true;
+		intersection = ::GetLineIntersection(mLeftTop, mRightTop, prevCenter, center);
+		normal = Vector3::Front();
 	}
-	if (center.y + bulletRadius >= mLeftBottom.y)
+	else if (center.y + bulletRadius >= mLeftBottom.y)
 	{
-		return true;
+		intersection = ::GetLineIntersection(mLeftBottom, mRightBottom, prevCenter, center);
+		normal = Vector3::Back();
 	}
-	if (center.x - bulletRadius < mLeftBottom.x)
+	else if (center.x - bulletRadius < mLeftBottom.x)
 	{
 		if (::CheckCollision(mLeftTop, mLeftBottom, prevCenter, center) == GL_TRUE)
 		{
-			return true;
+			intersection = ::GetLineIntersection(mLeftTop, mLeftBottom, prevCenter, center);
+			glm::vec3 v = ConvertVec3(mLeftTop - mLeftBottom);
+			normal = glm::normalize(glm::cross(v, Vector3::Up()));
+		}
+		else
+		{
+			return false;
 		}
 	}
 	else if (center.x + bulletRadius > mRightBottom.x)
 	{
 		if (::CheckCollision(mRightTop, mRightBottom, prevCenter, center) == GL_TRUE)
 		{
-			return true;
+			intersection = ::GetLineIntersection(mRightTop, mRightBottom, prevCenter, center);
+			glm::vec3 v = ConvertVec3(mRightBottom - mRightTop);
+			normal = glm::normalize(glm::cross(v, Vector3::Up()));
+		}
+		else
+		{
+			return false;
 		}
 	}
+	else
+	{
+		return false;
+	}
 
-	
-	
-
-	return false;
+	hitPoint = glm::vec3(intersection.x, prevPos.y, intersection.y);
+	return true;
 }

@@ -698,9 +698,13 @@ inline constexpr GLboolean IsInfinite(const GLfloat& n)
 {
 	return ((n + 1) != n) && (n == n);
 }
-inline constexpr glm::vec2 Get2D(const glm::vec3& position)
+inline constexpr glm::vec2 ConvertVec2(const glm::vec3& position)
 {
-	return { position.x, position.z };
+	return glm::vec2(position.x, position.z);
+}
+inline constexpr glm::vec3 ConvertVec3(const glm::vec2& position)
+{
+	return glm::vec3(position.x, 0, position.y);
 }
 
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);

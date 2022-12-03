@@ -1309,7 +1309,7 @@ PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObj
 	SetLook(normal);
 
 	Scale(0.5f);
-	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.01f;	// 0.01 ~ 0.0999 + 0.01
+	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.1f;	// 0.1 ~ 0.0999 + 0.01
 	MoveZ(randZ, false);
 }
 GLboolean PaintPlane::Update()

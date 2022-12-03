@@ -263,8 +263,8 @@ GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& 
 
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight)
 {
-	const glm::vec2 vCylinderCenter = Get2D(vCylinderPos);
-	const glm::vec2 uPointCenter = Get2D(uPoint);
+	const glm::vec2 vCylinderCenter = ConvertVec2(vCylinderPos);
+	const glm::vec2 uPointCenter = ConvertVec2(uPoint);
 	if (CheckCollision(vCylinderCenter, uPointCenter, vRadius, uRadius) == false)
 	{
 		return false;
