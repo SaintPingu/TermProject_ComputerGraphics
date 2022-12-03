@@ -216,7 +216,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
 
-	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 1.0f, 0 });
+	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 0.1f, 0 });
 	mBoundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
@@ -234,11 +234,11 @@ GLvoid Player::AddDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		mDirZ += BACK;
+		mDirZ += FRONT;
 		break;
 	case 's':
 	case 'S':
-		mDirZ += FRONT;
+		mDirZ += BACK;
 		break;
 	case 'a':
 	case 'A':
@@ -258,11 +258,11 @@ GLvoid Player::SubDir(const GLint& key)
 	{
 	case 'w':
 	case 'W':
-		mDirZ -= BACK;
+		mDirZ -= FRONT;
 		break;
 	case 's':
 	case 'S':
-		mDirZ -= FRONT;
+		mDirZ -= BACK;
 		break;
 	case 'a':
 	case 'A':
@@ -398,8 +398,8 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 	mObject->RotateLocal(0, pitch, 0);
 
-	mFpCamera->SetLook(-mObject->GetLook());
-	mFpCamera->RotateLocal(-mYaw, 0, 0);
+	mFpCamera->SetLook(mObject->GetLook());
+	mFpCamera->RotateLocal(mYaw, 0, 0);
 
 	mGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);

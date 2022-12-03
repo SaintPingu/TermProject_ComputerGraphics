@@ -165,21 +165,21 @@ GLvoid InitMeshes()
 	vectorLine_2 = { lineLength, 0.0f, 0.0f };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(RED);
-	line->MoveGlobal({ lineLength, 0, 0 });
+	line->MoveGlobal({ lineLength, 0, 0 }, false);
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
 	vectorLine_2 = { 0.0f, lineLength, 0.0f };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(GREEN);
-	line->MoveGlobal({ 0, lineLength, 0 });
+	line->MoveGlobal({ 0, lineLength, 0 }, false);
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
 	vectorLine_2 = { 0.0f, 0.0f, lineLength };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(BLUE);
-	line->MoveGlobal({ 0, 0, lineLength });
+	line->MoveGlobal({ 0, 0, lineLength }, false);
 	AddObject(Shader::Color, line);
 	//**************************************************//
 	
@@ -465,7 +465,7 @@ GLvoid MousePassiveMotion(GLint x, GLint y)
 	}
 	else if(player != nullptr)
 	{
-		player->Rotate(-dy, dx, 0.0f);
+		player->Rotate(dy, dx, 0.0f);
 	}
 
 	SetCursorPos(mouseCenter.x, mouseCenter.y);

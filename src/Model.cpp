@@ -70,6 +70,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 		{
 			glm::vec3 vertex;
 			fscanf(objFile, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
+			vertex.y *= -1;
+			std::swap(vertex.y, vertex.z);
 
 			if (vertex.y < bottom)
 			{
@@ -114,6 +116,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 		{
 			glm::vec3 normal;
 			fscanf(objFile, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+			normal.y *= -1;
+			std::swap(normal.y, normal.z);
 			mNormals.emplace_back(normal);
 		}
 		else if (strcmp(data, "f") == 0)

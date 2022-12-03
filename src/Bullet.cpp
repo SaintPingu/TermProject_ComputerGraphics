@@ -9,7 +9,6 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 
 	SetScale(mRadius);
 	SetColor(RED);
-	SetLook(Vector3::Back());
 	RotateLocal(0, resultPitch, 0);
 
 	mPosition = position;
@@ -17,8 +16,8 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 	mPosition.y += rand() % 2 - 1;
 
 	mVelocity = velocity;
-	mAngleY = sin(DEGREE_TO_RADIAN(-resultYaw));
-	mAngleZ = cos(DEGREE_TO_RADIAN(-resultYaw));
+	mAngleY = sin(DEGREE_TO_RADIAN(resultYaw));
+	mAngleZ = cos(DEGREE_TO_RADIAN(resultYaw));
 
 }
 GLvoid BulletManager::Bullet::Update()
@@ -27,7 +26,7 @@ GLvoid BulletManager::Bullet::Update()
 
 	/* https://www.101computing.net/projectile-motion-formula/ */
 	mT += timer::DeltaTime();
-	MoveZ(-mVelocity * mAngleZ);
+	MoveZ(mVelocity * mAngleZ);
 	MoveY(mVelocity * mAngleY - (0.5f * GRAVITY * mT * mT * mWeight));
 }
 

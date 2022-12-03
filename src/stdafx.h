@@ -61,8 +61,8 @@
 #define RADIAN_TO_DEGREE(radian) (GLfloat)(((180/PI) * (radian)))
 
 // values
-#define LEFT 1
-#define RIGHT -1
+#define LEFT -1
+#define RIGHT 1
 #define UP 1
 #define DOWN -1
 #define FRONT 1
@@ -393,13 +393,13 @@ public:
 	}
 	static inline Vector3 Left()
 	{
-		return { -1, 0, 0 };
+		return { 1, 0, 0 };
 	}
 	static inline Vector3 Right()
 	{
-		return { 1, 0, 0 };
+		return { -1, 0, 0 };
 	}
-	static inline Vector3 Look()
+	static inline Vector3 Front()
 	{
 		return { 0, 0, 1 };
 	}
@@ -485,7 +485,7 @@ public:
 			result.x = (vector.z * sin(theta)) + (vector.x * cos(theta));
 			result.z = (vector.z * cos(theta)) - (vector.x * sin(theta));
 		}
-		else if (axis == Vector3::Look())
+		else if (axis == Vector3::Front())
 		{
 			result.x = (vector.x * cos(theta)) - (vector.y * sin(theta));
 			result.y = (vector.x * sin(theta)) + (vector.y * cos(theta));

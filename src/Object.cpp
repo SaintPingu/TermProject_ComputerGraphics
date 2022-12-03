@@ -8,6 +8,7 @@
 
 #define PAINT_DISAPEAR_TIME 10.0f
 
+#define INIT_LOOK Vector3::Front()
 
 Object::Object()
 {
@@ -17,8 +18,8 @@ GLvoid Object::InitValues()
 {
 	mPosition = Vector3::Zero();
 
-	mLook = Vector3::Back();
-	mRotation = { 0.0f, 0.0f, 1.0f, 0.0f };
+	mLook = INIT_LOOK;
+	mRotation = glm::quat(1, 0, 0, 0);
 
 	mPivot = nullptr;
 	mRotationPivot = nullptr;
@@ -95,7 +96,7 @@ GLvoid Object::RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, con
 }
 GLvoid Object::SetLocalRotation(const glm::vec3& axis, const GLfloat& degree)
 {
-	mLook = Vector3::Back();
+	mLook = INIT_LOOK;
 
 	if (axis == Vector3::Up() || axis == Vector3::Right())
 	{
@@ -104,7 +105,7 @@ GLvoid Object::SetLocalRotation(const glm::vec3& axis, const GLfloat& degree)
 }
 GLvoid Object::ResetRotation()
 {
-	mRotation = { 0, 0, 1.0f, 0 };
+	mRotation = glm::quat(1, 0, 0, 0);
 }
 
 glm::quat Object::GetRotation() const
@@ -139,10 +140,10 @@ GLvoid Object::Look(const glm::vec3& point)
 GLvoid Object::SetLook(const glm::vec3& look)
 {
 	mLook = look;
-	if (look.x == 1.0f || look.y == 1.0f || look.z == 1.0f)
+	if (look.y == 1.0f)
 	{
 		// vector cross 시 0이 되는 문제 해결 (nan)
-		mLook = glm::normalize(mLook + 0.0001f);
+		mLook = glm::normalize(mLook + 0.00001f);
 	}
 }
 GLvoid Object::RotateLook(const glm::vec3& look)
@@ -151,7 +152,7 @@ GLvoid Object::RotateLook(const glm::vec3& look)
 }
 GLvoid Object::ResetLook()
 {
-	mLook = Vector3::Back();
+	mLook = INIT_LOOK;
 }
 glm::vec3 Object::GetLook() const
 {
@@ -345,27 +346,32 @@ glm::mat4 ShaderObject::GetTransform() const
 	if (mRotationPivot == nullptr)
 	{
 		transform *= glm::mat4_cast(mRotation);
-		transform = glm::translate(transform, { -mPosition.x, mPosition.y, -mPosition.z });	// T
+		transform = glm::translate(transform, { mPosition.x, mPosition.y, mPosition.z });	// T
 	}
 	else
 	{
-		transform = glm::translate(transform, { -mPosition.x, mPosition.y, -mPosition.z });
+		transform = glm::translate(transform, { mPosition.x, mPosition.y, mPosition.z });
 		if (mPivot == nullptr)
 		{
-			transform = glm::translate(transform, -*mRotationPivot);
-			transform *= glm::mat4_cast(mRotation);
 			transform = glm::translate(transform, *mRotationPivot);
+			transform *= glm::mat4_cast(mRotation);
+			transform = glm::translate(transform, -*mRotationPivot);
 		}
 		else
 		{
-			transform = glm::translate(transform, -*mRotationPivot + (*mPivot));
+			transform = glm::translate(transform, *mRotationPivot + (*mPivot));
 			transform *= glm::mat4_cast(mRotation);
-			transform = glm::translate(transform, *mRotationPivot - (*mPivot));
+			transform = glm::translate(transform, -*mRotationPivot - (*mPivot));
 		}
 	}
 
-	glm::quat lookAt = glm::quatLookAt(mLook, Vector3::Up());
+	/* use quaternion from look vector */
+	/* mLook(direction) can't be parallel to up */
+	glm::quat lookAt = glm::quatLookAt(mLook, GetUp());
 	transform *= glm::mat4_cast(lookAt);		// R
+
+	/* 3ds max obj to opengl */
+	transform = glm::rotate(transform, glm::radians(180.0f), Vector3::Up());
 
 	transform = glm::scale(transform, mScale);	// S
 
@@ -1144,7 +1150,7 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 	mCircle = new SharedObject(GetIdentityModelObject(Models::Circle));
 	mCircle->SetScale(radius);
 	mCircle->SetPivot(position);
-	mCircle->Move(offset);
+	mCircle->Move(offset, false);
 }
 GLvoid Circle::Draw() const
 {

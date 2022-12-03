@@ -29,6 +29,6 @@ public:
 	GLvoid Update();
 	GLvoid Draw() const;
 
-	GLvoid Create(const BuildingType& type, const glm::vec3& position, const glm::vec3 look = Vector3::Look());
+	GLvoid Create(const BuildingType& type, const glm::vec3& position, const glm::vec3 look = Vector3::Front());
 	//const SharedObject* GetMinDistanceBuilding() const;
 };
