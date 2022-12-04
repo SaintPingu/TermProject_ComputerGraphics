@@ -3,9 +3,10 @@
 
 class Cuboid;
 enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, Blooper, GuardTower, _count };
-enum class TextureModels { Gun, Map, CubeMap, Paint, _count };
+enum class TextureModels { Gun, Map, CubeMap, Paint, Paint2, _count };
 constexpr GLuint NUM_MODEL = static_cast<GLuint>(Models::_count);
 constexpr GLuint NUM_TEXTURE_MODEL = static_cast<GLuint>(TextureModels::_count);
+constexpr GLuint NUM_PAINT = 2;
 
 
 class Model {

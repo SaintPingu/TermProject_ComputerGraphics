@@ -12,13 +12,13 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 	mObject->SetPosition(gunPosition);
 
 	mGunPosition = gunPosition;
-
-	AddObject(Shader::Texture, mObject);
 }
 
 GLvoid Gun::Draw() const
 {
+	//glDisable(GL_DEPTH_TEST);
 	mObject->Draw();
+	//glEnable(GL_DEPTH_TEST);
 }
 GLvoid Gun::Update()
 {
@@ -35,10 +35,12 @@ GLvoid Gun::Update()
 
 	mCrntDelay = 0.0f;
 	extern BulletManager* bulletManager;
+	glm::vec3 origin = { 0, 9, 0 };
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
-	bulletManager->Create(BulletType::Normal, bulletPos, 300.0f, mYaw, mPitch);
+	MultiplyVector(mObject->GetTransform(), origin);
+	bulletManager->Create(BulletType::Normal, origin, bulletPos, 300.0f, mYaw, mPitch);
 }
 GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 {

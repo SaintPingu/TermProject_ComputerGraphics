@@ -243,6 +243,7 @@ unordered_map<TextureModels, const GLchar*> textureMap{
 	{TextureModels::Map, "map.png" },
 	{TextureModels::CubeMap, "cubemap.png" },
 	{TextureModels::Paint, "paint.png" },
+	{TextureModels::Paint2, "paint2.png" },
 };
 
 /* Should be arrange by obj file size (faster) */
@@ -413,6 +414,7 @@ GLvoid InitModels()
 	textureModelMap[TextureModels::CubeMap] = cubeModel;
 	textureModelMap[TextureModels::CubeMap]->ReverseNormal();
 	textureModelMap[TextureModels::Paint] = planeModel;
+	textureModelMap[TextureModels::Paint2] = planeModel;
 
 	auto duration = chrono::high_resolution_clock::now() - start;
 	cout << "Model loading time : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;

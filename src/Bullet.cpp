@@ -2,7 +2,7 @@
 #include "Bullet.h"
 #include "Timer.h"
 
-BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+BulletManager::Bullet::Bullet(const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
 {
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
@@ -11,6 +11,7 @@ BulletManager::Bullet::Bullet(const glm::vec3& position, const GLfloat& velocity
 	SetColor(RED);
 	RotateLocal(0, resultPitch, 0);
 
+	mPrevPos = origin;
 	mPosition = position;
 	mPosition.x += rand() % 2 - 1;
 	mPosition.y += rand() % 2 - 1;
@@ -59,9 +60,9 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
+GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
 {
-	Bullet* bullet = new Bullet(position, velocity, yaw, pitch);
+	Bullet* bullet = new Bullet(origin, position, velocity, yaw, pitch);
 	mBulletList.emplace_back(bullet);
 }
 
@@ -74,34 +75,39 @@ GLvoid BulletManager::Draw() const
 }
 GLvoid BulletManager::Update()
 {
+	constexpr GLfloat NO_NORMAL = 9;
+
 	for(auto iter = mBulletList.begin(); iter != mBulletList.end();)
 	{
 		Bullet* bullet = (*iter);
-		bullet->Update();
 
-		GLboolean isCollision = false;
 		for (IBulletCollisionable* object : mCollisionObjectList)
 		{
-			constexpr GLfloat noNormal = 9;
 			glm::vec3 hitPoint;
-			glm::vec3 normal = { noNormal, noNormal, noNormal };
+			glm::vec3 normal = { NO_NORMAL, NO_NORMAL, NO_NORMAL };
 
 			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius(), hitPoint, normal) == GL_TRUE)
 			{
+
 				delete bullet;
+				bullet = nullptr;
 				iter = mBulletList.erase(iter);
-				isCollision = true;
-				if (normal.x != noNormal)
+
+				/* create paint */
+				if (normal.x != NO_NORMAL)
 				{
 					PaintPlane* plane = new PaintPlane(hitPoint, normal);
 					mPaints.emplace_back(plane);
 				}
+
 				break;
 			}
 		}
 
-		if (isCollision == false)
+		/* didn't collision */
+		if (bullet != nullptr)
 		{
+			bullet->Update();
 			++iter;
 		}
 	}

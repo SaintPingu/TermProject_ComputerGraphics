@@ -116,6 +116,7 @@ public:
 	// Frame
 	GLvoid Update();
 	GLvoid Draw(const CameraMode& cameraMode) const;
+	GLvoid DrawGun() const;
 	GLvoid DrawIcon() const;
 
 	// Process

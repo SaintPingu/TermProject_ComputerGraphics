@@ -81,8 +81,11 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevP
 					return true;
 				}
 			}
+
+			/* upside */
+			hitPoint = { prevPos.x, mObject->GetHeight(), prevPos.z };
+			normal = Vector3::Up();
 			return true;
-			assert(0); // didn't find line intersection
 		}
 	}
 		break;

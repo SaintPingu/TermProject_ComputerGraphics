@@ -82,6 +82,7 @@ GLvoid Object::RotateLocal(const GLfloat& yaw, const GLfloat& pitch, const GLflo
 	}
 	if (roll != 0.0f)
 	{
+		mRoll += roll;
 		glm::vec3 axis = GetLook();
 		::Rotate(mLook, glm::radians(roll), axis);
 	}
@@ -364,6 +365,9 @@ glm::mat4 ShaderObject::GetTransform() const
 			transform = glm::translate(transform, -*mRotationPivot - (*mPivot));
 		}
 	}
+
+	/* roll */
+	transform = glm::rotate(transform, glm::radians(mRoll), GetLook());
 
 	/* use quaternion from look vector */
 	/* mLook(direction) can't be parallel to up */
@@ -1303,14 +1307,20 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(TextureModels::Paint), Shader::Texture)
 {
-	SetTexture(TextureModels::Paint);
+	GLuint randPaint = rand() % NUM_PAINT;
+	SetTexture(static_cast<TextureModels>(static_cast<GLuint>(TextureModels::Paint) + randPaint));
+
 	SetPosition(pos);
+	SetColor(RED);
 	
 	SetLook(normal);
 
 	Scale(0.5f);
-	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.1f;	// 0.1 ~ 0.0999 + 0.01
+	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.2f;	// 0.2 ~ 0.0999 + 0.2
 	MoveZ(randZ, false);
+
+	GLfloat randRotation = rand() % 720 * 0.5f;
+	RotateLocal(0, 0, randRotation);
 }
 GLboolean PaintPlane::Update()
 {

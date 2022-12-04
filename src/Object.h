@@ -10,17 +10,19 @@
 class Object abstract {
 protected:
 	/* Rotation, Scaling, Pivot 이전 원래 위치 */
-	glm::vec3 mPosition = { 0, 0, 0 };
+	glm::vec3 mPosition = glm::vec3(0,0,0);
 
 	/* 자전, 바라보는 방향 */
-	glm::vec3 mLook = { 0, 0, 0 };
+	glm::vec3 mLook = glm::vec3(0,0,0);
 	/* 공전, look 에 영향 X */
-	glm::quat mRotation = { 0, 0, 0, 0 };
+	glm::quat mRotation = glm::quat(1,0,0,0);
 
 	/* rotation(공전) 중심 좌표 */
 	const glm::vec3* mRotationPivot = nullptr;
 	/* position 중심 좌표 */
 	const glm::vec3* mPivot = nullptr;
+
+	GLfloat mRoll = 0.0f;
 
 public:
 	Object();

@@ -302,11 +302,19 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "light.pos", light->GetPviotedPosition());
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
-	DrawBlendObjects();
 
 	glCullFace(GL_FRONT);
 	cubeMap->Draw();
 	glCullFace(GL_BACK);
+
+	DrawBlendObjects();
+	if (cameraMode == CameraMode::FirstPerson)
+	{
+		if (player != nullptr)
+		{
+			player->DrawGun();
+		}
+	}
 
 	glBindVertexArray(0);
 	glutSwapBuffers();

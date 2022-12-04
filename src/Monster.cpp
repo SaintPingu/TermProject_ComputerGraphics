@@ -15,7 +15,7 @@ MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& m
 	mObject = new SharedObject(modelObject);
 	mObject->SetColor(BLUE);
 	mObject->SetPosition(position);
-	mObject->SetLook(Vector3::Up());
+	mObject->RotateLocal(0, 0, 90);
 
 	GLfloat modelWidth = modelObject->GetWidth();
 	GLfloat modelDepth = modelObject->GetDepth();
