@@ -40,7 +40,7 @@ GLvoid Gun::Update()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	bulletManager->Create(BulletType::Normal, origin, bulletPos, 300.0f, mYaw, mPitch);
+	bulletManager->Create(BulletType::Normal, origin, bulletPos, mYaw, mPitch);
 }
 GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 {

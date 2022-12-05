@@ -4,8 +4,10 @@
 #include "Object.h"
 #include "Bullet.h"
 #include "Monster.h"
+#include "Timer.h"
 
 extern MonsterManager* monsterManager;
+extern BulletManager* bulletManager;
 
 TurretManager::Turret::Turret(const glm::vec3& position)
 {
@@ -28,10 +30,27 @@ GLvoid TurretManager::Turret::Draw() const
 
 GLvoid TurretManager::Turret::Update()
 {
+	mCrntDelay += timer::DeltaTime();
+
 	glm::vec3 targetPos;
-	if (monsterManager->GetShortestMonsterPos(mObject_Head->GetPosition(), radius, targetPos) == GL_TRUE)
+	if (monsterManager->GetShortestMonsterPos(mObject_Head->GetPosition(), mRadius, targetPos) == GL_TRUE)
 	{
 		mObject_Head->Look(targetPos);
+
+		if (mCrntDelay >= mFireDelay)
+		{
+			mCrntDelay = 0;
+			glm::vec3 originPos = glm::vec3(0, 0, 0);
+			glm::vec3 bulletPos = glm::vec3(0, 0, 15);
+			MultiplyVector(mObject_Head->GetTransform(), bulletPos);
+			MultiplyVector(mObject_Head->GetTransform(), originPos);
+
+			GLfloat yaw = 0.0f;
+			GLfloat pitch = 0.0f;
+			GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
+
+			bulletManager->Create(BulletType::Normal, originPos, bulletPos, yaw, pitch);
+		}
 	}
 	else
 	{

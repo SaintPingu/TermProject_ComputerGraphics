@@ -60,8 +60,19 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch)
+GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
 {
+	GLfloat velocity = 0.0f;
+	switch (type)
+	{
+	case BulletType::Normal:
+		velocity = 300.0f;
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
 	Bullet* bullet = new Bullet(origin, position, velocity, yaw, pitch);
 	mBulletList.emplace_back(bullet);
 }

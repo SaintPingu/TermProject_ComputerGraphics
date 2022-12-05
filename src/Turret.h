@@ -7,8 +7,9 @@ class TurretManager {
 private:
 	class Turret {
 	private:
-		GLfloat radius = 100.0f;
-		GLfloat delay = 1.0f;
+		GLfloat mFireDelay = 1.0f;
+		GLfloat mCrntDelay = 0.0f;
+		GLfloat mRadius = 100.0f;
 
 		SharedObject* mObject_Body = nullptr;
 		SharedObject* mObject_Head = nullptr;

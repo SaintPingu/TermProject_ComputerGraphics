@@ -37,7 +37,7 @@ private:
 public:
 	BulletManager();
 	~BulletManager();
-	GLvoid Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
 	GLvoid Draw() const;
 	GLvoid Update();
 

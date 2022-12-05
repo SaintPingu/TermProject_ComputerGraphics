@@ -180,7 +180,7 @@ public:
 
 	inline constexpr operator glm::vec2() const
 	{
-		return { x, y };
+		return glm::vec2(x, y);
 	}
 
 	inline Vector2 operator+(const Vector2& rhs) const
@@ -230,7 +230,7 @@ public:
 	}
 	static inline GLfloat GetTheta(const Vector2& lhs, const Vector2& rhs)
 	{
-		float dot = Vector2::Dot(lhs, rhs);
+		GLfloat dot = Vector2::Dot(lhs, rhs);
 		return acos(dot / (Vector2::GetNorm(lhs) * Vector2::GetNorm(rhs)));
 	}
 
@@ -667,6 +667,9 @@ GLboolean IsOutOfIndex(const size_t& index, const size_t& size);
 GLvoid ToggleDepthTest();
 GLvoid SetDepthTest(const GLboolean& isDepthTest);
 
+GLfloat GetTheta(const glm::vec2& lhs, const glm::vec2& rhs);
+GLvoid GetYawPitch(const glm::vec3& target, GLfloat& yaw, GLfloat& pitch);
+
 template<typename T>
 inline GLvoid CopyVector(vector<T>& dst, const vector<T>& src)
 {
@@ -705,6 +708,10 @@ inline constexpr glm::vec2 ConvertVec2(const glm::vec3& position)
 inline constexpr glm::vec3 ConvertVec3(const glm::vec2& position)
 {
 	return glm::vec3(position.x, 0, position.y);
+}
+inline constexpr glm::vec2 ConvertVec2_YZ(const glm::vec3& position)
+{
+	return glm::vec2(position.y, position.z);
 }
 
 GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
