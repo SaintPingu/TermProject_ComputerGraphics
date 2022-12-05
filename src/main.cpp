@@ -11,6 +11,7 @@
 #include "Bullet.h"
 #include "Monster.h"
 #include "Building.h"
+#include "Turret.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -29,6 +30,7 @@ GLvoid MousePassiveMotion(GLint x, GLint y);
 GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y);
 GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y);
 GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y);
+GLvoid ProcessSpecialKeyUp(GLint key, GLint x, GLint y);
 
 GLvoid ToggleDepthTest();
 GLvoid SetCameraMode(const CameraMode& cameraMode);
@@ -43,11 +45,14 @@ GLint screenHeight = DEFAULT_SCREEN_HEIGHT;
 glm::vec3 worldPosition(0.0f, 0.0f, 0.0f);
 glm::vec3 worldRotation(0.0f, 0.0f, 0.0f);
 
-// lights
+// light
+Light* light = nullptr;
+
+// managers
 BulletManager* bulletManager = nullptr;
 MonsterManager* monsterManager = nullptr;
 BuildingManager* buildingManager = nullptr;
-Light* light = nullptr;
+TurretManager* turretManager = nullptr;
 
 // objects
 Map* crntMap = nullptr;
@@ -98,6 +103,7 @@ GLint main(GLint argc, GLchar** argv)
 	glutKeyboardFunc(ProcessKeyDown);
 	glutKeyboardUpFunc(ProcessKeyUp);
 	glutSpecialFunc(ProcessSpecialKeyDown);
+	glutSpecialUpFunc(ProcessSpecialKeyUp);
 	timer::StartUpdate();
 
 	glutMainLoop();
@@ -153,8 +159,10 @@ GLvoid InitMeshes()
 	bulletManager = new BulletManager();
 	monsterManager = new MonsterManager();
 	buildingManager = new BuildingManager();
+	turretManager = new TurretManager();
 	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
 	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });
+	turretManager->Create({ 0, 0, 100 });
 
 	//********** [ Coordinate system lines ] **********//
 	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
@@ -197,6 +205,7 @@ GLvoid InitMeshes()
 	crntMap = new Map();
 	player = new Player({ 0,0,0 }, &cameraMode);
 	monsterManager->SetPlayer(player);
+
 }
 
 GLvoid Reset()
@@ -205,6 +214,9 @@ GLvoid Reset()
 
 	delete bulletManager;
 	bulletManager = nullptr;
+
+	delete turretManager;
+	turretManager = nullptr;
 
 	delete cameraFree;
 	delete cameraTop;
@@ -302,6 +314,7 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "light.pos", light->GetPviotedPosition());
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
+	turretManager->Draw();
 
 	glCullFace(GL_FRONT);
 	cubeMap->Draw();
@@ -349,8 +362,9 @@ GLvoid Update()
 	}
 
 	bulletManager->Update();
-	//monsterManager->Update();
+	monsterManager->Update();
 	buildingManager->Update();
+	turretManager->Update();
 
 	constexpr GLfloat cameraMovement = 100.0f;
 	GLfloat cameraSpeed = cameraMovement;
@@ -576,6 +590,27 @@ GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 	case GLUT_KEY_F1:
 		isWireFrame = !isWireFrame;
 		break;
+	}
+
+	if (player != nullptr)
+	{
+		if (key == GLUT_KEY_LEFT)
+		{
+			return;
+		}
+
+		player->ProcessKeyDown(key);
+	}
+}
+GLvoid ProcessSpecialKeyUp(GLint key, GLint x, GLint y)
+{
+	if (player != nullptr)
+	{
+		if (key == GLUT_KEY_LEFT)
+		{
+			return;
+		}
+		player->ProcessKeyUp(key);
 	}
 }
 

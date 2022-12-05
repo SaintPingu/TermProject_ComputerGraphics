@@ -19,7 +19,7 @@ const set<GLint> movLR = { 'a', 'A', 'd', 'D' };
 const set<GLint> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
 
 ////////////////////////////// [ State ] //////////////////////////////
-// [ IDLE ] //
+/********** [ IDLE ] **********/
 GLvoid Idle::Enter(const Event& e, const GLint& value)
 {
 	mPlayer->Stop();
@@ -55,7 +55,7 @@ GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 	}
 }
 
-// [ WALK ] //
+/********** [ WALK ] **********/
 GLvoid Walk::Enter(const Event& e, const GLint& value)
 {
 	switch (e)
@@ -95,6 +95,10 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->ChangeState(Player::State::Jump);
 		}
+		else if (key == GLUT_KEY_SHIFT_L)
+		{
+			mPlayer->Run();
+		}
 		break;
 	case Event::KeyUp:
 		if (movKeys.find(key) != movKeys.end())
@@ -106,12 +110,16 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->ChangeState(Player::State::Idle, e, key);
 		}
+		else if (key == GLUT_KEY_SHIFT_L)
+		{
+			mPlayer->StopRun();
+		}
 		break;
 	}
 }
 
 
-// [ JUMP ] //
+/********** [ JUMP ] **********/
 GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
@@ -182,10 +190,6 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 		}
 	}
 }
-
-
-
-
 
 
 
@@ -373,12 +377,18 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 
 GLvoid Player::Move()
 {
-	glm::vec3 prevPos = mObject->GetPosition();
-	if (mDirX != 0.0f) mObject->MoveX(mSpeed * mDirX);
+	GLfloat correction = 1.0f;
+	if (mDirX != 0.0f && mDirZ != 0.0f)
+	{
+		correction = 0.8f;
+	}
+
+	if (mDirX != 0.0f) mObject->MoveX(mSpeed * mDirX * correction);
 	if (mDirY != 0.0f) mObject->MoveY(mJumpSpeed * mDirY);
-	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ);
+	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ * correction);
 
 	// xz collision
+	glm::vec3 prevPos = mObject->GetPosition();
 	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
 		mObject->SetPosX(prevPos.x);

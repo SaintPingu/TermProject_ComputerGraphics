@@ -3,8 +3,8 @@
 
 #define PLAYER_RADIUS 10 // Width = 20 : 2m -> radius = 1m
 #define PLAYER_HEIGHT 40 // height = 40 : 4m
-// #define PLAYER_WALK_SPEED 10 // 1 m/s
-#define PLAYER_WALK_SPEED 50 // for test
+#define PLAYER_WALK_SPEED 50 // 5m/s
+#define PLAYER_RUN_SPEED 100 // 10m/s
 #define PLAYER_JUMP_SPEED 30 // 3 m/s
 
 class SharedObject;
@@ -127,6 +127,8 @@ public:
 	// Movement
 	GLvoid Move();
 	GLvoid Stop();
+	inline constexpr GLvoid Run() { mSpeed = PLAYER_RUN_SPEED; };
+	inline constexpr GLvoid StopRun() { mSpeed = PLAYER_WALK_SPEED; };
 	GLvoid AddDir(const GLint& key);
 	GLvoid SubDir(const GLint& key);
 	GLvoid SetDir(const GLint& key, const GLint& value);

@@ -15,7 +15,6 @@ MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& m
 	mObject = new SharedObject(modelObject);
 	mObject->SetColor(BLUE);
 	mObject->SetPosition(position);
-	mObject->RotateLocal(0, 0, 90);
 
 	GLfloat modelWidth = modelObject->GetWidth();
 	GLfloat modelDepth = modelObject->GetDepth();
@@ -66,6 +65,11 @@ glm::vec3 MonsterManager::Monster::GetPosition() const
 {
 	return mObject->GetPosition();
 }
+glm::vec3 MonsterManager::Monster::GetCenter() const
+{
+	glm::vec3 pos = mObject->GetPosition();
+	return glm::vec3(pos.x, pos.y + mObject->GetHeight() / 2.0f, pos.z);
+}
 
 
 
@@ -114,7 +118,7 @@ GLvoid MonsterManager::Update()
 }
 GLvoid MonsterManager::Draw() const
 {
-	for (Monster* monster : mMonsterList)
+	for (const Monster* monster : mMonsterList)
 	{
 		monster->Draw();
 	}
@@ -123,4 +127,27 @@ GLvoid MonsterManager::Draw() const
 GLvoid MonsterManager::SetPlayer(const Player* player)
 {
 	mPlayer = player;
+}
+
+GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const
+{
+	GLfloat min = radius;
+
+	for (const Monster* monster : mMonsterList)
+	{
+		glm::vec3 monsterPos = monster->GetPosition();
+		GLfloat length = glm::length(monsterPos - srcPos);
+		if (length < min)
+		{
+			min = length;
+			targetPos = monster->GetCenter();
+		}
+	}
+
+	if (min >= radius)
+	{
+		return false;
+	}
+
+	return true;
 }

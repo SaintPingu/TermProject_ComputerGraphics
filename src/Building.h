@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Object.h"
 
-enum class BuildingType { GuardTower, };
+enum class BuildingType { GuardTower };
 
 class BuildingManager {
 private:
@@ -30,5 +30,4 @@ public:
 	GLvoid Draw() const;
 
 	GLvoid Create(const BuildingType& type, const glm::vec3& position, const glm::vec3 look = Vector3::Front());
-	//const SharedObject* GetMinDistanceBuilding() const;
 };

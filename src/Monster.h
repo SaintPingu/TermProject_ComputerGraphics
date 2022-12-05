@@ -26,6 +26,7 @@ private:
 
 		GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal);
 		glm::vec3 GetPosition() const;
+		glm::vec3 GetCenter() const;
 	};
 
 	vector<Monster*> mMonsterList;
@@ -39,4 +40,5 @@ public:
 	GLvoid Update();
 	GLvoid Draw() const;
 	GLvoid SetPlayer(const Player* player);
+	GLboolean GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const;
 };
