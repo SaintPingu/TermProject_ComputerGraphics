@@ -379,12 +379,12 @@ GLvoid Player::Move()
 		correction = 0.8f;
 	}
 
+	glm::vec3 prevPos = mObject->GetPosition();
 	if (mDirX != 0.0f) mObject->MoveX(mSpeed * mDirX * correction);
 	if (mDirY != 0.0f) mObject->MoveY(mJumpSpeed * mDirY);
 	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ * correction);
 
 	// xz collision
-	glm::vec3 prevPos = mObject->GetPosition();
 	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
 		mObject->SetPosX(prevPos.x);

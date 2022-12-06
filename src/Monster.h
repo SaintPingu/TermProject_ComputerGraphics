@@ -40,7 +40,12 @@ public:
 
 class Egg : public Monster {
 private:
-	GLfloat rotationPerSec = 90.0f;
+	GLfloat mRotationPerSec = 90.0f;
+
+	GLint mFloatingDir = UP;
+	GLfloat mFloatingSpeed = 10.0f;
+	GLfloat mFloatingRange = 10.0f;
+	GLfloat mFloatingOrigin = 0.0f;
 public:
 	Egg(const MonsterType& monsterType, const glm::vec3& position);
 

@@ -98,11 +98,28 @@ Blooper::Blooper(const MonsterType& monsterType, const glm::vec3& position) : Mo
 Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
 {
 	mExplosionColor = AQUA;
+	mFloatingOrigin = position.y;
 }
 GLvoid Egg::Update(const glm::vec3* target)
 {
 	Monster::Update(target);
-	mObject->RotateModel(Vector3::Up(), timer::DeltaTime() * rotationPerSec);
+	mObject->RotateModel(Vector3::Up(), timer::DeltaTime() * mRotationPerSec);
+
+	mObject->MoveY(mFloatingDir * mFloatingSpeed);
+	if (mFloatingDir == DOWN)
+	{
+		if (mObject->GetPosition().y <= mFloatingOrigin - mFloatingRange)
+		{
+			mFloatingDir *= -1;
+		}
+	}
+	else
+	{
+		if (mObject->GetPosition().y >= mFloatingOrigin + mFloatingRange)
+		{
+			mFloatingDir *= -1;
+		}
+	}
 }
 
 
