@@ -6,10 +6,11 @@
 extern BulletManager* bulletManager;
 
 unordered_map<MonsterType, TextureModels> modelMap{
-	{MonsterType::Blooper, TextureModels::Blooper}
+	{MonsterType::Blooper, TextureModels::Blooper},
+	{MonsterType::Egg, TextureModels::Egg},
 };
 
-MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& monsterType)
+MonsterManager::Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 {
 	mCollisionType = CollisionType::Circle;
 
@@ -116,7 +117,7 @@ MonsterManager::~MonsterManager()
 }
 GLvoid MonsterManager::Create(const MonsterType& monsterType, const glm::vec3& position)
 {
-	Monster* monster = new Monster(position, monsterType);
+	Monster* monster = new Monster(monsterType, position);
 	mMonsterList.emplace_back(monster);
 }
 GLvoid MonsterManager::Update()

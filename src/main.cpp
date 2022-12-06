@@ -161,6 +161,7 @@ GLvoid InitMeshes()
 	buildingManager = new BuildingManager();
 	turretManager = new TurretManager();
 	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
+	monsterManager->Create(MonsterType::Egg, { 150, 50, 150 });
 	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });
 	turretManager->Create({ 0, 0, 100 });
 

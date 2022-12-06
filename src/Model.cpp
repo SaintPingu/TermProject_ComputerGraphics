@@ -219,6 +219,7 @@ static Model* cubeMapModel = new Model();
 static Model* paintModel = new Model();
 
 static Model* blooperModel = new Model();
+static Model* eggModel = new Model();
 
 static Model* turretBodyModel = new Model();
 static Model* turretHeadModel = new Model();
@@ -239,6 +240,7 @@ unordered_map<TextureModels, Model*> textureModelMap{
 	{TextureModels::Map, mapModel },
 	{TextureModels::CubeMap, cubeMapModel },
 	{TextureModels::Blooper, blooperModel},
+	{TextureModels::Egg, eggModel},
 	{TextureModels::Turret_Body, turretBodyModel },
 	{TextureModels::Turret_Head, turretHeadModel },
 };
@@ -247,6 +249,7 @@ unordered_map<TextureModels, const GLchar*> textureMap{
 	{TextureModels::Map, "map.png" },
 	{TextureModels::CubeMap, "cubemap.png" },
 	{TextureModels::Blooper, "blooper.png" },
+	{TextureModels::Egg, "egg.png" },
 	{TextureModels::Paint, "paint.png" },
 	{TextureModels::Paint2, "paint2.png" },
 	{TextureModels::Turret_Body, "turret_body.png" },
@@ -254,12 +257,13 @@ unordered_map<TextureModels, const GLchar*> textureMap{
 };
 
 /* Should be arrange by obj file size (faster) */
-enum class ObjList { Gun, Blooper, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, Turret_Body, Turret_Head, _count };
+enum class ObjList { Gun, Blooper, Egg, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, Turret_Body, Turret_Head, _count };
 constexpr GLuint NUM_OBJ = static_cast<GLuint>(ObjList::_count);
 
 unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
 	{ObjList::Gun, make_pair(gunModel, "gun.obj")},
 	{ObjList::Blooper, make_pair(blooperModel, "blooper.obj")},
+	{ObjList::Egg, make_pair(eggModel, "egg.obj")},
 	{ObjList::Player, make_pair(playerModel, "player.obj")},
 	{ObjList::GuardTower, make_pair(guardTowerModel, "guard_tower_test.obj")},
 	{ObjList::GeoSphere, make_pair(geoSphereModel, "geo_sphere.obj")},

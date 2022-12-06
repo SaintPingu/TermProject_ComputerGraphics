@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
 
-enum class MonsterType { Blooper, };
+enum class MonsterType { Blooper, Egg };
 
 class Player;
 class SharedObject;
@@ -22,7 +22,7 @@ private:
 		const glm::vec3* target = nullptr;
 
 	public:
-		Monster(const glm::vec3& position, const MonsterType& monsterType);
+		Monster(const MonsterType& monsterType, const glm::vec3& position);
 
 		GLvoid Update(const glm::vec3* target);
 		GLvoid Draw() const;
