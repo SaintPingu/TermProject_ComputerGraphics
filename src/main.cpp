@@ -12,6 +12,7 @@
 #include "Monster.h"
 #include "Building.h"
 #include "Turret.h"
+#include "Sound.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -53,6 +54,7 @@ BulletManager* bulletManager = nullptr;
 MonsterManager* monsterManager = nullptr;
 BuildingManager* buildingManager = nullptr;
 TurretManager* turretManager = nullptr;
+SoundManager* soundManager = nullptr;
 
 // objects
 Map* crntMap = nullptr;
@@ -149,6 +151,7 @@ GLvoid Init()
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
+	soundManager->PlayBGMSound(BGMSound::Intro, 1.0f, true);
 	//system("cls");
 }
 
@@ -160,6 +163,7 @@ GLvoid InitMeshes()
 	monsterManager = new MonsterManager();
 	buildingManager = new BuildingManager();
 	turretManager = new TurretManager();
+	soundManager = new SoundManager();
 	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
 	monsterManager->Create(MonsterType::Egg, { 150, 30, 150 });
 	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });

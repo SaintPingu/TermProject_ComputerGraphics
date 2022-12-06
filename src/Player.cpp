@@ -173,6 +173,10 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 		else if (e == Event::KeyDown)
 		{
 			isKeyUp = false;
+			if (key == GLUT_KEY_SHIFT_L)
+			{
+				mPlayer->StopRun();
+			}
 		}
 		return;
 	}

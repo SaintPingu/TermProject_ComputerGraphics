@@ -29,6 +29,8 @@
 #include <myGL/glm/ext.hpp>
 #include <myGL/glm/gtc/matrix_transform.hpp>
 
+#include <fmod.hpp>
+
 // colors
 #define BLACK RGB(0, 0, 0)
 #define WHITE RGB(255, 255, 255)
