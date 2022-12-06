@@ -2,8 +2,30 @@
 #include "Bullet.h"
 #include "Timer.h"
 
-BulletManager::Bullet::Bullet(const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+
+GLvoid IBulletCollisionable::Destroy()
 {
+	extern BulletManager* bulletManager;
+	isDestroyed = GL_TRUE;
+	bulletManager->DelCollisionObject(this);
+};
+
+
+BulletManager::Bullet::Bullet(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+{
+	switch (type)
+	{
+	case BulletType::Normal:
+		mWeight = 30.0f;
+		mRadius = 0.1f;
+		mVelocity = 300.0f;
+		mDamage = 10.0f;
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
 
@@ -16,7 +38,6 @@ BulletManager::Bullet::Bullet(const glm::vec3& origin, const glm::vec3& position
 	mPosition.x += rand() % 2 - 1;
 	mPosition.y += rand() % 2 - 1;
 
-	mVelocity = velocity;
 	mAngleY = sin(DEGREE_TO_RADIAN(resultYaw));
 	mAngleZ = cos(DEGREE_TO_RADIAN(resultYaw));
 
@@ -30,7 +51,16 @@ GLvoid BulletManager::Bullet::Update()
 	MoveZ(mVelocity * mAngleZ);
 	MoveY(mVelocity * mAngleY - (0.5f * GRAVITY * mT * mT * mWeight));
 }
+BulletAtt BulletManager::Bullet::GetAttribute() const
+{
+	BulletAtt result;
+	result.prevPos = mPrevPos;
+	result.crntPos = GetTransformedPos();
+	result.radius = mRadius;
+	result.damage = mDamage;
 
+	return result;
+}
 
 
 
@@ -62,18 +92,7 @@ BulletManager::~BulletManager()
 
 GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
 {
-	GLfloat velocity = 0.0f;
-	switch (type)
-	{
-	case BulletType::Normal:
-		velocity = 300.0f;
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	Bullet* bullet = new Bullet(origin, position, velocity, yaw, pitch);
+	Bullet* bullet = new Bullet(type, origin, position, yaw, pitch);
 	mBulletList.emplace_back(bullet);
 }
 
@@ -97,9 +116,8 @@ GLvoid BulletManager::Update()
 			glm::vec3 hitPoint;
 			glm::vec3 normal = { NO_NORMAL, NO_NORMAL, NO_NORMAL };
 
-			if (object->CheckCollisionBullet(bullet->GetPrevPos(), bullet->GetTransformedPos(), bullet->GetRadius(), hitPoint, normal) == GL_TRUE)
+			if (object->CheckCollisionBullet(bullet->GetAttribute(), hitPoint, normal) == GL_TRUE)
 			{
-
 				delete bullet;
 				bullet = nullptr;
 				iter = mBulletList.erase(iter);

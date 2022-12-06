@@ -39,17 +39,7 @@ GLvoid TurretManager::Turret::Update()
 
 		if (mCrntDelay >= mFireDelay)
 		{
-			mCrntDelay = 0;
-			glm::vec3 originPos = glm::vec3(0, 0, 0);
-			glm::vec3 bulletPos = glm::vec3(0, 0, 15);
-			MultiplyVector(mObject_Head->GetTransform(), bulletPos);
-			MultiplyVector(mObject_Head->GetTransform(), originPos);
-
-			GLfloat yaw = 0.0f;
-			GLfloat pitch = 0.0f;
-			GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
-
-			bulletManager->Create(BulletType::Normal, originPos, bulletPos, yaw, pitch);
+			Fire();
 		}
 	}
 	else
@@ -57,7 +47,22 @@ GLvoid TurretManager::Turret::Update()
 		mObject_Head->SetLook(Vector3::Front());
 	}
 }
+GLvoid TurretManager::Turret::Fire()
+{
+	mCrntDelay = 0;
 
+	glm::mat4 transform = mObject_Head->GetTransform();
+	glm::vec3 originPos = glm::vec3(0, 0, 0);
+	glm::vec3 bulletPos = glm::vec3(0, 2, 13);
+	MultiplyVector(transform, bulletPos);
+	MultiplyVector(transform, originPos);
+
+	GLfloat yaw = 0.0f;
+	GLfloat pitch = 0.0f;
+	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
+
+	bulletManager->Create(BulletType::Normal, originPos, bulletPos, yaw, pitch);
+}
 
 
 TurretManager::TurretManager()

@@ -297,7 +297,6 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	bulletManager->Draw();
-	monsterManager->Draw();
 	buildingManager->Draw();
 		
 	if (player != nullptr)
@@ -315,19 +314,13 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	turretManager->Draw();
+	monsterManager->Draw();
 
 	glCullFace(GL_FRONT);
 	cubeMap->Draw();
 	glCullFace(GL_BACK);
 
 	DrawBlendObjects();
-	if (cameraMode == CameraMode::FirstPerson)
-	{
-		if (player != nullptr)
-		{
-			player->DrawGun();
-		}
-	}
 
 	glBindVertexArray(0);
 	glutSwapBuffers();

@@ -209,9 +209,6 @@ static Model* geoSphereModel = new Model();
 static Model* playerModel = new Model();
 static Model* gunModel = new Model();
 
-// monster
-static Model* blooperModel = new Model();
-
 // building
 static Model* guardTowerModel = new Model();
 
@@ -220,6 +217,8 @@ static Model* guardTowerModel = new Model();
 static Model* mapModel = new Model();
 static Model* cubeMapModel = new Model();
 static Model* paintModel = new Model();
+
+static Model* blooperModel = new Model();
 
 static Model* turretBodyModel = new Model();
 static Model* turretHeadModel = new Model();
@@ -233,13 +232,13 @@ unordered_map<Models, Model*> modelMap{
 	{Models::LowSphere, lowSphereModel},
 	{Models::GeoSphere, geoSphereModel},
 	{Models::Player, playerModel},
-	{Models::Blooper, blooperModel},
 	{Models::GuardTower, guardTowerModel},
 };
 unordered_map<TextureModels, Model*> textureModelMap{
 	{TextureModels::Gun, gunModel },
 	{TextureModels::Map, mapModel },
 	{TextureModels::CubeMap, cubeMapModel },
+	{TextureModels::Blooper, blooperModel},
 	{TextureModels::Turret_Body, turretBodyModel },
 	{TextureModels::Turret_Head, turretHeadModel },
 };
@@ -247,6 +246,7 @@ unordered_map<TextureModels, const GLchar*> textureMap{
 	{TextureModels::Gun, "gun.png" },
 	{TextureModels::Map, "map.png" },
 	{TextureModels::CubeMap, "cubemap.png" },
+	{TextureModels::Blooper, "blooper.png" },
 	{TextureModels::Paint, "paint.png" },
 	{TextureModels::Paint2, "paint2.png" },
 	{TextureModels::Turret_Body, "turret_body.png" },
@@ -402,6 +402,7 @@ GLvoid InitModels()
 		if (t != nullptr)
 		{
 			t->join();
+			t = nullptr;
 		}
 	}
 

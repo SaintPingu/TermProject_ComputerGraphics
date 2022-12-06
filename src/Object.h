@@ -398,12 +398,7 @@ public:
 	GLfloat GetRadius() const;
 };
 
-/* 총알과 충돌하는 객체 */
 class PaintPlane;
-class IBulletCollisionable abstract {
-public:
-	virtual GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal) abstract;
-};
 
 /* 2D 충돌체크를 하는 객체 */
 class ICollisionable_2D abstract {

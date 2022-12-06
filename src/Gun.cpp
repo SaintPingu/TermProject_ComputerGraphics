@@ -12,14 +12,9 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 	mObject->SetPosition(gunPosition);
 
 	mGunPosition = gunPosition;
+	AddObject(Shader::Texture, mObject);
 }
 
-GLvoid Gun::Draw() const
-{
-	//glDisable(GL_DEPTH_TEST);
-	mObject->Draw();
-	//glEnable(GL_DEPTH_TEST);
-}
 GLvoid Gun::Update()
 {
 	if (mIsFire == false)

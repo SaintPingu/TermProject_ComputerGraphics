@@ -1,19 +1,20 @@
 #include "stdafx.h"
 #include "Monster.h"
-#include "Bullet.h"
+#include "Object.h"
 #include "Player.h"
 
-unordered_map<MonsterType, Models> modelMap{
-	{MonsterType::Blooper, Models::Blooper}
+extern BulletManager* bulletManager;
+
+unordered_map<MonsterType, TextureModels> modelMap{
+	{MonsterType::Blooper, TextureModels::Blooper}
 };
 
 MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& monsterType)
 {
 	mCollisionType = CollisionType::Circle;
 
-	const ModelObject* modelObject = GetIdentityModelObject(modelMap[monsterType]);
+	const ModelObject* modelObject = GetIdentityTextureObject(modelMap[monsterType]);
 	mObject = new SharedObject(modelObject);
-	mObject->SetColor(BLUE);
 	mObject->SetPosition(position);
 
 	GLfloat modelWidth = modelObject->GetWidth();
@@ -25,7 +26,6 @@ MonsterManager::Monster::Monster(const glm::vec3& position, const MonsterType& m
 
 	mSpeed = 10.0f;
 
-	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
 }
 
@@ -45,15 +45,20 @@ GLvoid MonsterManager::Monster::Draw() const
 	mObject->Draw();
 }
 
-GLboolean MonsterManager::Monster::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
+GLboolean MonsterManager::Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch (mCollisionType)
 	{
 	case CollisionType::Circle:
 	{
 		glm::vec3 monsterPos = mObject->GetTransformedPos();
-		return ::CheckCollision(monsterPos, bulletPos, mRadius, bulletRadius, mHeight);
+		if (::CheckCollision(monsterPos, bullet.crntPos, mRadius, bullet.radius, mHeight) == GL_TRUE)
+		{
+			GetDamage(bullet.damage);
+			return true;
+		}
 	}
+	break;
 	default:
 		assert(0);
 		break;
@@ -70,7 +75,14 @@ glm::vec3 MonsterManager::Monster::GetCenter() const
 	glm::vec3 pos = mObject->GetPosition();
 	return glm::vec3(pos.x, pos.y + mObject->GetHeight() / 2.0f, pos.z);
 }
-
+GLvoid MonsterManager::Monster::GetDamage(const GLfloat& damage)
+{
+	mHP -= damage;
+	if (mHP <= 0)
+	{
+		Destroy();
+	}
+}
 
 
 
@@ -109,11 +121,21 @@ GLvoid MonsterManager::Create(const MonsterType& monsterType, const glm::vec3& p
 }
 GLvoid MonsterManager::Update()
 {
-	for (Monster* monster : mMonsterList)
+	for (auto it = mMonsterList.begin(); it != mMonsterList.end();)
 	{
-		const glm::vec3* target = FindTargetPos(monster->GetPosition());
+		Monster* monster = *it;
+		if (monster->IsDestroyed() == GL_TRUE)
+		{
+			it = mMonsterList.erase(it);
+		}
+		else
+		{
+			const glm::vec3* target = FindTargetPos(monster->GetPosition());
+			monster->Update(target);
 
-		monster->Update(target);
+
+			++it;
+		}
 	}
 }
 GLvoid MonsterManager::Draw() const
@@ -124,7 +146,7 @@ GLvoid MonsterManager::Draw() const
 	}
 }
 
-GLvoid MonsterManager::SetPlayer(const Player* player)
+GLvoid MonsterManager::SetPlayer(Player* player)
 {
 	mPlayer = player;
 }
@@ -150,4 +172,8 @@ GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const G
 	}
 
 	return true;
+}
+
+GLvoid MonsterManager::CheckPlayerCollision(const Monster* monster)
+{
 }

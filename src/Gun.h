@@ -19,7 +19,6 @@ private:
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 
-	GLvoid Draw() const;
 	GLvoid Update();
 
 	inline constexpr GLvoid StartFire() { mIsFire = true; }

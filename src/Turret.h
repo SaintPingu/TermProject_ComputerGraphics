@@ -19,6 +19,7 @@ private:
 
 		GLvoid Update();
 		GLvoid Draw() const;
+		GLvoid Fire();
 	};
 
 	vector<Turret*> turrets;

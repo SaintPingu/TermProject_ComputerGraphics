@@ -33,17 +33,17 @@ GLvoid BuildingManager::Building::Update()
 
 }
 
-GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal)
+GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch(mCollisionType)
 	{
 	case CollisionType::Rect:
 	{
 		GLrect rect = mObject->GetRect();
-		const glm::vec2 bulletCenter = { bulletPos.x, bulletPos.z };
-		if (::CheckCollision(rect, bulletCenter, bulletRadius) == GL_TRUE && bulletPos.y - bulletRadius <= mObject->GetTransformedPos().y + mObject->GetHeight())
+		const glm::vec2 bulletCenter = { bullet.crntPos.x, bullet.crntPos.z };
+		if (::CheckCollision(rect, bulletCenter, bullet.radius) == GL_TRUE && bullet.crntPos.y - bullet.radius <= mObject->GetTransformedPos().y + mObject->GetHeight())
 		{
-			const glm::vec2 prevBulletCenter = { prevPos.x, prevPos.z };
+			const glm::vec2 prevBulletCenter = { bullet.prevPos.x, bullet.prevPos.z };
 
 			glm::vec2 leftTop = { rect.left, rect.top };
 			glm::vec2 leftBottom = { rect.left,rect.bottom };
@@ -60,7 +60,7 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevP
 				if (CheckCollision(line.v, line.u, prevBulletCenter, bulletCenter) == GL_TRUE)
 				{
 					glm::vec2 point = GetLineIntersection(line.v, line.u, prevBulletCenter, bulletCenter);
-					hitPoint = { point.x, prevPos.y, point.y };
+					hitPoint = { point.x, bullet.prevPos.y, point.y };
 					if (line.v == leftTop)
 					{
 						normal = Vector3::Right();
@@ -83,7 +83,7 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const glm::vec3& prevP
 			}
 
 			/* upside */
-			hitPoint = { prevPos.x, mObject->GetHeight(), prevPos.z };
+			hitPoint = { bullet.prevPos.x, mObject->GetHeight(), bullet.prevPos.z };
 			normal = Vector3::Up();
 			return true;
 		}

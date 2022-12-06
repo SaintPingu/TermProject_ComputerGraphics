@@ -342,10 +342,6 @@ GLvoid Player::Draw(const CameraMode& cameraMode) const
 	mObject->Draw();
 	mBoundingCircle->Draw();
 }
-GLvoid Player::DrawGun() const
-{
-	mGun->Draw();
-}
 GLvoid Player::DrawIcon() const
 {
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
-#include "Object.h"
+#include "Bullet.h"
+
+class SharedObject;
 
 enum class BuildingType { GuardTower };
 
@@ -17,7 +19,7 @@ private:
 		GLvoid Update();
 		GLvoid Draw() const;
 
-		GLboolean CheckCollisionBullet(const glm::vec3& prevPos, const glm::vec3& bulletPos, const GLfloat& bulletRadius, glm::vec3& hitPoint, glm::vec3& normal);
+		GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
 		const SharedObject* GetBuildingObject() const { return mObject; }
 	};
 

@@ -4,12 +4,35 @@
 
 enum class BulletType { Normal };
 
+typedef struct BulletAtt {
+	glm::vec3 prevPos = glm::vec3(0, 0, 0);
+	glm::vec3 crntPos = glm::vec3(0, 0, 0);
+	GLfloat radius = 0.0f;
+	GLfloat damage = 0.0f;
+}BulletAtt;
+
+class IBulletCollisionable abstract {
+private:
+	GLint mID = 0;
+	GLboolean isDestroyed = GL_FALSE;
+public:
+	virtual GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal) abstract;
+	GLvoid Destroy();
+	inline constexpr GLboolean IsDestroyed() const { return isDestroyed; };
+	inline constexpr GLvoid SetID(const GLint& id) { mID = id; }
+	inline constexpr GLint GetID() { return mID; }
+};
+
+
+
 class BulletManager {
 private:
 	class Bullet : public SharedObject {
 		/* 무게, 중력의 영향을 받는 정도 (n배) */
-		const GLfloat mWeight = 30.0f;
-		const GLfloat mRadius = 0.1f;
+		GLfloat mWeight = 0.0f;
+
+		GLfloat mRadius = 0.0f;
+		GLfloat mDamage = 0.0f;
 
 		/* 이전 좌표값 */
 		glm::vec3 mPrevPos = { 0,0,0 };
@@ -24,11 +47,10 @@ private:
 		GLfloat mAngleZ = 0.0f;
 		GLfloat mVelocity = 0.0f;
 	public:
-		Bullet(const glm::vec3& origin, const glm::vec3& position, const GLfloat& velocity, const GLfloat& yaw, const GLfloat& pitch);
+		Bullet(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
 		GLvoid Update();
 
-		inline constexpr GLfloat GetRadius() const { return mRadius; }
-		inline constexpr glm::vec3 GetPrevPos() const { return mPrevPos; }
+		BulletAtt GetAttribute() const;
 	};
 
 	vector<Bullet*> mBulletList;
@@ -45,4 +67,7 @@ public:
 	inline constexpr const vector<PaintPlane*>& GetPaints() const { return mPaints; }
 
 	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjectList.emplace_back(object); }
+	inline GLvoid DelCollisionObject(IBulletCollisionable* object) {
+		mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end(), [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
+	};
 };
