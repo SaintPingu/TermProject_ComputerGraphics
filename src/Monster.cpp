@@ -26,7 +26,7 @@ Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 	(modelWidth > modelDepth) ? mRadius = modelWidth : mRadius = modelDepth;
 	mRadius /= 2;
 
-	mSpeed = 10.0f;
+	mSpeed = 30.0f;
 
 	bulletManager->AddCollisionObject(this);
 }
@@ -89,37 +89,61 @@ GLvoid Monster::GetDamage(const GLfloat& damage)
 	}
 }
 
-
-Blooper::Blooper(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+GLvoid Floatable::InitFloat(SharedObject* object, const GLfloat& floatingSpeed, const GLfloat& floatingRange, const GLfloat& floatingOrigin)
 {
-	mExplosionColor = GRAY;
+	mFloatingObject = object;
+	mFloatingSpeed = floatingSpeed;
+	mFloatingRange = floatingRange;
+	mFloatingOrigin = floatingOrigin;
 }
-
-Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+GLvoid Floatable::UpdateFloat()
 {
-	mExplosionColor = AQUA;
-	mFloatingOrigin = position.y;
-}
-GLvoid Egg::Update(const glm::vec3* target)
-{
-	Monster::Update(target);
-	mObject->RotateModel(Vector3::Up(), timer::DeltaTime() * mRotationPerSec);
-
-	mObject->MoveY(mFloatingDir * mFloatingSpeed);
+	mFloatingObject->MoveY(mFloatingDir * mFloatingSpeed);
 	if (mFloatingDir == DOWN)
 	{
-		if (mObject->GetPosition().y <= mFloatingOrigin - mFloatingRange)
+		if (mFloatingObject->GetPosition().y <= mFloatingOrigin - mFloatingRange)
 		{
 			mFloatingDir *= -1;
 		}
 	}
 	else
 	{
-		if (mObject->GetPosition().y >= mFloatingOrigin + mFloatingRange)
+		if (mFloatingObject->GetPosition().y >= mFloatingOrigin + mFloatingRange)
 		{
 			mFloatingDir *= -1;
 		}
 	}
+}
+
+
+
+Blooper::Blooper(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+{
+	mExplosionColor = GRAY;
+
+	InitFloat(mObject, 5.0f, 5.0f, position.y);
+}
+GLvoid Blooper::Update(const glm::vec3* target)
+{
+	Monster::Update(target);
+	UpdateFloat();
+}
+
+Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+{
+	mExplosionColor = AQUA;
+
+	GLfloat randRotation = static_cast<GLfloat>(rand() % 360);
+	mObject->RotateModel(Vector3::Up(), randRotation);
+
+	InitFloat(mObject, 10.0f, 8.0f, position.y);
+}
+GLvoid Egg::Update(const glm::vec3* target)
+{
+	Monster::Update(target);
+	mObject->RotateModel(Vector3::Up(), timer::DeltaTime() * mRotationPerSec);
+
+	UpdateFloat();
 }
 
 

@@ -1435,7 +1435,7 @@ GLvoid DeleteObject(const Shader& shader, ShaderObject* object)
 {
 
 }
-GLvoid ResetObjects()
+GLvoid DeleteObjects()
 {
 	for (ShaderObject* object : customObjects)
 	{

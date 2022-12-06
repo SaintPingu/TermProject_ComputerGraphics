@@ -29,7 +29,7 @@ SoundManager::SoundManager()
 GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const GLfloat& volume, GLboolean isNewChannel)
 {
 	FMOD_System_Update(soundSystem);
-	if (isNewChannel == true)
+	if (isNewChannel == GL_TRUE)
 	{
 		FMOD_System_PlaySound(soundSystem, effectSoundList[static_cast<GLint>(effectSound)], 0, false, &soundChannel[static_cast<GLint>(SoundChannel::Effect)]);
 		FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Effect)], volume);
@@ -47,7 +47,7 @@ GLvoid SoundManager::StopEffectSound()
 GLvoid SoundManager::PlayBGMSound(const BGMSound& bgmSound, const GLfloat& volume, GLboolean isNewChannel)
 {
 	FMOD_System_Update(soundSystem);
-	if (isNewChannel == true)
+	if (isNewChannel == GL_TRUE)
 	{
 		FMOD_System_PlaySound(soundSystem, bgmSoundList[static_cast<GLint>(bgmSound)], 0, false, &soundChannel[static_cast<GLint>(SoundChannel::Bgm)]);
 		FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Bgm)], volume);

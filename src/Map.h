@@ -19,4 +19,6 @@ public:
 	GLvoid Draw();
 	GLboolean CheckCollision(const Circle* boundingCircle);
 	GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
+	inline constexpr GLfloat GetMaxWidth() const { return mRightTop.x - mLeftTop.x; }
+	inline constexpr GLfloat GetTop() const { return mRightTop.y; }
 };

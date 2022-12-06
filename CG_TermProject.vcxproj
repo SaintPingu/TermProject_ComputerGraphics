@@ -36,6 +36,7 @@
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Turret.h" />
+    <ClInclude Include="src\Wave.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Building.cpp" />
@@ -61,6 +62,7 @@
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Turret.cpp" />
+    <ClCompile Include="src\Wave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\back_frag.glsl">

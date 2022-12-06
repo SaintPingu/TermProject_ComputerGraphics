@@ -20,6 +20,8 @@ protected:
 
 	const glm::vec3* target = nullptr;
 
+	GLboolean isSpawning = GL_TRUE;
+
 public:
 	Monster(const MonsterType& monsterType, const glm::vec3& position);
 
@@ -33,23 +35,32 @@ public:
 	GLvoid GetDamage(const GLfloat& damage);
 };
 
-class Blooper : public Monster {
+class Floatable abstract {
+private:
+	SharedObject* mFloatingObject = nullptr;
+	GLint mFloatingDir = UP;
+	GLfloat mFloatingSpeed = 0.0f;
+	GLfloat mFloatingRange = 0.0f;
+	GLfloat mFloatingOrigin = 0.0f;
 public:
-	Blooper(const MonsterType& monsterType, const glm::vec3& position);
+	GLvoid InitFloat(SharedObject* object, const GLfloat& floatingSpeed, const GLfloat& floatingRange, const GLfloat& floatingOrigin);
+	GLvoid UpdateFloat();
 };
 
-class Egg : public Monster {
+class Blooper : public Monster, Floatable {
+public:
+	Blooper(const MonsterType& monsterType, const glm::vec3& position);
+	GLvoid Update(const glm::vec3* target) override;
+};
+
+class Egg : public Monster, Floatable {
 private:
 	GLfloat mRotationPerSec = 90.0f;
 
-	GLint mFloatingDir = UP;
-	GLfloat mFloatingSpeed = 10.0f;
-	GLfloat mFloatingRange = 10.0f;
-	GLfloat mFloatingOrigin = 0.0f;
+	
 public:
 	Egg(const MonsterType& monsterType, const glm::vec3& position);
-
-	virtual GLvoid Update(const glm::vec3* target);
+	GLvoid Update(const glm::vec3* target) override;
 };
 
 

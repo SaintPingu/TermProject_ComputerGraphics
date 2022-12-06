@@ -9,9 +9,6 @@ constexpr GLuint NUM_SOUND_BGM = static_cast<GLuint>(BGMSound::_count);
 constexpr GLuint NUM_SOUND_EFFECT = static_cast<GLuint>(EffectSound::_count);
 constexpr GLuint NUM_SOUND_CHEENEL = NUM_SOUND_BGM + NUM_SOUND_EFFECT;
 
-// has no Channel
-#define SOUND_LIST_HIT 4
-
 // Stop은 Play후에 사용할 것
 class SoundManager {
 private:

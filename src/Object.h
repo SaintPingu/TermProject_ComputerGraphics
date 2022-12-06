@@ -468,7 +468,7 @@ const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel);
 GLvoid AddObject(const Shader& shader, ShaderObject* object);
 GLvoid AddBlendObject(ShaderObject* object);
 GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
-GLvoid ResetObjects();
+GLvoid DeleteObjects();
 GLvoid DrawObjects(const Shader& shader);
 GLvoid DrawBlendObjects();
 

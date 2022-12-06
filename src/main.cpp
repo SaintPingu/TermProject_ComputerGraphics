@@ -13,6 +13,7 @@
 #include "Building.h"
 #include "Turret.h"
 #include "Sound.h"
+#include "Wave.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -55,6 +56,7 @@ MonsterManager* monsterManager = nullptr;
 BuildingManager* buildingManager = nullptr;
 TurretManager* turretManager = nullptr;
 SoundManager* soundManager = nullptr;
+WaveManager* waveManager = nullptr;
 
 // objects
 Map* crntMap = nullptr;
@@ -151,7 +153,8 @@ GLvoid Init()
 
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
-	soundManager->PlayBGMSound(BGMSound::Intro, 1.0f, true);
+	waveManager->Start();
+	soundManager->PlayBGMSound(BGMSound::Normal, 1.0f, true);
 	//system("cls");
 }
 
@@ -164,8 +167,8 @@ GLvoid InitMeshes()
 	buildingManager = new BuildingManager();
 	turretManager = new TurretManager();
 	soundManager = new SoundManager();
-	monsterManager->Create(MonsterType::Blooper, { 50, 20, 50 });
-	monsterManager->Create(MonsterType::Egg, { 150, 30, 150 });
+	waveManager = new WaveManager();
+
 	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });
 	turretManager->Create({ 0, 0, 100 });
 
@@ -215,13 +218,21 @@ GLvoid InitMeshes()
 
 GLvoid Reset()
 {
-	ResetObjects();
+	DeleteObjects();
 
 	delete bulletManager;
-	bulletManager = nullptr;
-
+	delete monsterManager;
+	delete buildingManager;
 	delete turretManager;
+	delete soundManager;
+	delete waveManager;
+
+	bulletManager = nullptr;
+	monsterManager = nullptr;
+	buildingManager = nullptr;
 	turretManager = nullptr;
+	soundManager = nullptr;
+	waveManager = nullptr;
 
 	delete cameraFree;
 	delete cameraTop;
