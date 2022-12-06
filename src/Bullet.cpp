@@ -11,7 +11,7 @@ GLvoid IBulletCollisionable::Destroy()
 };
 
 
-BulletManager::Bullet::Bullet(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
 {
 	switch (type)
 	{
@@ -20,6 +20,12 @@ BulletManager::Bullet::Bullet(const BulletType& type, const glm::vec3& origin, c
 		mRadius = 0.1f;
 		mVelocity = 300.0f;
 		mDamage = 10.0f;
+		break;
+	case BulletType::Particle_Explosion:
+		mWeight = 100.0f;
+		mRadius = 0.1f;
+		mVelocity = 150.0f;
+		mDamage = 0.0f;
 		break;
 	default:
 		assert(0);
@@ -30,8 +36,8 @@ BulletManager::Bullet::Bullet(const BulletType& type, const glm::vec3& origin, c
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
 
 	SetScale(mRadius);
-	SetColor(RED);
 	RotateLocal(0, resultPitch, 0);
+	SetColor(color);
 
 	mPrevPos = origin;
 	mPosition = position;
@@ -61,7 +67,10 @@ BulletAtt BulletManager::Bullet::GetAttribute() const
 
 	return result;
 }
-
+COLORREF BulletManager::Bullet::GetColor() const
+{
+	return ShaderObject::GetColor();
+}
 
 
 
@@ -80,7 +89,7 @@ BulletAtt BulletManager::Bullet::GetAttribute() const
 
 BulletManager::BulletManager()
 {
-	mBulletList.reserve(100);
+	mBulletList.reserve(1000);
 }
 BulletManager::~BulletManager()
 {
@@ -90,12 +99,30 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
+GLvoid BulletManager::Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
 {
-	Bullet* bullet = new Bullet(type, origin, position, yaw, pitch);
+	Bullet* bullet = new Bullet(type, color, origin, position, yaw, pitch);
 	mBulletList.emplace_back(bullet);
 }
+GLvoid BulletManager::CreateExplosion(const COLORREF& color, const glm::vec3& position, const GLfloat& radius, const GLint& amount)
+{
+	glm::vec3 origin = position;
+	const GLint r = static_cast<GLint>(radius);
 
+	for (GLint i = 0; i < amount; ++i)
+	{
+		GLfloat yaw = static_cast<GLfloat>(rand() % 180) - 90.0f;
+		GLfloat pitch = static_cast<GLfloat>(rand() % 360);
+		glm::vec3 pos = position;
+
+		
+		pos.x += rand() % (r * 2) - r;
+		pos.y += rand() % (r * 2) - r;
+		pos.z += rand() % (r * 2) - r;
+
+		Create(BulletType::Particle_Explosion, color, origin, pos, yaw, pitch);
+	}
+}
 GLvoid BulletManager::Draw() const
 {
 	for (const Bullet* bullet : mBulletList)
@@ -118,17 +145,16 @@ GLvoid BulletManager::Update()
 
 			if (object->CheckCollisionBullet(bullet->GetAttribute(), hitPoint, normal) == GL_TRUE)
 			{
-				delete bullet;
-				bullet = nullptr;
-				iter = mBulletList.erase(iter);
-
 				/* create paint */
 				if (normal.x != NO_NORMAL)
 				{
-					PaintPlane* plane = new PaintPlane(hitPoint, normal);
+					PaintPlane* plane = new PaintPlane(bullet->GetColor(), hitPoint, normal);
 					mPaints.emplace_back(plane);
 				}
 
+				delete bullet;
+				bullet = nullptr;
+				iter = mBulletList.erase(iter);
 				break;
 			}
 		}
@@ -156,3 +182,11 @@ GLvoid BulletManager::Update()
 	}
 }
 
+GLvoid BulletManager::AddCollisionObject(IBulletCollisionable* object)
+{
+	mCollisionObjectList.emplace_back(object);
+	object->SetID(mID++);
+}
+GLvoid BulletManager::DelCollisionObject(IBulletCollisionable* object) {
+	mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end(), [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
+};

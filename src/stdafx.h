@@ -35,6 +35,8 @@
 #define GRAY RGB(100, 100, 100)
 #define RED RGB(255, 0, 0)
 #define GREEN RGB(0, 255, 0)
+#define AQUA RGB(0, 255, 255)
+#define MINT RGB(152, 255, 152)
 #define DARK_GREEN RGB(0,100,0)
 #define FOREST_GREEN RGB(34,139,34)
 #define BLUE RGB(0, 0, 255)

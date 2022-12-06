@@ -7,33 +7,51 @@ enum class MonsterType { Blooper, Egg };
 class Player;
 class SharedObject;
 
+class Monster : public IBulletCollisionable {
+protected:
+	SharedObject* mObject = nullptr;
+
+	GLfloat mHP = 100.0f;
+	GLfloat mRadius = 0.0f;
+	GLfloat mHeight = 0.0f;
+	GLfloat mSpeed = 0.0f;
+	CollisionType mCollisionType = CollisionType::None;
+	COLORREF mExplosionColor = WHITE;
+
+	const glm::vec3* target = nullptr;
+
+public:
+	Monster(const MonsterType& monsterType, const glm::vec3& position);
+
+	virtual GLvoid Update(const glm::vec3* target);
+	GLvoid Draw() const;
+
+	GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
+	glm::vec3 GetPosition() const;
+	glm::vec3 GetCenter() const;
+
+	GLvoid GetDamage(const GLfloat& damage);
+};
+
+class Blooper : public Monster {
+public:
+	Blooper(const MonsterType& monsterType, const glm::vec3& position);
+};
+
+class Egg : public Monster {
+private:
+	GLfloat rotationPerSec = 90.0f;
+public:
+	Egg(const MonsterType& monsterType, const glm::vec3& position);
+
+	virtual GLvoid Update(const glm::vec3* target);
+};
+
+
+
+
 class MonsterManager {
 private:
-	class Monster : public IBulletCollisionable {
-	private:
-		SharedObject* mObject = nullptr;
-
-		GLfloat mHP = 100.0f;
-		GLfloat mRadius = 0.0f;
-		GLfloat mHeight = 0.0f;
-		GLfloat mSpeed = 0.0f;
-		CollisionType mCollisionType = CollisionType::None;
-
-		const glm::vec3* target = nullptr;
-
-	public:
-		Monster(const MonsterType& monsterType, const glm::vec3& position);
-
-		GLvoid Update(const glm::vec3* target);
-		GLvoid Draw() const;
-
-		GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
-		glm::vec3 GetPosition() const;
-		glm::vec3 GetCenter() const;
-
-		GLvoid GetDamage(const GLfloat& damage);
-	};
-
 	vector<Monster*> mMonsterList;
 	Player* mPlayer = nullptr;
 

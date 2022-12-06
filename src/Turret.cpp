@@ -61,7 +61,7 @@ GLvoid TurretManager::Turret::Fire()
 	GLfloat pitch = 0.0f;
 	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
 
-	bulletManager->Create(BulletType::Normal, originPos, bulletPos, yaw, pitch);
+	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch);
 }
 
 

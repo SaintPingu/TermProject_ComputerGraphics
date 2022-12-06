@@ -16,6 +16,8 @@ protected:
 	glm::vec3 mLook = glm::vec3(0,0,0);
 	/* 공전, look 에 영향 X */
 	glm::quat mRotation = glm::quat(1,0,0,0);
+	/* 객체 모델 회전 */
+	glm::quat mModelRotation = glm::quat(1, 0, 0, 0);
 
 	/* rotation(공전) 중심 좌표 */
 	const glm::vec3* mRotationPivot = nullptr;
@@ -66,6 +68,9 @@ public:
 	GLvoid RotateLocal(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
 	/* mLocalRotation을 axis를 기준으로 회전하는 quaternion값으로 설정 */
 	GLvoid SetLocalRotation(const glm::vec3& axis, const GLfloat& degree);
+
+	/* axis를 기준으로 모델 회전 */
+	GLvoid RotateModel(const glm::vec3& axis, const GLfloat& degree);
 
 	/* pivot 위치에 대해 axis를 기준으로 공전 */
 	GLvoid RotatePivot(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
@@ -154,6 +159,7 @@ public:
 	//********** [ Draw ] **********//
 	virtual GLvoid Draw() const abstract;
 	inline GLvoid SetColor(const COLORREF& color) { mColor = MyColor(color); }
+	inline constexpr COLORREF GetColor() const { return mColor; }
 
 	//********** [ Shader ] **********//
 	inline constexpr Shader GetShader() const { return mShader; }
@@ -444,7 +450,7 @@ public:
 class PaintPlane : public ModelObject {
 	GLfloat dt = 0.0f;
 public:
-	PaintPlane(const glm::vec3& pos, const glm::vec3& normal);
+	PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal);
 	GLboolean Update();
 };
 

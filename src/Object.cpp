@@ -20,6 +20,10 @@ GLvoid Object::InitValues()
 
 	mLook = INIT_LOOK;
 	mRotation = glm::quat(1, 0, 0, 0);
+	mModelRotation = glm::quat(1, 0, 0, 0);
+
+	/* 3ds max obj to opengl */
+	mModelRotation = glm::rotate(mModelRotation, glm::radians(180.0f), Vector3::Up());
 
 	mPivot = nullptr;
 	mRotationPivot = nullptr;
@@ -103,6 +107,10 @@ GLvoid Object::SetLocalRotation(const glm::vec3& axis, const GLfloat& degree)
 	{
 		mLook = Vector3::RotateOrigin(mLook, glm::radians(-degree), axis);
 	}
+}
+GLvoid Object::RotateModel(const glm::vec3& axis, const GLfloat& degree)
+{
+	mModelRotation = glm::rotate(mModelRotation, glm::radians(degree), axis);
 }
 GLvoid Object::ResetRotation()
 {
@@ -374,8 +382,7 @@ glm::mat4 ShaderObject::GetTransform() const
 	glm::quat lookAt = glm::quatLookAt(mLook, GetUp());
 	transform *= glm::mat4_cast(lookAt);		// R
 
-	/* 3ds max obj to opengl */
-	transform = glm::rotate(transform, glm::radians(180.0f), Vector3::Up());
+	transform *= glm::mat4_cast(mModelRotation);
 
 	transform = glm::scale(transform, mScale);	// S
 
@@ -1305,13 +1312,13 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-PaintPlane::PaintPlane(const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(TextureModels::Paint), Shader::Texture)
+PaintPlane::PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(TextureModels::Paint), Shader::Texture)
 {
 	GLuint randPaint = rand() % NUM_PAINT;
 	SetTexture(static_cast<TextureModels>(static_cast<GLuint>(TextureModels::Paint) + randPaint));
 
 	SetPosition(pos);
-	SetColor(RED);
+	SetColor(color);
 	
 	SetLook(normal);
 

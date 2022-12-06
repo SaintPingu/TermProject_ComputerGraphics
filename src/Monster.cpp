@@ -2,6 +2,7 @@
 #include "Monster.h"
 #include "Object.h"
 #include "Player.h"
+#include "Timer.h"
 
 extern BulletManager* bulletManager;
 
@@ -10,7 +11,7 @@ unordered_map<MonsterType, TextureModels> modelMap{
 	{MonsterType::Egg, TextureModels::Egg},
 };
 
-MonsterManager::Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
+Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 {
 	mCollisionType = CollisionType::Circle;
 
@@ -30,7 +31,7 @@ MonsterManager::Monster::Monster(const MonsterType& monsterType, const glm::vec3
 	bulletManager->AddCollisionObject(this);
 }
 
-GLvoid MonsterManager::Monster::Update(const glm::vec3* target)
+GLvoid Monster::Update(const glm::vec3* target)
 {
 	glm::vec3 monsterPos = mObject->GetPosition();
 	glm::vec3 v = { target->x, monsterPos.y, target->z };
@@ -41,12 +42,12 @@ GLvoid MonsterManager::Monster::Update(const glm::vec3* target)
 
 	mObject->MoveZ(mSpeed);
 }
-GLvoid MonsterManager::Monster::Draw() const
+GLvoid Monster::Draw() const
 {
 	mObject->Draw();
 }
 
-GLboolean MonsterManager::Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
+GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch (mCollisionType)
 	{
@@ -67,23 +68,44 @@ GLboolean MonsterManager::Monster::CheckCollisionBullet(const BulletAtt& bullet,
 
 	return false;
 }
-glm::vec3 MonsterManager::Monster::GetPosition() const
+glm::vec3 Monster::GetPosition() const
 {
 	return mObject->GetPosition();
 }
-glm::vec3 MonsterManager::Monster::GetCenter() const
+glm::vec3 Monster::GetCenter() const
 {
 	glm::vec3 pos = mObject->GetPosition();
 	return glm::vec3(pos.x, pos.y + mObject->GetHeight() / 2.0f, pos.z);
 }
-GLvoid MonsterManager::Monster::GetDamage(const GLfloat& damage)
+GLvoid Monster::GetDamage(const GLfloat& damage)
 {
 	mHP -= damage;
 	if (mHP <= 0)
 	{
 		Destroy();
+		glm::vec3 explosionPos = mObject->GetTransformedPos();
+		explosionPos.y += mObject->GetHeight() / 2;
+		bulletManager->CreateExplosion(mExplosionColor, explosionPos, mRadius);
 	}
 }
+
+
+Blooper::Blooper(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+{
+	mExplosionColor = GRAY;
+}
+
+Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+{
+	mExplosionColor = AQUA;
+}
+GLvoid Egg::Update(const glm::vec3* target)
+{
+	Monster::Update(target);
+	mObject->RotateModel(Vector3::Up(), timer::DeltaTime() * rotationPerSec);
+}
+
+
 
 
 
@@ -117,7 +139,20 @@ MonsterManager::~MonsterManager()
 }
 GLvoid MonsterManager::Create(const MonsterType& monsterType, const glm::vec3& position)
 {
-	Monster* monster = new Monster(monsterType, position);
+	Monster* monster = nullptr;
+	switch (monsterType)
+	{
+	case MonsterType::Blooper:
+		monster = new Blooper(monsterType, position);
+		break;
+	case MonsterType::Egg:
+		monster = new Egg(monsterType, position);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
 	mMonsterList.emplace_back(monster);
 }
 GLvoid MonsterManager::Update()

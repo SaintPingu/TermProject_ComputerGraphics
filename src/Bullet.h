@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Object.h"
 
-enum class BulletType { Normal };
+enum class BulletType { Normal, Particle_Explosion };
 
 typedef struct BulletAtt {
 	glm::vec3 prevPos = glm::vec3(0, 0, 0);
@@ -47,27 +47,28 @@ private:
 		GLfloat mAngleZ = 0.0f;
 		GLfloat mVelocity = 0.0f;
 	public:
-		Bullet(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+		Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
 		GLvoid Update();
 
 		BulletAtt GetAttribute() const;
+		COLORREF GetColor() const;
 	};
 
+	GLint mID = 0;
 	vector<Bullet*> mBulletList;
 	vector<PaintPlane*> mPaints;
 	vector<IBulletCollisionable*> mCollisionObjectList;
 public:
 	BulletManager();
 	~BulletManager();
-	GLvoid Create(const BulletType& type, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid CreateExplosion(const COLORREF& color, const glm::vec3& position, const GLfloat& radius, const GLint& amount = 20);
 	GLvoid Draw() const;
 	GLvoid Update();
 
 	/* Read only */
 	inline constexpr const vector<PaintPlane*>& GetPaints() const { return mPaints; }
 
-	inline GLvoid AddCollisionObject(IBulletCollisionable* object) { mCollisionObjectList.emplace_back(object); }
-	inline GLvoid DelCollisionObject(IBulletCollisionable* object) {
-		mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end(), [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
-	};
+	GLvoid AddCollisionObject(IBulletCollisionable* object);
+	GLvoid DelCollisionObject(IBulletCollisionable* object);
 };
