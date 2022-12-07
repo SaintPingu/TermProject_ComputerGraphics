@@ -17,7 +17,7 @@ private:
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
 
-	GLint mAmmo = 0;
+	GLint mAmmo = 60;
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 

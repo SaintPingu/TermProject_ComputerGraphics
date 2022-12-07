@@ -270,6 +270,7 @@ unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::UI_NUM_7, "ui_num_7.png" },
 	{Textures::UI_NUM_8, "ui_num_8.png" },
 	{Textures::UI_NUM_9, "ui_num_9.png" },
+	{Textures::UI_TEXT_HP, "ui_text_HP.png" },
 };
 
 /* Should be arrange by obj file size (faster) */
@@ -447,9 +448,15 @@ GLvoid InitModels()
 	textureModelMap[Textures::Paint] = planeModel;
 	textureModelMap[Textures::Paint2] = planeModel;
 
-	for (GLint i = 0; i <= 9; ++i)
+	for(GLint i=0;;++i)
 	{
-		textureModelMap[static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + i)] = planeModel;
+		GLint uiIndex = static_cast<GLint>(Textures::UI_NUM_0) + i;
+		Textures texture = static_cast<Textures>(uiIndex);
+		if (texture == Textures::_count)
+		{
+			break;
+		}
+		textureModelMap[texture] = planeModel;
 	}
 
 	auto duration = chrono::high_resolution_clock::now() - start;

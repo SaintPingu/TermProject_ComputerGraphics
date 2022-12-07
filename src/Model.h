@@ -14,6 +14,7 @@ enum class Textures {
 	Turret_Head,
 	Paint,
 	Paint2,
+	/* must be ui */
 	UI_NUM_0,
 	UI_NUM_1,
 	UI_NUM_2,
@@ -24,6 +25,7 @@ enum class Textures {
 	UI_NUM_7,
 	UI_NUM_8,
 	UI_NUM_9,
+	UI_TEXT_HP,
 	_count
 };
 constexpr GLuint NUM_MODEL = static_cast<GLuint>(Models::_count);

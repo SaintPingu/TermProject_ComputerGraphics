@@ -18,13 +18,17 @@ private:
 	UITexture mTens;
 	UITexture mUnits;
 
+	UITexture mHP;
+	UITexture mgun_mark;
+
 	const Player* mPlayer = nullptr;
 
 public:
 	UIManager();
 
-	GLvoid Draw() const;
+	GLvoid Draw();
 	GLvoid SetAmmo(const GLint& num);
+	GLvoid SetHP(const GLfloat& HP);
 	inline constexpr GLvoid SetPlayer(const Player* player)
 	{
 		mPlayer = player;
