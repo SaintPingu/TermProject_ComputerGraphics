@@ -2,6 +2,7 @@
 #include "Wave.h"
 #include "Monster.h"
 #include "Map.h"
+#include <random>
 
 
 extern MonsterManager* monsterManager;
@@ -22,8 +23,11 @@ glm::vec2 WaveManager::GetRandomMonsterPos(const GLint& mapWidth, const GLfloat&
 
 GLvoid WaveManager::Start()
 {
+
+
 	GLint mapWidth = static_cast<GLint>(crntMap->GetMaxWidth());
 	GLfloat mapTop = crntMap->GetTop();
+
 
 	const GLuint numOfBlooper = crntWave * 3;
 	const GLuint numOfEgg = crntWave * 3;
@@ -43,5 +47,9 @@ GLvoid WaveManager::Start()
 
 GLvoid WaveManager::Update()
 {
-
+	if (monsterManager->CheckEnemyEmpty())
+	{
+		crntWave++;
+		WaveManager::Start();
+	}
 }

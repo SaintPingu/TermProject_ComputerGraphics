@@ -254,3 +254,9 @@ GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const G
 GLvoid MonsterManager::CheckPlayerCollision(const Monster* monster)
 {
 }
+
+
+bool MonsterManager::CheckEnemyEmpty()
+{
+	return mMonsterList.empty();
+}
