@@ -15,6 +15,8 @@ class Player;
 class Circle;
 class Gun;
 
+enum class GunType;
+
 namespace playerState {
 	/* ±âº» State  */
 	class PlayerState abstract {
@@ -88,9 +90,10 @@ private:
 	GLfloat mTpCameraPitch = 0.0f;
 
 	// values
-	GLfloat mHp = 0.0f;
+	GLfloat mHp = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
+	GLfloat mHoldTurret = 0;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -152,5 +155,14 @@ public:
 	{
 		return mTpCamera;
 	}
+
+	// Set
+	GLvoid SetHoldTurret(GLint addTurret);
+
+
+	// Get information
+	GLfloat GetHp() const;
 	GLint GetAmmo() const;
+	GLint GetMaxAmmo() const;
+	GunType GetGunType() const;
 };

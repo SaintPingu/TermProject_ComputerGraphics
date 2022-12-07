@@ -11,7 +11,8 @@ class Monster : public IBulletCollisionable {
 protected:
 	SharedObject* mObject = nullptr;
 
-	GLfloat mHP = 100.0f;
+	//GLfloat mHP = 100.0f;
+	GLfloat mHP = 1.0f;
 	GLfloat mRadius = 0.0f;
 	GLfloat mHeight = 0.0f;
 	GLfloat mSpeed = 0.0f;

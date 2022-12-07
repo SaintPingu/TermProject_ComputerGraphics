@@ -2,11 +2,13 @@
 #include "Wave.h"
 #include "Monster.h"
 #include "Map.h"
+#include "Turret.h"
 #include <random>
 
 
 extern MonsterManager* monsterManager;
 extern Map* crntMap;
+extern TurretManager* turretManager;
 
 WaveManager::WaveManager()
 {
@@ -29,8 +31,8 @@ GLvoid WaveManager::Start()
 	GLfloat mapTop = crntMap->GetTop();
 
 
-	const GLuint numOfBlooper = crntWave * 3;
-	const GLuint numOfEgg = crntWave * 3;
+	const GLuint numOfBlooper = crntWave * 1;
+	const GLuint numOfEgg = crntWave * 1;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -47,9 +49,16 @@ GLvoid WaveManager::Start()
 
 GLvoid WaveManager::Update()
 {
+	static GLfloat turret_x = 0.0f;
+
 	if (monsterManager->CheckEnemyEmpty())
 	{
 		crntWave++;
+		turret_x += 10;
+		// 포탑 지름 20.0f
+		turretManager->Create(glm::vec3(turret_x, 0, 100));
+		// player upgrade or Turret upgrade
+
 
 		WaveManager::Start();
 		cout << crntWave << endl;

@@ -5,6 +5,7 @@
 #include "Timer.h"
 #include "Map.h"
 #include "Gun.h"
+#include "Turret.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
@@ -311,6 +312,7 @@ GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint
 		mCrntState = new Walk(this);
 		break;
 	case State::Jump:
+		mHp -= 5;
 		mCrntState = new Jump(this);
 		break;
 	default:
@@ -424,7 +426,21 @@ glm::vec3 Player::GetPosition() const
 	return mObject->GetPosition();
 }
 
+GLfloat Player::GetHp() const
+{
+	return mHp;
+}
+
 GLint Player::GetAmmo() const
 {
 	return mGun->GetAmmo();
+}
+
+GLint Player::GetMaxAmmo() const
+{
+	return mGun->GetMaxAmmo();
+}
+GunType Player::GetGunType() const
+{
+	return mGun->GetGunType();
 }

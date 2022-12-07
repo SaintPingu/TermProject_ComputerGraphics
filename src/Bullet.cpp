@@ -11,7 +11,7 @@ GLvoid IBulletCollisionable::Destroy()
 };
 
 
-BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+BulletManager::Bullet::Bullet(const BulletType& type,const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
 {
 	switch (type)
 	{
@@ -21,6 +21,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		mVelocity = 300.0f;
 		mDamage = 10.0f;
 		break;
+
 	case BulletType::Particle_Explosion:
 		mWeight = 100.0f;
 		mRadius = 0.1f;
