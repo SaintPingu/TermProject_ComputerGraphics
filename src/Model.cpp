@@ -218,13 +218,17 @@ static Model* mapModel = new Model();
 static Model* cubeMapModel = new Model();
 static Model* paintModel = new Model();
 
+// monster
 static Model* blooperModel = new Model();
 static Model* eggModel = new Model();
 
+static Model* coreModel= new Model();
+
+// turret
 static Model* turretBodyModel = new Model();
 static Model* turretHeadModel = new Model();
 
-static GLuint textures[NUM_TEXTURE_MODEL];
+static GLuint textures[NUM_TEXTURE];
 
 unordered_map<Models, Model*> modelMap{
 	{Models::Plane, planeModel},
@@ -235,35 +239,49 @@ unordered_map<Models, Model*> modelMap{
 	{Models::Player, playerModel},
 	{Models::GuardTower, guardTowerModel},
 };
-unordered_map<TextureModels, Model*> textureModelMap{
-	{TextureModels::Gun, gunModel },
-	{TextureModels::Map, mapModel },
-	{TextureModels::CubeMap, cubeMapModel },
-	{TextureModels::Blooper, blooperModel},
-	{TextureModels::Egg, eggModel},
-	{TextureModels::Turret_Body, turretBodyModel },
-	{TextureModels::Turret_Head, turretHeadModel },
+unordered_map<Textures, Model*> textureModelMap{
+	{Textures::Gun, gunModel },
+	{Textures::Map, mapModel },
+	{Textures::CubeMap, cubeMapModel },
+	{Textures::Blooper, blooperModel},
+	{Textures::Egg, eggModel},
+	{Textures::Core, coreModel},
+	{Textures::Turret_Body, turretBodyModel },
+	{Textures::Turret_Head, turretHeadModel },
 };
-unordered_map<TextureModels, const GLchar*> textureMap{
-	{TextureModels::Gun, "gun.png" },
-	{TextureModels::Map, "map.png" },
-	{TextureModels::CubeMap, "cubemap.png" },
-	{TextureModels::Blooper, "blooper.png" },
-	{TextureModels::Egg, "egg.png" },
-	{TextureModels::Paint, "paint.png" },
-	{TextureModels::Paint2, "paint2.png" },
-	{TextureModels::Turret_Body, "turret_body.png" },
-	{TextureModels::Turret_Head, "turret_head.png" },
+unordered_map<Textures, const GLchar*> textureMap{
+	{Textures::Gun, "gun.png" },
+	{Textures::Map, "map.png" },
+	{Textures::CubeMap, "cubemap.png" },
+	{Textures::Blooper, "blooper.png" },
+	{Textures::Egg, "egg.png" },
+	{Textures::Core, "core.png" },
+	{Textures::Paint, "paint.png" },
+	{Textures::Paint2, "paint2.png" },
+	{Textures::Turret_Body, "turret_body.png" },
+	{Textures::Turret_Head, "turret_head.png" },
+	{Textures::UI_NUM_0, "ui_num_0.png" },
+	{Textures::UI_NUM_1, "ui_num_1.png" },
+	{Textures::UI_NUM_2, "ui_num_2.png" },
+	{Textures::UI_NUM_3, "ui_num_3.png" },
+	{Textures::UI_NUM_4, "ui_num_4.png" },
+	{Textures::UI_NUM_5, "ui_num_5.png" },
+	{Textures::UI_NUM_6, "ui_num_6.png" },
+	{Textures::UI_NUM_7, "ui_num_7.png" },
+	{Textures::UI_NUM_8, "ui_num_8.png" },
+	{Textures::UI_NUM_9, "ui_num_9.png" },
+	{Textures::UI_TEXT_HP, "ui_text_HP.png" },
 };
 
 /* Should be arrange by obj file size (faster) */
-enum class ObjList { Gun, Blooper, Egg, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, Turret_Body, Turret_Head, _count };
+enum class ObjList { Gun, Blooper, Egg, Core, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, Turret_Body, Turret_Head, _count };
 constexpr GLuint NUM_OBJ = static_cast<GLuint>(ObjList::_count);
 
 unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
 	{ObjList::Gun, make_pair(gunModel, "gun.obj")},
 	{ObjList::Blooper, make_pair(blooperModel, "blooper.obj")},
 	{ObjList::Egg, make_pair(eggModel, "egg.obj")},
+	{ObjList::Core, make_pair(coreModel, "core.obj")},
 	{ObjList::Player, make_pair(playerModel, "player.obj")},
 	{ObjList::GuardTower, make_pair(guardTowerModel, "guard_tower_test.obj")},
 	{ObjList::GeoSphere, make_pair(geoSphereModel, "geo_sphere.obj")},
@@ -292,7 +310,7 @@ GLvoid ImportObj(mutex& m, unordered_set<GLuint>& emptyCore, const GLuint& id, c
 typedef struct ImageData {
 	GLint width, height, numOfChannel;
 }ImageData;
-GLvoid ImportTextureData(mutex& m, unordered_set<GLuint>& emptyCore, const GLuint& id, const TextureModels& textureModel, ImageData& imageData, GLubyte*& data)
+GLvoid ImportTextureData(mutex& m, unordered_set<GLuint>& emptyCore, const GLuint& id, const Textures& textureModel, ImageData& imageData, GLubyte*& data)
 {
 	string path = "textures\\";
 	path += textureMap[textureModel];
@@ -373,15 +391,15 @@ GLvoid InitModels()
 		threads[id] = new thread(ref(ImportObj), ref(m), ref(emptyCore), id, obj);
 	}
 
+	/* Import texture */
 	stbi_set_flip_vertically_on_load(true);
 
-	glGenTextures(NUM_TEXTURE_MODEL, textures);
-	GLubyte* textureDataList[NUM_TEXTURE_MODEL];
-	ImageData imageDataList[NUM_TEXTURE_MODEL];
+	glGenTextures(NUM_TEXTURE, textures);
+	GLubyte* textureDataList[NUM_TEXTURE];
+	ImageData imageDataList[NUM_TEXTURE];
 
-	/* Import texture */
 	cout << "load textures..." << endl;
-	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
+	for (GLsizei i = 0; i < NUM_TEXTURE; ++i)
 	{
 		// find empty core id
 		GLuint id = -1;
@@ -397,7 +415,7 @@ GLvoid InitModels()
 		{
 			threads[id]->join();
 		}
-		TextureModels textureModel = static_cast<TextureModels>(i);
+		Textures textureModel = static_cast<Textures>(i);
 		threads[id] = new thread(ref(ImportTextureData), ref(m), ref(emptyCore), id, textureModel, ref(imageDataList[i]), ref(textureDataList[i]));
 	}
 
@@ -410,7 +428,7 @@ GLvoid InitModels()
 		}
 	}
 
-	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
+	for (GLsizei i = 0; i < NUM_TEXTURE; ++i)
 	{
 		GLubyte* data = textureDataList[i];
 		glBindTexture(GL_TEXTURE_2D, textures[i]);
@@ -425,10 +443,21 @@ GLvoid InitModels()
 		stbi_image_free(data);
 	}
 
-	textureModelMap[TextureModels::CubeMap] = cubeModel;
-	textureModelMap[TextureModels::CubeMap]->ReverseNormal();
-	textureModelMap[TextureModels::Paint] = planeModel;
-	textureModelMap[TextureModels::Paint2] = planeModel;
+	textureModelMap[Textures::CubeMap] = cubeModel;
+	textureModelMap[Textures::CubeMap]->ReverseNormal();
+	textureModelMap[Textures::Paint] = planeModel;
+	textureModelMap[Textures::Paint2] = planeModel;
+
+	for(GLint i=0;;++i)
+	{
+		GLint uiIndex = static_cast<GLint>(Textures::UI_NUM_0) + i;
+		Textures texture = static_cast<Textures>(uiIndex);
+		if (texture == Textures::_count)
+		{
+			break;
+		}
+		textureModelMap[texture] = planeModel;
+	}
 
 	auto duration = chrono::high_resolution_clock::now() - start;
 	cout << "Model loading time : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
@@ -441,18 +470,17 @@ const Model* GetModel(const Models& model)
 
 	return result;
 }
-const Model* GetTextureModel(const TextureModels& textureModel)
+const Model* GetTextureModel(const Textures& textureModel)
 {
 	const Model* result = textureModelMap[textureModel];
 	assert(result != nullptr);
 
 	return result;
 }
-GLuint GetTexture(const TextureModels& textureModel)
+GLuint GetTexture(const Textures& textureModel)
 {
 	return textures[static_cast<GLuint>(textureModel)];
 }
-
 
 
 
@@ -469,7 +497,7 @@ Cuboid* Model::GetCuboid(const glm::vec3* position, const glm::vec3* scale) cons
 }
 
 
-const GLchar* GetTexturePath(const TextureModels& textureModel)
+const GLchar* GetTexturePath(const Textures& textureModel)
 {
 	return textureMap[textureModel];
 }

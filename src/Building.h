@@ -4,7 +4,7 @@
 
 class SharedObject;
 
-enum class BuildingType { GuardTower };
+enum class BuildingType { Core };
 
 class BuildingManager {
 private:

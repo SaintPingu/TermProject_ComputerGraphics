@@ -72,6 +72,9 @@
     <ClInclude Include="src\Wave.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\UI.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Object.cpp">
@@ -129,6 +132,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\Wave.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

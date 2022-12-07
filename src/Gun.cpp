@@ -6,7 +6,7 @@
 
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
-	mObject = new SharedObject(GetIdentityTextureObject(TextureModels::Gun));
+	mObject = new SharedObject(GetIdentityTextureObject(Textures::Gun));
 
 	mObject->SetPivot(pivot);
 	mObject->SetPosition(gunPosition);
@@ -17,6 +17,7 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 
 GLvoid Gun::Update()
 {
+
 	if (mIsFire == false)
 	{
 		return;
@@ -28,7 +29,16 @@ GLvoid Gun::Update()
 		return;
 	}
 
+	if (mAmmo >= 0) mAmmo--;
+	else {
+		cout << "ÃÑ¾Ë ºÎÁ·" << endl;
+		mAmmo = 60;
+	}
+
+
 	mCrntDelay = 0.0f;
+
+	// ----------------------------------
 	extern BulletManager* bulletManager;
 	glm::vec3 origin = { 0, 9, 0 };
 	glm::vec3 bulletPos = { 0, 9, 38 };

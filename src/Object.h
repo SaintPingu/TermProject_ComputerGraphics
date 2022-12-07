@@ -203,7 +203,7 @@ public:
 	GLvoid InitBuffers();
 	GLvoid BindBuffers();
 	GLvoid DeleteBuffers();
-	GLvoid SetTexture(const TextureModels& textureModel);
+	GLvoid SetTexture(const Textures& textureModel);
 
 	// 현재 사용 X //
 	GLfloat GetWidth() const override;
@@ -461,7 +461,7 @@ public:
 GLvoid InitObject();
 const LineObject* GetIdentityLine();
 const ModelObject* GetIdentityModelObject(const Models& model);
-const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel);
+const ModelObject* GetIdentityTextureObject(const Textures& textureModel);
 
 
 
