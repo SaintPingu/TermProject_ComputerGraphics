@@ -50,6 +50,8 @@ GLvoid WaveManager::Update()
 	if (monsterManager->CheckEnemyEmpty())
 	{
 		crntWave++;
+
 		WaveManager::Start();
+		cout << crntWave << endl;
 	}
 }
