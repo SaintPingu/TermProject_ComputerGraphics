@@ -3,17 +3,16 @@
 #include "Building.h"
 #include "Bullet.h"
 
-unordered_map<BuildingType, Models> modelMap{
-	{BuildingType::GuardTower, Models::GuardTower}
+unordered_map<BuildingType, Textures> modelMap{
+	{BuildingType::Core, Textures::Core}
 };
 
 BuildingManager::Building::Building(const BuildingType& type, const glm::vec3& position, const glm::vec3 look)
 {
 	mCollisionType = CollisionType::Rect;
-	mObject = new SharedObject(GetIdentityModelObject(modelMap[type]));
+	mObject = new SharedObject(GetIdentityTextureObject(modelMap[type]));
 	mObject->SetPosition(position);
 	mObject->SetLook(look);
-	mObject->SetColor(WOOD);
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
@@ -41,7 +40,10 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 	{
 		GLrect rect = mObject->GetRect();
 		const glm::vec2 bulletCenter = { bullet.crntPos.x, bullet.crntPos.z };
-		if (::CheckCollision(rect, bulletCenter, bullet.radius) == GL_TRUE && bullet.crntPos.y - bullet.radius <= mObject->GetTransformedPos().y + mObject->GetHeight())
+		GLfloat transformedPosY = mObject->GetTransformedPos().y;
+		if (::CheckCollision(rect, bulletCenter, bullet.radius) == GL_TRUE &&
+			bullet.crntPos.y - bullet.radius <= transformedPosY + mObject->GetHeight() &&
+			bullet.crntPos.y + bullet.radius >= transformedPosY)
 		{
 			const glm::vec2 prevBulletCenter = { bullet.prevPos.x, bullet.prevPos.z };
 
@@ -82,9 +84,17 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 				}
 			}
 
-			/* upside */
-			hitPoint = { bullet.prevPos.x, mObject->GetHeight(), bullet.prevPos.z };
-			normal = Vector3::Up();
+			/* up-down side */
+			if (bullet.prevPos.y > bullet.crntPos.y)
+			{
+				hitPoint = { bullet.prevPos.x, transformedPosY + mObject->GetHeight(), bullet.prevPos.z };
+				normal = Vector3::Up();
+			}
+			else
+			{
+				hitPoint = { bullet.prevPos.x, transformedPosY, bullet.prevPos.z };
+				normal = Vector3::Down();
+			}
 			return true;
 		}
 	}

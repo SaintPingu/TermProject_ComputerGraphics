@@ -423,3 +423,8 @@ glm::vec3 Player::GetPosition() const
 {
 	return mObject->GetPosition();
 }
+
+GLint Player::GetAmmo() const
+{
+	return mGun->GetAmmo();
+}

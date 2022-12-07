@@ -152,4 +152,5 @@ public:
 	{
 		return mTpCamera;
 	}
+	GLint GetAmmo() const;
 };

@@ -149,7 +149,7 @@ GLvoid Object::Look(const glm::vec3& point)
 GLvoid Object::SetLook(const glm::vec3& look)
 {
 	mLook = look;
-	if (look.y == 1.0f)
+	if (look.y == 1.0f || look.y == -1.0f)
 	{
 		// vector cross 시 0이 되는 문제 해결 (nan)
 		mLook = glm::normalize(mLook + 0.00001f);
@@ -499,7 +499,7 @@ GLvoid IdentityObject::BindBuffers()
 
 	glBindVertexArray(0);
 }
-GLvoid IdentityObject::SetTexture(const TextureModels& textureModel)
+GLvoid IdentityObject::SetTexture(const Textures& textureModel)
 {
 	mTexture = ::GetTexture(textureModel);
 }
@@ -509,11 +509,11 @@ GLvoid IdentityObject::Draw() const
 	ShaderObject::PrepareDraw();
 	const size_t indexCount = GetIndexCount();
 
-	glBindVertexArray(mVAO);
 	if (mShader == Shader::Texture || mShader == Shader::Back)
 	{
 		glBindTexture(GL_TEXTURE_2D, mTexture);
 	}
+	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
@@ -1312,10 +1312,10 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-PaintPlane::PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(TextureModels::Paint), Shader::Texture)
+PaintPlane::PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(Textures::Paint), Shader::Texture)
 {
 	GLuint randPaint = rand() % NUM_PAINT;
-	SetTexture(static_cast<TextureModels>(static_cast<GLuint>(TextureModels::Paint) + randPaint));
+	SetTexture(static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint));
 
 	SetPosition(pos);
 	SetColor(color);
@@ -1365,7 +1365,7 @@ GLboolean PaintPlane::Update()
 static const LineObject* lineObject = nullptr;
 
 static ModelObject* modelObjects[NUM_MODEL];
-static ModelObject* textureModelObjects[NUM_TEXTURE_MODEL];
+static ModelObject* textureModelObjects[NUM_TEXTURE];
 
 GLvoid InitObject()
 {
@@ -1377,9 +1377,9 @@ GLvoid InitObject()
 		modelObjects[i] = new ModelObject(model, Shader::Light);
 	}
 
-	for (GLsizei i = 0; i < NUM_TEXTURE_MODEL; ++i)
+	for (GLsizei i = 0; i < NUM_TEXTURE; ++i)
 	{
-		TextureModels textureModel = static_cast<TextureModels>(i);
+		Textures textureModel = static_cast<Textures>(i);
 		const Model* model = GetTextureModel(textureModel);
 		textureModelObjects[i] = new ModelObject(model, Shader::Texture);
 		textureModelObjects[i]->SetTexture(textureModel);
@@ -1393,7 +1393,7 @@ const ModelObject* GetIdentityModelObject(const Models& model)
 {
 	return modelObjects[static_cast<GLint>(model)];
 }
-const ModelObject* GetIdentityTextureObject(const TextureModels& textureModel)
+const ModelObject* GetIdentityTextureObject(const Textures& textureModel)
 {
 	return textureModelObjects[static_cast<GLint>(textureModel)];
 }
@@ -1491,7 +1491,6 @@ GLvoid DrawObjects(const Shader& shader)
 GLvoid DrawBlendObjects()
 {
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	extern const Camera* crntCamera;
 	glm::vec3 cameraPos = crntCamera->GetPosition();

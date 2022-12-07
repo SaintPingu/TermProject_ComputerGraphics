@@ -4,8 +4,8 @@
 
 Map::Map()
 {
-	mMapObject = new ModelObject(GetTextureModel(TextureModels::Map), Shader::Texture);
-	mMapObject->SetTexture(TextureModels::Map);
+	mMapObject = new ModelObject(GetTextureModel(Textures::Map), Shader::Texture);
+	mMapObject->SetTexture(Textures::Map);
 	AddObject(Shader::Texture, mMapObject);
 
 	set<glm::vec2, CompareSet> boundingMap = mMapObject->GetBoundings_XZ();

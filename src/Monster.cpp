@@ -6,9 +6,9 @@
 
 extern BulletManager* bulletManager;
 
-unordered_map<MonsterType, TextureModels> modelMap{
-	{MonsterType::Blooper, TextureModels::Blooper},
-	{MonsterType::Egg, TextureModels::Egg},
+unordered_map<MonsterType, Textures> modelMap{
+	{MonsterType::Blooper, Textures::Blooper},
+	{MonsterType::Egg, Textures::Egg},
 };
 
 Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)

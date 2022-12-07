@@ -11,8 +11,8 @@ extern BulletManager* bulletManager;
 
 TurretManager::Turret::Turret(const glm::vec3& position)
 {
-	mObject_Body = new SharedObject(GetIdentityTextureObject(TextureModels::Turret_Body));
-	mObject_Head = new SharedObject(GetIdentityTextureObject(TextureModels::Turret_Head));
+	mObject_Body = new SharedObject(GetIdentityTextureObject(Textures::Turret_Body));
+	mObject_Head = new SharedObject(GetIdentityTextureObject(Textures::Turret_Head));
 	mObject_Body->SetPosition(position);
 	mObject_Head->SetPosition(position);
 	mObject_Head->MoveY(10, false);

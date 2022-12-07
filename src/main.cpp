@@ -14,6 +14,7 @@
 #include "Turret.h"
 #include "Sound.h"
 #include "Wave.h"
+#include "UI.h"
 
 const Camera* crntCamera = nullptr;
 Camera* cameraMain = nullptr;
@@ -57,6 +58,7 @@ BuildingManager* buildingManager = nullptr;
 TurretManager* turretManager = nullptr;
 SoundManager* soundManager = nullptr;
 WaveManager* waveManager = nullptr;
+UIManager* uiManager = nullptr;
 
 // objects
 Map* crntMap = nullptr;
@@ -88,6 +90,7 @@ GLint main(GLint argc, GLchar** argv)
 	glutInitWindowSize(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 	glShadeModel(GL_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glutCreateWindow("TestProject");
 
 	glewExperimental = GL_TRUE;
@@ -168,8 +171,9 @@ GLvoid InitMeshes()
 	turretManager = new TurretManager();
 	soundManager = new SoundManager();
 	waveManager = new WaveManager();
+	uiManager = new UIManager();
 
-	buildingManager->Create(BuildingType::GuardTower, { -100, 0, -100 });
+	buildingManager->Create(BuildingType::Core, { 0, 0, 400 });
 	turretManager->Create({ 0, 0, 100 });
 
 	//********** [ Coordinate system lines ] **********//
@@ -200,9 +204,9 @@ GLvoid InitMeshes()
 	//**************************************************//
 	
 	// test object
-	const Model* cubeMapModel = GetTextureModel(TextureModels::CubeMap);
+	const Model* cubeMapModel = GetTextureModel(Textures::CubeMap);
 	cubeMap = new ModelObject(cubeMapModel, Shader::Texture);
-	cubeMap->SetTexture(TextureModels::CubeMap);
+	cubeMap->SetTexture(Textures::CubeMap);
 	cubeMap->Scale(150);
 	cubeMap->SetPosY(-cubeMap->GetHeight() / 2);
 
@@ -212,6 +216,7 @@ GLvoid InitMeshes()
 
 	crntMap = new Map();
 	player = new Player({ 0,0,0 }, &cameraMode);
+	uiManager->SetPlayer(player);
 	monsterManager->SetPlayer(player);
 
 }
@@ -313,7 +318,6 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	bulletManager->Draw();
-	buildingManager->Draw();
 		
 	if (player != nullptr)
 	{
@@ -331,12 +335,16 @@ GLvoid DrawScene()
 	DrawObjects(crntShader);
 	turretManager->Draw();
 	monsterManager->Draw();
+	buildingManager->Draw();
 
 	glCullFace(GL_FRONT);
 	cubeMap->Draw();
 	glCullFace(GL_BACK);
 
 	DrawBlendObjects();
+
+	shd::Use(Shader::Back);
+	uiManager->Draw();
 
 	glBindVertexArray(0);
 	glutSwapBuffers();
