@@ -11,7 +11,10 @@
 #include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
+<<<<<<< wave_test
+=======
 extern BuildingManager* buildingManager;
+>>>>>>> main
 
 using namespace playerState;
 
@@ -429,4 +432,16 @@ glm::vec3 Player::GetPosition() const
 GLint Player::GetAmmo() const
 {
 	return mGun->GetAmmo();
+<<<<<<< wave_test
+}
+
+GLint Player::GetMaxAmmo() const
+{
+	return mGun->GetMaxAmmo();
+}
+GunType Player::GetGunType() const
+{
+	return mGun->GetGunType();
+=======
+>>>>>>> main
 }
