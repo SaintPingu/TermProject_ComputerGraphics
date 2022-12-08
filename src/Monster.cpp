@@ -3,21 +3,51 @@
 #include "Object.h"
 #include "Player.h"
 #include "Timer.h"
+#include "Building.h"
 
 extern BulletManager* bulletManager;
+extern BuildingManager* buildingManager;
 
 unordered_map<MonsterType, Textures> modelMap{
 	{MonsterType::Blooper, Textures::Blooper},
 	{MonsterType::Egg, Textures::Egg},
+	{MonsterType::Koromon, Textures::Koromon},
 };
 
 Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 {
+	if (modelMap.find(monsterType) == modelMap.end())
+	{
+		assert(0);
+	}
+
 	mCollisionType = CollisionType::Circle;
 
 	const ModelObject* modelObject = GetIdentityTextureObject(modelMap[monsterType]);
 	mObject = new SharedObject(modelObject);
 	mObject->SetPosition(position);
+
+	switch (monsterType)
+	{
+	case MonsterType::Blooper:
+		mHP = 100.0f;
+		mSpeed = 30.0f;
+		mDetectRadius = 200.0f;
+		break;
+	case MonsterType::Egg:
+		mHP = 50.0f;
+		mSpeed = 40.0f;
+		mDetectRadius = 100.0f;
+		break;
+	case MonsterType::Koromon:
+		mHP = 150.0f;
+		mSpeed = 150.0f;
+		mDetectRadius = 150.0f;
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 	GLfloat modelWidth = modelObject->GetWidth();
 	GLfloat modelDepth = modelObject->GetDepth();
@@ -26,12 +56,11 @@ Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 	(modelWidth > modelDepth) ? mRadius = modelWidth : mRadius = modelDepth;
 	mRadius /= 2;
 
-	mSpeed = 30.0f;
 
 	bulletManager->AddCollisionObject(this);
 }
 
-GLvoid Monster::Update(const glm::vec3* target)
+GLvoid Monster::Look(const glm::vec3* target)
 {
 	glm::vec3 monsterPos = mObject->GetPosition();
 	glm::vec3 v = { target->x, monsterPos.y, target->z };
@@ -39,7 +68,10 @@ GLvoid Monster::Update(const glm::vec3* target)
 
 	glm::vec3 look = glm::normalize(v - u);
 	mObject->SetLook(look);
-
+}
+GLvoid Monster::Update(const glm::vec3* target)
+{
+	Look(target);
 	mObject->MoveZ(mSpeed);
 }
 GLvoid Monster::Draw() const
@@ -57,7 +89,7 @@ GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitP
 		if (::CheckCollision(monsterPos, bullet.crntPos, mRadius, bullet.radius, mHeight) == GL_TRUE)
 		{
 			GetDamage(bullet.damage);
-			return true;
+			return GL_TRUE;
 		}
 	}
 	break;
@@ -66,7 +98,7 @@ GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitP
 		break;
 	}
 
-	return false;
+	return GL_FALSE;
 }
 glm::vec3 Monster::GetPosition() const
 {
@@ -147,21 +179,69 @@ GLvoid Egg::Update(const glm::vec3* target)
 }
 
 
+Koromon::Koromon(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
+{
+	mExplosionColor = PINK;
+}
+GLvoid Koromon::Update(const glm::vec3* target)
+{
+	mCrntDelay += timer::DeltaTime();
+	if (mCrntDelay < mJumpDelay)
+	{
+		return;
+	}
+
+	mCrntJumpTime += timer::DeltaTime();
+	if (mCrntJumpTime > mJumpTime)
+	{
+		mCrntDelay = 0;
+		mCrntJumpTime = 0;
+		mObject->SetPosY(0.0f);
+		return;
+	}
+
+	constexpr GLfloat yaw = 30.0f;
+	constexpr GLfloat weight = 45.0f;
+	GLfloat t = mCrntJumpTime;
+
+	Look(target);
+
+	const GLfloat mAngleY = sin(DEGREE_TO_RADIAN(yaw));
+	const GLfloat mAngleZ = cos(DEGREE_TO_RADIAN(yaw));
+
+	mObject->MoveZ(mSpeed * mAngleZ);
+	mObject->MoveY(mSpeed * mAngleY - (0.5f * GRAVITY * t * t * weight));
+}
 
 
 
 
-const glm::vec3* MonsterManager::FindTargetPos(const glm::vec3& monsterPos) const
+const glm::vec3* MonsterManager::FindTargetPos(const glm::vec3& monsterPos, const GLfloat& radius) const
 {
 	const glm::vec3* target = nullptr;
+	const glm::vec3* corePos = buildingManager->GetCorePos();
 
-	glm::vec2 playerCenter = { mPlayer->GetPosition().x , mPlayer->GetPosition().z };
+	glm::vec2 playerCenter = ConvertVec2(mPlayer->GetPosition());
+	glm::vec2 coreCenter = ConvertVec2(*corePos);
 	glm::vec2 monsterCenter = { monsterPos.x, monsterPos.z };
-	GLfloat minDistance = glm::length(playerCenter - monsterCenter);
+	GLfloat distanceToPlayer = glm::length(playerCenter - monsterCenter);
+	GLfloat distanceToCore = glm::length(coreCenter - monsterCenter);
 
-
-
-	target = mPlayer->GetRefPos();
+	if (distanceToPlayer < radius)
+	{
+		if (distanceToPlayer < distanceToCore)
+		{
+			target = mPlayer->GetRefPos();
+		}
+		else
+		{
+			target = buildingManager->GetCorePos();
+		}
+	}
+	else
+	{
+		target = buildingManager->GetCorePos();
+	}
 
 	return target;
 }
@@ -189,6 +269,9 @@ GLvoid MonsterManager::Create(const MonsterType& monsterType, const glm::vec3& p
 	case MonsterType::Egg:
 		monster = new Egg(monsterType, position);
 		break;
+	case MonsterType::Koromon:
+		monster = new Koromon(monsterType, position);
+		break;
 	default:
 		assert(0);
 		break;
@@ -207,7 +290,7 @@ GLvoid MonsterManager::Update()
 		}
 		else
 		{
-			const glm::vec3* target = FindTargetPos(monster->GetPosition());
+			const glm::vec3* target = FindTargetPos(monster->GetPosition(), monster->GetDetectRadius());
 			monster->Update(target);
 
 
@@ -245,18 +328,12 @@ GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const G
 
 	if (min >= radius)
 	{
-		return false;
+		return GL_FALSE;
 	}
 
-	return true;
+	return GL_TRUE;
 }
 
 GLvoid MonsterManager::CheckPlayerCollision(const Monster* monster)
 {
-}
-
-
-bool MonsterManager::CheckEnemyEmpty()
-{
-	return mMonsterList.empty();
 }

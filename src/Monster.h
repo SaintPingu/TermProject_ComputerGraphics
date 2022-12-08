@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
 
-enum class MonsterType { Blooper, Egg };
+enum class MonsterType { Blooper, Egg, Koromon };
 
 class Player;
 class SharedObject;
@@ -11,11 +11,11 @@ class Monster : public IBulletCollisionable {
 protected:
 	SharedObject* mObject = nullptr;
 
-	//GLfloat mHP = 100.0f;
-	GLfloat mHP = 1.0f;
+	GLfloat mHP = 100.0f;
 	GLfloat mRadius = 0.0f;
 	GLfloat mHeight = 0.0f;
 	GLfloat mSpeed = 0.0f;
+	GLfloat mDetectRadius = 0.0f;
 	CollisionType mCollisionType = CollisionType::None;
 	COLORREF mExplosionColor = WHITE;
 
@@ -27,6 +27,7 @@ public:
 	Monster(const MonsterType& monsterType, const glm::vec3& position);
 
 	virtual GLvoid Update(const glm::vec3* target);
+	virtual GLvoid Look(const glm::vec3* target);
 	GLvoid Draw() const;
 
 	GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
@@ -34,6 +35,8 @@ public:
 	glm::vec3 GetCenter() const;
 
 	GLvoid GetDamage(const GLfloat& damage);
+
+	inline constexpr GLfloat GetDetectRadius() const { return mDetectRadius; }
 };
 
 class Floatable abstract {
@@ -64,6 +67,16 @@ public:
 	GLvoid Update(const glm::vec3* target) override;
 };
 
+class Koromon : public Monster {
+private:
+	const GLfloat mJumpDelay = 2.0f;
+	const GLfloat mJumpTime = 1.0f;
+	GLfloat mCrntJumpTime = 0.0f;
+	GLfloat mCrntDelay = 0.0f;
+public:
+	Koromon(const MonsterType& monsterType, const glm::vec3& position);
+	GLvoid Update(const glm::vec3* target) override;
+};
 
 
 
@@ -72,8 +85,7 @@ private:
 	vector<Monster*> mMonsterList;
 	Player* mPlayer = nullptr;
 
-	const glm::vec3* FindTargetPos(const glm::vec3& monsterPos) const;
-
+	const glm::vec3* FindTargetPos(const glm::vec3& monsterPos, const GLfloat& radius) const;
 public:
 	MonsterManager();
 	~MonsterManager();
@@ -83,5 +95,4 @@ public:
 	GLvoid SetPlayer(Player* player);
 	GLboolean GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const;
 	GLvoid CheckPlayerCollision(const Monster* monster);
-	bool CheckEnemyEmpty();
 };
