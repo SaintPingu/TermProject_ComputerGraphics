@@ -11,7 +11,6 @@
 #include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
-extern TurretManager* turretManager;
 
 using namespace playerState;
 
@@ -19,8 +18,6 @@ using namespace playerState;
 const set<GLint> movFB = { 'w', 'W', 's', 'S' };
 const set<GLint> movLR = { 'a', 'A', 'd', 'D' };
 const set<GLint> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
-
-const set<GLint> actKeys = {'r','R'}; // 액션또는 스킬 키 할당. r & R : 포탑 설치
 
 ////////////////////////////// [ State ] //////////////////////////////
 /********** [ IDLE ] **********/
@@ -376,7 +373,6 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 		{
 			mGun->StopFire();
 		}
-		
 		break;
 	}
 }
@@ -447,14 +443,4 @@ GLint Player::GetMaxAmmo() const
 GunType Player::GetGunType() const
 {
 	return mGun->GetGunType();
-}
-
-GLvoid Player::add_HoldTurret(GLint add_tullet_num)
-{
-	this->mHoldTurret += add_tullet_num;
-}
-
-GLvoid Player::install_Turret()
-{
-	turretManager->Create(glm::vec3(0,0,0)); // 나중에 플레이어 현재 위치로 수정
 }

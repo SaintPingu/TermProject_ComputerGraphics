@@ -15,8 +15,6 @@ class Player;
 class Circle;
 class Gun;
 
-class Shotgun;
-
 enum class GunType;
 
 namespace playerState {
@@ -83,7 +81,6 @@ private:
 	// childs
 	SharedObject* mObject = nullptr;
 	Gun* mGun = nullptr;
-	Shotgun* mShotGun = nullptr;
 
 	// camera
 	const CameraMode* mCameraMode = nullptr;
@@ -96,7 +93,7 @@ private:
 	GLfloat mHp = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
-	GLint mHoldTurret = 0;
+	GLfloat mHoldTurret = 0;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -108,10 +105,6 @@ private:
 	// rotation
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
-
-
-	// item?
-	
 
 public:
 	Player(const glm::vec3& position, const CameraMode* cameraMode);
@@ -164,7 +157,7 @@ public:
 	}
 
 	// Set
-	GLvoid add_HoldTurret(GLint addTurret);
+	GLvoid SetHoldTurret(GLint addTurret);
 
 
 	// Get information
@@ -172,8 +165,4 @@ public:
 	GLint GetAmmo() const;
 	GLint GetMaxAmmo() const;
 	GunType GetGunType() const;
-
-
-	// Action...?
-	GLvoid install_Turret();
 };
