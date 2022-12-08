@@ -2,19 +2,21 @@
 #include "stdafx.h"
 
 class Cuboid;
-enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, GuardTower, _count };
+enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, _count };
 enum class Textures { 
 	Gun,
 	Map,
 	CubeMap,
 	Blooper,
 	Egg,
+	Koromon,
 	Core,
 	Turret_Body,
 	Turret_Head,
 	Paint,
 	Paint2,
 	/* must be ui */
+	Coin,
 	UI_NUM_0,
 	UI_NUM_1,
 	UI_NUM_2,
@@ -26,11 +28,6 @@ enum class Textures {
 	UI_NUM_8,
 	UI_NUM_9,
 	UI_TEXT_HP,
-	UI_TEXT_SLASH,
-	UI_COLOR_HP,
-	UI_SHOTGUN_SYMBOL,
-	UI_LAUNCHER_SYMBOL,
-	UI_SNIPER_SYMBOL,
 	_count
 };
 constexpr GLuint NUM_MODEL = static_cast<GLuint>(Models::_count);

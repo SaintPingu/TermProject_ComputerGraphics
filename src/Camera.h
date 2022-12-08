@@ -7,7 +7,7 @@
 class Camera : public Object{
 private:
 	GLfloat mFovY = 45.0f;
-	GLboolean mIsPersp = true;
+	GLboolean mIsPersp = GL_TRUE;
 	GLfloat mSpeed = DEFAULT_CAMERA_SPEED;
 public:
 

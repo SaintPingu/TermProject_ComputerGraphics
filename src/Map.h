@@ -8,6 +8,7 @@ class Circle;
 class Map : public IBulletCollisionable {
 private:
 	ModelObject* mMapObject;
+	SharedObject* mCoins = nullptr;
 
 	glm::vec2 mLeftTop = { 0,0 };
 	glm::vec2 mLeftBottom = {0,0};
