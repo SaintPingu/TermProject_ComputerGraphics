@@ -35,7 +35,9 @@ private:
 		GLfloat mDamage = 0.0f;
 
 		/* 이전 좌표값 */
-		glm::vec3 mPrevPos = { 0,0,0 };
+		glm::vec3 mPrevPos = glm::vec3(0, 0, 0);
+		/* 시작 좌표값 */
+		glm::vec3 mOrigin = glm::vec3(0, 0, 0);
 
 		/* 발사 후 경과한 시간 */
 		GLfloat mT = 0.0f;
@@ -43,6 +45,7 @@ private:
 		/* 탄퍼짐 */
 		GLint mSpreadAmount = 2;
 
+		GLfloat mAngleX = 0.0f;
 		GLfloat mAngleY = 0.0f;
 		GLfloat mAngleZ = 0.0f;
 		GLfloat mVelocity = 0.0f;

@@ -1,14 +1,9 @@
 .vs/CG_TermProject/v16/ipch/
 Debug/
 .vs/CG_TermProject/v16/Browse.VC.opendb
-<<<<<<< HEAD
-.vs/CG_TermProject/FileContentIndex/1f048aae-28ab-4640-85c8-922defc3914c.vsidx
-.vs/CG_TermProject/FileContentIndex/d1bc164d-87b0-4690-ad24-11fb61162f86.vsidx
-=======
 .vs/CG_TermProject/FileContentIndex/9e84662d-52ce-4ab2-b8e3-43a9954478b7.vsidx
 .vs/CG_TermProject/FileContentIndex/b8626c04-7383-4bf9-bbf5-95eb77ce7534.vsidx
 .vs/CG_TermProject/FileContentIndex/ebb4b863-2f9a-4899-8edd-0a11e84c7a78.vsidx
->>>>>>> main
 .vs/CG_TermProject/FileContentIndex/read.lock
 .vs/CG_TermProject/v17/.suo
 .vs/CG_TermProject/v17/Browse.VC.db
@@ -16,6 +11,12 @@ Debug/
 .vs/CG_TermProject/v17/Browse.VC.db-wal
 .vs/CG_TermProject/v17/Browse.VC.opendb
 .vs/CG_TermProject/v17/ipch/b714252f4eef6eb0.ipch
+<<<<<<< wave_test
 .vs/CG_TermProject/FileContentIndex/06535c15-0bdb-44d8-80af-1ad8b505f73f.vsidx
 .vs/CG_TermProject/FileContentIndex/16c74d65-6d57-43c5-8318-ce3573adc411.vsidx
 .vs/CG_TermProject/FileContentIndex/d9f1f2d0-cb31-44f9-8272-142fd7c23b79.vsidx
+=======
+.vs/CG_TermProject/FileContentIndex/08a9a857-2a30-41d4-abdf-829887439e5f.vsidx
+.vs/CG_TermProject/FileContentIndex/84399f2c-9206-47fc-a8ac-15d5f2ab72c4.vsidx
+.vs/CG_TermProject/FileContentIndex/d8a16137-8858-499f-a66c-9912479d2f21.vsidx
+>>>>>>> main
