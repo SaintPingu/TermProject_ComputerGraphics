@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Building.h"
+#include "Bullet.h"
 
 unordered_map<BuildingType, Textures> modelMap{
 	{BuildingType::Core, Textures::Core}
@@ -13,15 +14,6 @@ BuildingManager::Building::Building(const BuildingType& type, const glm::vec3& p
 	mObject->SetPosition(position);
 	mObject->SetLook(look);
 
-	mRect = mObject->GetRect();
-	mCenter = mRect.GetCenter();
-	mRadius = mRect.GetRadius();
-
-	if (type == BuildingType::Core)
-	{
-		AddBlendObject(mObject);
-	}
-
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
 }
@@ -32,6 +24,7 @@ BuildingManager::Building::~Building()
 
 GLvoid BuildingManager::Building::Draw() const
 {
+	mObject->Draw();
 }
 
 GLvoid BuildingManager::Building::Update()
@@ -39,36 +32,6 @@ GLvoid BuildingManager::Building::Update()
 
 }
 
-
-GLboolean BuildingManager::Building::CheckCollision(const Circle* boundingCircle) const
-{
-	glm::vec2 targetCenter = boundingCircle->GetCenter();
-	GLfloat targetRadius = boundingCircle->GetRadius();
-
-	if (::CheckCollision(mCenter, targetCenter, mRadius, targetRadius) == GL_FALSE)
-	{
-		return GL_FALSE;
-	}
-
-	if (targetCenter.x + targetRadius < mRect.left)
-	{
-		return GL_FALSE;
-	}
-	if (targetCenter.x - targetRadius > mRect.right)
-	{
-		return GL_FALSE;
-	}
-	if (targetCenter.y + targetRadius < mRect.top)
-	{
-		return GL_FALSE;
-	}
-	if (targetCenter.y - targetRadius > mRect.bottom)
-	{
-		return GL_FALSE;
-	}
-
-	return GL_TRUE;
-}
 GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch(mCollisionType)
@@ -96,7 +59,7 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 			lines.emplace_back(Line(rightTop, leftTop));
 			for (const Line& line : lines)
 			{
-				if (::CheckCollision(line.v, line.u, prevBulletCenter, bulletCenter) == GL_TRUE)
+				if (CheckCollision(line.v, line.u, prevBulletCenter, bulletCenter) == GL_TRUE)
 				{
 					glm::vec2 point = GetLineIntersection(line.v, line.u, prevBulletCenter, bulletCenter);
 					hitPoint = { point.x, bullet.prevPos.y, point.y };
@@ -117,22 +80,22 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 						normal = Vector3::Back();
 					}
 
-					return GL_TRUE;
+					return true;
 				}
 			}
 
 			/* up-down side */
-			if (bullet.prevPos.y > transformedPosY + mObject->GetHeight())
+			if (bullet.prevPos.y > bullet.crntPos.y)
 			{
 				hitPoint = { bullet.prevPos.x, transformedPosY + mObject->GetHeight(), bullet.prevPos.z };
 				normal = Vector3::Up();
 			}
-			else if (bullet.prevPos.y < transformedPosY)
+			else
 			{
 				hitPoint = { bullet.prevPos.x, transformedPosY, bullet.prevPos.z };
 				normal = Vector3::Down();
 			}
-			return GL_TRUE;
+			return true;
 		}
 	}
 		break;
@@ -141,7 +104,7 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 		break;
 	}
 
-	return GL_FALSE;
+	return false;
 }
 
 
@@ -177,22 +140,8 @@ GLvoid BuildingManager::Create(const BuildingType& type, const glm::vec3& positi
 {
 	Building* building = new Building(type, position, look);
 	buildings.emplace_back(building);
-
-	if (type == BuildingType::Core)
-	{
-		mCorePos = building->GetBuildingObject()->GetRefPos();
-	}
 }
-
-GLboolean BuildingManager::CheckCollision(const Circle* boundingCircle) const
-{
-	for (const Building* building : buildings)
-	{
-		if (building->CheckCollision(boundingCircle) == GL_TRUE)
-		{
-			return GL_TRUE;
-		}
-	}
-
-	return GL_FALSE;
-}
+//vector<const SharedObject*> BuildingManager::GetBuilngObjects() const
+//{
+//	for()
+//}

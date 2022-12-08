@@ -11,7 +11,7 @@ GLvoid IBulletCollisionable::Destroy()
 };
 
 
-BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+BulletManager::Bullet::Bullet(const BulletType& type,const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
 {
 	switch (type)
 	{
@@ -21,6 +21,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		mVelocity = 300.0f;
 		mDamage = 10.0f;
 		break;
+
 	case BulletType::Particle_Explosion:
 		mWeight = 100.0f;
 		mRadius = 0.1f;
@@ -148,11 +149,7 @@ GLvoid BulletManager::Update()
 				/* create paint */
 				if (normal.x != NO_NORMAL)
 				{
-					GLuint randPaint = rand() % NUM_PAINT;
-					Textures texture = static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint);
-					const IdentityObject* object = GetIdentityTextureObject(texture);
-
-					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
+					PaintPlane* plane = new PaintPlane(bullet->GetColor(), hitPoint, normal);
 					mPaints.emplace_back(plane);
 				}
 
@@ -174,7 +171,7 @@ GLvoid BulletManager::Update()
 	for (auto iter = mPaints.begin(); iter != mPaints.end();)
 	{
 		PaintPlane* paint = *iter;
-		if (paint->Update() == GL_FALSE)
+		if (paint->Update() == false)
 		{
 			delete paint;
 			iter = mPaints.erase(iter);

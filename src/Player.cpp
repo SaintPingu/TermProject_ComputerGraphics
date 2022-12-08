@@ -5,13 +5,13 @@
 #include "Timer.h"
 #include "Map.h"
 #include "Gun.h"
-#include "Building.h"
+#include "Turret.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
-extern BuildingManager* buildingManager;
+extern TurretManager* turretManager;
 
 using namespace playerState;
 
@@ -19,6 +19,8 @@ using namespace playerState;
 const set<GLint> movFB = { 'w', 'W', 's', 'S' };
 const set<GLint> movLR = { 'a', 'A', 'd', 'D' };
 const set<GLint> movKeys = { 'w', 'W', 's', 'S', 'a', 'A', 's', 'S', 'd', 'D' };
+
+const set<GLint> actKeys = {'r','R'}; // 액션또는 스킬 키 할당. r & R : 포탑 설치
 
 ////////////////////////////// [ State ] //////////////////////////////
 /********** [ IDLE ] **********/
@@ -170,11 +172,11 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 	{
 		if (e == Event::KeyUp)
 		{
-			isKeyUp = GL_TRUE;
+			isKeyUp = true;
 		}
 		else if (e == Event::KeyDown)
 		{
-			isKeyUp = GL_FALSE;
+			isKeyUp = false;
 			if (key == GLUT_KEY_SHIFT_L)
 			{
 				mPlayer->StopRun();
@@ -313,6 +315,7 @@ GLvoid Player::ChangeState(const State& playerState, const Event& e, const GLint
 		mCrntState = new Walk(this);
 		break;
 	case State::Jump:
+		mHp -= 5;
 		mCrntState = new Jump(this);
 		break;
 	default:
@@ -373,6 +376,7 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 		{
 			mGun->StopFire();
 		}
+		
 		break;
 	}
 }
@@ -391,7 +395,7 @@ GLvoid Player::Move()
 	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ * correction);
 
 	// xz collision
-	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE || buildingManager->CheckCollision(mBoundingCircle) == GL_TRUE)
+	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
 		mObject->SetPosX(prevPos.x);
 		mObject->SetPosZ(prevPos.z);
@@ -426,7 +430,31 @@ glm::vec3 Player::GetPosition() const
 	return mObject->GetPosition();
 }
 
+GLfloat Player::GetHp() const
+{
+	return mHp;
+}
+
 GLint Player::GetAmmo() const
 {
 	return mGun->GetAmmo();
+}
+
+GLint Player::GetMaxAmmo() const
+{
+	return mGun->GetMaxAmmo();
+}
+GunType Player::GetGunType() const
+{
+	return mGun->GetGunType();
+}
+
+GLvoid Player::add_HoldTurret(GLint add_tullet_num)
+{
+	this->mHoldTurret += add_tullet_num;
+}
+
+GLvoid Player::install_Turret()
+{
+	turretManager->Create(glm::vec3(0,0,0)); // 나중에 플레이어 현재 위치로 수정
 }
