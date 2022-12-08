@@ -65,15 +65,15 @@ Map* crntMap = nullptr;
 Player* player = nullptr;
 
 // modes
-GLboolean isPersp = true;
-GLboolean isCulling = true;
-GLboolean isWireFrame = false;
+GLboolean isPersp = GL_TRUE;
+GLboolean isCulling = GL_TRUE;
+GLboolean isWireFrame = GL_FALSE;
 
 // mouse
 GLpoint mouseCenter = { 0,0 };
 GLpoint crntPos = { 0,0 };
-GLboolean isLeftDown = false;
-GLboolean isRightDown = false;
+GLboolean isLeftDown = GL_FALSE;
+GLboolean isRightDown = GL_FALSE;
 
 // temp
 ModelObject* cubeMap = nullptr;
@@ -148,7 +148,7 @@ GLvoid Init()
 
 	cameraTop = new Camera();
 	cameraTop->RotateLocal(89.9f, 0.0f, 0.0f);
-	cameraTop->SetPerpective(false);
+	cameraTop->SetPerpective(GL_FALSE);
 
 	cameraMain = cameraFree;
 	crntCamera = cameraMain;
@@ -157,7 +157,7 @@ GLvoid Init()
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	waveManager->Start();
-	soundManager->PlayBGMSound(BGMSound::Normal, 1.0f, true);
+	soundManager->PlayBGMSound(BGMSound::Normal, 1.0f, GL_TRUE);
 	//system("cls");
 }
 
@@ -173,7 +173,7 @@ GLvoid InitMeshes()
 	waveManager = new WaveManager();
 	uiManager = new UIManager();
 
-	buildingManager->Create(BuildingType::Core, { 0, 0, 400 });
+	buildingManager->Create(BuildingType::Core, { 0, 0, 550 });
 	turretManager->Create({ 0, 0, 100 });
 
 	//********** [ Coordinate system lines ] **********//
@@ -185,21 +185,21 @@ GLvoid InitMeshes()
 	vectorLine_2 = { lineLength, 0.0f, 0.0f };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(RED);
-	line->MoveGlobal({ lineLength, 0, 0 }, false);
+	line->MoveGlobal({ lineLength, 0, 0 }, GL_FALSE);
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
 	vectorLine_2 = { 0.0f, lineLength, 0.0f };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(GREEN);
-	line->MoveGlobal({ 0, lineLength, 0 }, false);
+	line->MoveGlobal({ 0, lineLength, 0 }, GL_FALSE);
 	AddObject(Shader::Color, line);
 
 	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
 	vectorLine_2 = { 0.0f, 0.0f, lineLength };
 	line = new LineObject(vectorLine_1, vectorLine_2);
 	line->SetColor(BLUE);
-	line->MoveGlobal({ 0, 0, lineLength }, false);
+	line->MoveGlobal({ 0, 0, lineLength }, GL_FALSE);
 	AddObject(Shader::Color, line);
 	//**************************************************//
 	
@@ -212,7 +212,7 @@ GLvoid InitMeshes()
 
 	// light object
 	light = new Light();
-	light->SetPosition({ 200, 400, 200 });
+	light->SetPosition({ 0, 400, 0 });
 
 	crntMap = new Map();
 	player = new Player({ 0,0,0 }, &cameraMode);
@@ -277,12 +277,12 @@ GLvoid SetWindow(GLint index)
 	case 0:
 		crntCamera = cameraMain;
 		glViewport(0, 0, screenWidth, screenHeight);
-		SetDepthTest(true);
+		SetDepthTest(GL_TRUE);
 		return;
 	case 1:
 		crntCamera = cameraTop;
 		glViewport(halfWidth + halfWidth/2, halfHeight, halfWidth/2, halfHeight);
-		SetDepthTest(false);
+		SetDepthTest(GL_FALSE);
 		return;
 	default:
 		assert(0);
@@ -431,7 +431,7 @@ GLvoid Update()
 		}
 		if (IS_KEY_DOWN(VK_PRIOR))
 		{
-			cameraMain->MoveGlobal({ 0, cameraSpeed, 0 });
+			//cameraMain->MoveGlobal({ 0, cameraSpeed, 0 });
 			if (cameraMode == CameraMode::Light)
 			{
 				light->MoveGlobal({ 0, -cameraSpeed, 0 });
@@ -452,21 +452,21 @@ GLvoid Mouse(GLint button, GLint state, GLint x, GLint y)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			isLeftDown = true;
+			isLeftDown = GL_TRUE;
 		}
 		else if (state == GLUT_UP)
 		{
-			isLeftDown = false;
+			isLeftDown = GL_FALSE;
 		}
 		break;
 	case GLUT_RIGHT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			isRightDown = true;
+			isRightDown = GL_TRUE;
 		}
 		else if (state == GLUT_UP)
 		{
-			isRightDown = false;
+			isRightDown = GL_FALSE;
 		}
 		break;
 	}
@@ -548,11 +548,11 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		// camera
 	case 'p':
 	case 'P':
-		cameraMain->SetPerpective(true);
+		cameraMain->SetPerpective(GL_TRUE);
 		break;
 	case 'o':
 	case 'O':
-		cameraMain->SetPerpective(false);
+		cameraMain->SetPerpective(GL_FALSE);
 		break;
 	case '1':
 		SetCameraMode(CameraMode::Free);
@@ -561,7 +561,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		SetCameraMode(CameraMode::FirstPerson);
 		break;
 	case '3':
-		SetCameraMode(CameraMode::ThirdPerson);
+		//SetCameraMode(CameraMode::ThirdPerson);
 		break;
 	case '0':
 		SetCameraMode(CameraMode::Light);

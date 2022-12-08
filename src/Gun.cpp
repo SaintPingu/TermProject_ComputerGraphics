@@ -17,8 +17,12 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 
 GLvoid Gun::Update()
 {
+<<<<<<< HEAD
 
 	if (mIsFire == false)
+=======
+	if (mIsFire == GL_FALSE)
+>>>>>>> 984f1d4100caf66db35c751795a85b5f8a964982
 	{
 		return;
 	}

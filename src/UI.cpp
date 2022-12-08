@@ -35,6 +35,7 @@ GLvoid UIManager::Draw()
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
+<<<<<<< HEAD
 	mPlane->SetPosition(glm::vec3(mTens.pos.x, mTens.pos.y, 0));
 	mPlane->SetTexture(mTens.texture);
 	mPlane->SetScale(mTens.scale);
@@ -51,6 +52,8 @@ GLvoid UIManager::Draw()
 	mPlane->Draw();
 
 
+=======
+>>>>>>> 984f1d4100caf66db35c751795a85b5f8a964982
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 }
