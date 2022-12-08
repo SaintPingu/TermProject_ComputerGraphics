@@ -348,22 +348,6 @@ GLvoid ImportTextureData(mutex& m, unordered_set<GLuint>& emptyCore, const GLuin
 	m.unlock();
 }
 
-
-GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id)
-{
-	if (emptyCore.empty() == GL_FALSE)
-	{
-		m.lock();
-		id = *emptyCore.begin();
-		emptyCore.erase(id);
-		m.unlock();
-		return GL_TRUE;
-	}
-
-	this_thread::yield();
-	return GL_FALSE;
-}
-
 // 12-02 benchmark
 // [ obj loading ]
 // core 1	: 6900ms
@@ -374,8 +358,8 @@ GLvoid InitModels()
 	auto start = chrono::high_resolution_clock::now();
 
 	mutex m;
-	vector<thread*> threads;
 	unordered_set<GLuint> emptyCore;
+	vector<thread*> threads;
 	threads.resize(NUM_CORE);
 
 	for (size_t i = 0; i < threads.size(); ++i)

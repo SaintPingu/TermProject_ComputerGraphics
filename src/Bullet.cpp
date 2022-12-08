@@ -148,7 +148,11 @@ GLvoid BulletManager::Update()
 				/* create paint */
 				if (normal.x != NO_NORMAL)
 				{
-					PaintPlane* plane = new PaintPlane(bullet->GetColor(), hitPoint, normal);
+					GLuint randPaint = rand() % NUM_PAINT;
+					Textures texture = static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint);
+					const IdentityObject* object = GetIdentityTextureObject(texture);
+
+					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
 					mPaints.emplace_back(plane);
 				}
 

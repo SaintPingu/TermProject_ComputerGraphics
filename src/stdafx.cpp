@@ -289,3 +289,19 @@ void SetConsoleCursor(short x, short y)
 	COORD cursor = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
 }
+
+
+GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id)
+{
+	if (emptyCore.empty() == GL_FALSE)
+	{
+		m.lock();
+		id = *emptyCore.begin();
+		emptyCore.erase(id);
+		m.unlock();
+		return GL_TRUE;
+	}
+
+	this_thread::yield();
+	return GL_FALSE;
+}

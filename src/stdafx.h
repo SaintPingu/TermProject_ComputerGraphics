@@ -748,3 +748,6 @@ GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& 
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight);
 
 void SetConsoleCursor(short x, short y);
+
+
+GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id);

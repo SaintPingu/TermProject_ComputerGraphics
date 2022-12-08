@@ -78,6 +78,7 @@ public:
 	GLvoid RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
 	
 	GLvoid ResetRotation();
+	GLvoid ResetModelRotation();
 	glm::quat GetRotation() const;
 	GLvoid SetRotationPivot(const glm::vec3* pivot);
 
@@ -230,11 +231,13 @@ class SharedObject : public ShaderObject {
 protected:
 	const IdentityObject* mObject = nullptr;
 	GLboolean mIsChangeColor = GL_FALSE;
+
+	GLuint mTexture = 0;
 public:
-	SharedObject() {};
 	SharedObject(const IdentityObject* object);
 
 	GLvoid Draw() const override;
+	GLvoid SetTexture(const Textures& textureModel);
 
 	inline GLfloat GetWidth() const override { return mObject->GetWidth(); }
 	inline GLfloat GetHeight() const override { return mObject->GetHeight(); }
@@ -447,10 +450,10 @@ public:
 
 
 /************************************************** [ OTHER OBJECTS ] **************************************************/
-class PaintPlane : public ModelObject {
+class PaintPlane : public SharedObject {
 	GLfloat dt = 0.0f;
 public:
-	PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal);
+	PaintPlane(const IdentityObject* object, const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal);
 	GLboolean Update();
 };
 

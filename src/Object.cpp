@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Bullet.h"
 
-#define PAINT_DISAPEAR_TIME 10.0f
+#define PAINT_DISAPEAR_TIME 100.0f
 
 #define INIT_LOOK Vector3::Front()
 
@@ -19,11 +19,8 @@ GLvoid Object::InitValues()
 	mPosition = Vector3::Zero();
 
 	mLook = INIT_LOOK;
-	mRotation = glm::quat(1, 0, 0, 0);
-	mModelRotation = glm::quat(1, 0, 0, 0);
-
-	/* 3ds max obj to opengl */
-	mModelRotation = glm::rotate(mModelRotation, glm::radians(180.0f), Vector3::Up());
+	ResetRotation();
+	ResetModelRotation();
 
 	mPivot = nullptr;
 	mRotationPivot = nullptr;
@@ -115,6 +112,12 @@ GLvoid Object::RotateModel(const glm::vec3& axis, const GLfloat& degree)
 GLvoid Object::ResetRotation()
 {
 	mRotation = glm::quat(1, 0, 0, 0);
+}
+GLvoid Object::ResetModelRotation()
+{
+	mModelRotation = glm::quat(1, 0, 0, 0);
+	/* 3ds max obj to opengl */
+	mModelRotation = glm::rotate(mModelRotation, glm::radians(180.0f), Vector3::Up());
 }
 
 glm::quat Object::GetRotation() const
@@ -538,6 +541,7 @@ SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 {
 	SetObject(object);
 	SetShader(object->GetShader());
+	mTexture = object->GetTexture();
 }
 GLvoid SharedObject::Draw() const
 {
@@ -549,7 +553,7 @@ GLvoid SharedObject::Draw() const
 	{
 		if (GetShader() == Shader::Texture)
 		{
-			glBindTexture(GL_TEXTURE_2D, mObject->GetTexture());
+			glBindTexture(GL_TEXTURE_2D, mTexture);
 		}
 		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 	}
@@ -570,6 +574,10 @@ GLvoid SharedObject::Draw() const
 		}
 	}
 	glBindVertexArray(0);
+}
+GLvoid SharedObject::SetTexture(const Textures& textureModel)
+{
+	mTexture = ::GetTexture(textureModel);
 }
 
 
@@ -1305,11 +1313,8 @@ GLvoid DrawDebugWireXZ(const set<glm::vec2, CompareSet>& vertices, GLfloat yPos,
 
 
 
-PaintPlane::PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal) : ModelObject(GetTextureModel(Textures::Paint), Shader::Texture)
+PaintPlane::PaintPlane(const IdentityObject* object, const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal) : SharedObject(object)
 {
-	GLuint randPaint = rand() % NUM_PAINT;
-	SetTexture(static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint));
-
 	SetPosition(pos);
 	SetColor(color);
 	
@@ -1480,6 +1485,47 @@ GLvoid DrawObjects(const Shader& shader)
 	}
 
 }
+
+
+
+
+
+
+
+
+GLvoid MergeSort(const GLuint& id)
+{
+
+}
+
+vector<ShaderObject*> GetSorted()
+{ 
+	vector<ShaderObject*> result;
+
+	const size_t size = blendObjects.size();
+	pair<ShaderObject*, GLfloat>* objects = new pair<ShaderObject*, GLfloat>[size];
+
+	extern const Camera* crntCamera;
+	glm::vec3 cameraPos = crntCamera->GetPosition();
+
+	
+	for (size_t i = 0; i < size; ++i)
+	{
+		ShaderObject* object = blendObjects[i];
+		const GLfloat distance = glm::length(cameraPos - object->GetTransformedPos());
+		objects[i] = make_pair(object, distance);
+	}
+
+	vector<thread*> threads;
+	threads.resize(NUM_CORE);
+	for (GLuint i = 0; i < NUM_CORE; ++i)
+	{
+
+	}
+
+	return result;
+}
+
 
 GLvoid DrawBlendObjects()
 {
