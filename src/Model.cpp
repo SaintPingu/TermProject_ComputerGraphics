@@ -31,6 +31,7 @@ Model::Model(const Model& origin)
 }
 
 /* Warning : 법선 벡터가 unify되어있지 않을 경우 제대로 그려지지 않을 수 있음 */
+/* ZBrush 모델 읽지 못함 */
 GLvoid Model::LoadModel(const GLchar* path)
 {
 	string objPath = "obj\\";
@@ -55,14 +56,15 @@ GLvoid Model::LoadModel(const GLchar* path)
 	GLfloat back = FLOAT_MIN;
 
 	set<size_t> set_overlapChecker_vertex;
-	set<pair<size_t, size_t>> set_overlapChecker_pair;
+	set<pair<size_t, size_t>> overlapChecker_normal;
+	set<pair<size_t, size_t>> overlapChecker_uv;
 
 	// 다음 element reading 시, 이전 element의 overlapCount만큼 vertex index를 증가시켜야 함.
 	size_t overlapCount = 0;
 	size_t beforeOverlapCount = 0;
 
 	GLchar data[128];
-	while (feof(objFile) == false)
+	while (feof(objFile) == GL_FALSE)
 	{
 		fscanf(objFile, "%s", data);
 
@@ -148,12 +150,18 @@ GLvoid Model::LoadModel(const GLchar* path)
 
 				// normal index 중복 검사
 				const size_t index_normal = indices_normal[i];
-				if (set_overlapChecker_pair.find(make_pair(index_vertex, index_normal)) == set_overlapChecker_pair.end())
+				const size_t index_uv = indices_uv[i];
+
+				if (overlapChecker_normal.find(make_pair(index_vertex, index_normal)) != overlapChecker_normal.end())
 				{
-					continue;	// 한 vertex에 동일 normal 사용
+					// 한 vertex에 동일 normal 사용
+					if (overlapChecker_uv.find(make_pair(index_vertex, index_uv)) != overlapChecker_uv.end())
+					{
+						continue; // 한 vertex에 동일 uv 사용
+					}
 				}
 
-				// 한 vertex에 다른 normal 사용
+				// 한 vertex에 다른 normal or uv 사용
 
 				const glm::vec3 newVertex = mVertices[index_vertex - 1];	// 현재 index에 있는 vertex 추출
 				mVertices.emplace_back(newVertex);							// 마지막 원소에 추가
@@ -165,7 +173,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 			for (size_t i = 0; i < 3; ++i)
 			{
 				set_overlapChecker_vertex.insert(indices_vertex[i]);
-				set_overlapChecker_pair.insert(make_pair(indices_vertex[i], indices_normal[i]));
+				overlapChecker_normal.insert(make_pair(indices_vertex[i], indices_normal[i]));
+				overlapChecker_uv.insert(make_pair(indices_vertex[i], indices_uv[i]));
 
 				mIndices_vertex.emplace_back(indices_vertex[i] - 1);
 				mIndices_uv.emplace_back(indices_uv[i] - 1);
@@ -176,7 +185,8 @@ GLvoid Model::LoadModel(const GLchar* path)
 		{
 			// 새로운 object element -> set_overlapChecker 초기화
 			set_overlapChecker_vertex.clear();
-			set_overlapChecker_pair.clear();
+			overlapChecker_normal.clear();
+			overlapChecker_uv.clear();
 			beforeOverlapCount += overlapCount;
 			overlapCount = 0;
 		}
@@ -209,20 +219,20 @@ static Model* geoSphereModel = new Model();
 static Model* playerModel = new Model();
 static Model* gunModel = new Model();
 
-// building
-static Model* guardTowerModel = new Model();
-
 
 // [ texture models ] //
 static Model* mapModel = new Model();
 static Model* cubeMapModel = new Model();
 static Model* paintModel = new Model();
+static Model* coinModel = new Model();
 
 // monster
 static Model* blooperModel = new Model();
 static Model* eggModel = new Model();
+static Model* koromonModel = new Model();
 
-static Model* coreModel= new Model();
+// building
+static Model* coreModel = new Model();
 
 // turret
 static Model* turretBodyModel = new Model();
@@ -237,17 +247,18 @@ unordered_map<Models, Model*> modelMap{
 	{Models::LowSphere, lowSphereModel},
 	{Models::GeoSphere, geoSphereModel},
 	{Models::Player, playerModel},
-	{Models::GuardTower, guardTowerModel},
 };
 unordered_map<Textures, Model*> textureModelMap{
 	{Textures::Gun, gunModel },
-	{Textures::Map, mapModel },
+	{Textures::Map, mapModel},
 	{Textures::CubeMap, cubeMapModel },
 	{Textures::Blooper, blooperModel},
 	{Textures::Egg, eggModel},
+	{Textures::Koromon, koromonModel},
 	{Textures::Core, coreModel},
 	{Textures::Turret_Body, turretBodyModel },
 	{Textures::Turret_Head, turretHeadModel },
+	{Textures::Coin, coinModel },
 };
 unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::Gun, "gun.png" },
@@ -255,11 +266,13 @@ unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::CubeMap, "cubemap.png" },
 	{Textures::Blooper, "blooper.png" },
 	{Textures::Egg, "egg.png" },
+	{Textures::Koromon, "koromon.png" },
 	{Textures::Core, "core.png" },
 	{Textures::Paint, "paint.png" },
 	{Textures::Paint2, "paint2.png" },
 	{Textures::Turret_Body, "turret_body.png" },
 	{Textures::Turret_Head, "turret_head.png" },
+	{Textures::Coin, "coin.png" },
 	{Textures::UI_NUM_0, "ui_num_0.png" },
 	{Textures::UI_NUM_1, "ui_num_1.png" },
 	{Textures::UI_NUM_2, "ui_num_2.png" },
@@ -273,21 +286,22 @@ unordered_map<Textures, const GLchar*> textureMap{
 };
 
 /* Should be arrange by obj file size (faster) */
-enum class ObjList { Gun, Blooper, Egg, Core, Player, GuardTower, GeoSphere, Circle, LowSphere, Cube, Map, Plane, Turret_Body, Turret_Head, _count };
+enum class ObjList { Coin, Gun, Egg, Turret_Head, Blooper, Turret_Body, Koromon, Player, GeoSphere, Circle, LowSphere, Cube, Core, Map, Plane, _count };
 constexpr GLuint NUM_OBJ = static_cast<GLuint>(ObjList::_count);
 
 unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
 	{ObjList::Gun, make_pair(gunModel, "gun.obj")},
+	{ObjList::Map, make_pair(mapModel, "map.obj")},
 	{ObjList::Blooper, make_pair(blooperModel, "blooper.obj")},
 	{ObjList::Egg, make_pair(eggModel, "egg.obj")},
+	{ObjList::Koromon, make_pair(koromonModel, "koromon.obj")},
+	{ObjList::Coin, make_pair(coinModel, "coin.obj")},
 	{ObjList::Core, make_pair(coreModel, "core.obj")},
 	{ObjList::Player, make_pair(playerModel, "player.obj")},
-	{ObjList::GuardTower, make_pair(guardTowerModel, "guard_tower_test.obj")},
 	{ObjList::GeoSphere, make_pair(geoSphereModel, "geo_sphere.obj")},
 	{ObjList::Circle, make_pair(circleModel, "circle.obj")},
 	{ObjList::LowSphere, make_pair(lowSphereModel, "low_sphere.obj")},
 	{ObjList::Cube, make_pair(cubeModel, "cube.obj")},
-	{ObjList::Map, make_pair(mapModel, "map.obj")},
 	{ObjList::Plane, make_pair(planeModel, "plane.obj")},
 	{ObjList::Turret_Body, make_pair(turretBodyModel, "turret_body.obj")},
 	{ObjList::Turret_Head, make_pair(turretHeadModel, "turret_head.obj")},
@@ -337,17 +351,17 @@ GLvoid ImportTextureData(mutex& m, unordered_set<GLuint>& emptyCore, const GLuin
 
 GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id)
 {
-	if (emptyCore.empty() == false)
+	if (emptyCore.empty() == GL_FALSE)
 	{
 		m.lock();
 		id = *emptyCore.begin();
 		emptyCore.erase(id);
 		m.unlock();
-		return true;
+		return GL_TRUE;
 	}
 
 	this_thread::yield();
-	return false;
+	return GL_FALSE;
 }
 
 // 12-02 benchmark
@@ -374,7 +388,7 @@ GLvoid InitModels()
 	{
 		// find empty core id
 		GLuint id = -1;
-		while(true)
+		while(GL_TRUE)
 		{
 			if (FindEmptyCoreID(m, emptyCore, id) == GL_TRUE)
 			{
@@ -391,7 +405,7 @@ GLvoid InitModels()
 	}
 
 	/* Import texture */
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(GL_TRUE);
 
 	glGenTextures(NUM_TEXTURE, textures);
 	GLubyte* textureDataList[NUM_TEXTURE];
@@ -402,7 +416,7 @@ GLvoid InitModels()
 	{
 		// find empty core id
 		GLuint id = -1;
-		while (true)
+		while (GL_TRUE)
 		{
 			if (FindEmptyCoreID(m, emptyCore, id) == GL_TRUE)
 			{

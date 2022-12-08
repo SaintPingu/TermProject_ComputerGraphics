@@ -170,7 +170,7 @@ GLvoid BulletManager::Update()
 	for (auto iter = mPaints.begin(); iter != mPaints.end();)
 	{
 		PaintPlane* paint = *iter;
-		if (paint->Update() == false)
+		if (paint->Update() == GL_FALSE)
 		{
 			delete paint;
 			iter = mPaints.erase(iter);

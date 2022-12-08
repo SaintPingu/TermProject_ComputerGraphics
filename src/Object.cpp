@@ -534,7 +534,6 @@ GLfloat IdentityObject::GetDepth() const
 }
 
 
-
 SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 {
 	SetObject(object);
@@ -636,19 +635,15 @@ GLvoid ModelObject::PullVertices(vector<GLfloat>& vertices) const
 }
 GLvoid ModelObject::Pull_Indices_Vertex(vector<size_t>& indices_vertex) const
 {
-	const vector<size_t> objectIndices = mModel->GetIndices_Vertex();
-	for (const size_t& index : objectIndices)
-	{
-		indices_vertex.emplace_back(index);
-	}
+	const vector<size_t> indices = mModel->GetIndices_Vertex();
+	indices_vertex.resize(indices.size());
+	std::copy(indices.begin(), indices.end(), indices_vertex.begin());
 }
 GLvoid ModelObject::Pull_Indices_Normal(vector<size_t>& indices_normal) const
 {
 	const vector<size_t> indices = mModel->GetIndices_Normal();
-	for (const size_t& index : indices)
-	{
-		indices_normal.emplace_back(index);
-	}
+	indices_normal.resize(indices.size());
+	std::copy(indices.begin(), indices.end(), indices_normal.begin());
 }
 GLvoid ModelObject::PullUVs(vector<GLfloat>& uvs) const
 {
@@ -670,10 +665,8 @@ GLvoid ModelObject::PullUVs(vector<GLfloat>& uvs) const
 GLvoid ModelObject::Pull_Indices_UV(vector<size_t>& indices_uv) const
 {
 	const vector<size_t> indices = mModel->GetIndices_UV();
-	for (const size_t& index : indices)
-	{
-		indices_uv.emplace_back(index);
-	}
+	indices_uv.resize(indices.size());
+	std::copy(indices.begin(), indices.end(), indices_uv.begin());
 }
 
 
@@ -1053,10 +1046,10 @@ GLboolean Cuboid::CheckCollide(const glm::vec3& point, const GLfloat& radius) co
 		(point.y < top && point.y > bottom) &&
 		(point.z < back && point.z > front))
 	{
-		return true;
+		return GL_TRUE;
 	}
 
-	return false;
+	return GL_FALSE;
 }
 GLboolean Cuboid::CheckCollide(const GLrect& rect) const
 {
@@ -1072,10 +1065,10 @@ GLboolean Cuboid::CheckCollide(const GLrect& rect) const
 	if (((rect.left > left && rect.left < right) || (rect.right > left && rect.right < right)) &&
 		((rect.top > front && rect.top < back) || (rect.bottom > front && rect.bottom < back)))
 	{
-		return true;
+		return GL_TRUE;
 	}
 
-	return false;
+	return GL_FALSE;
 }
 GLvoid Cuboid::Draw() const
 {
@@ -1161,7 +1154,7 @@ Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3
 	mCircle = new SharedObject(GetIdentityModelObject(Models::Circle));
 	mCircle->SetScale(radius);
 	mCircle->SetPivot(position);
-	mCircle->Move(offset, false);
+	mCircle->Move(offset, GL_FALSE);
 }
 GLvoid Circle::Draw() const
 {
@@ -1324,7 +1317,7 @@ PaintPlane::PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::v
 
 	Scale(0.5f);
 	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.2f;	// 0.2 ~ 0.0999 + 0.2
-	MoveZ(randZ, false);
+	MoveZ(randZ, GL_FALSE);
 
 	GLfloat randRotation = rand() % 720 * 0.5f;
 	RotateLocal(0, 0, randRotation);
@@ -1334,10 +1327,10 @@ GLboolean PaintPlane::Update()
 	dt += timer::DeltaTime();
 	if (dt >= PAINT_DISAPEAR_TIME)
 	{
-		return false;
+		return GL_FALSE;
 	}
 
-	return true;
+	return GL_TRUE;
 }
 
 
@@ -1491,6 +1484,7 @@ GLvoid DrawObjects(const Shader& shader)
 GLvoid DrawBlendObjects()
 {
 	glEnable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
 
 	extern const Camera* crntCamera;
 	glm::vec3 cameraPos = crntCamera->GetPosition();
@@ -1515,5 +1509,6 @@ GLvoid DrawBlendObjects()
 		(*it).second->Draw();
 	}
 
+	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 }

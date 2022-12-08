@@ -9,7 +9,7 @@ private:
 	SharedObject* mObject = nullptr;
 	glm::vec3 mGunPosition = { 0,0,0 };
 
-	GLboolean mIsFire = false;
+	GLboolean mIsFire = GL_FALSE;
 
 	GLfloat mFireDelay = 0.1f;
 	GLfloat mCrntDelay = 0.0f;
@@ -23,8 +23,8 @@ public:
 
 	GLvoid Update();
 
-	inline constexpr GLvoid StartFire() { mIsFire = true; }
-	inline constexpr GLvoid StopFire() { mIsFire = false; }
+	inline constexpr GLvoid StartFire() { mIsFire = GL_TRUE; }
+	inline constexpr GLvoid StopFire() { mIsFire = GL_FALSE; }
 
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch);
 	inline constexpr GLint GetAmmo() const { return mAmmo; };

@@ -5,11 +5,13 @@
 #include "Timer.h"
 #include "Map.h"
 #include "Gun.h"
+#include "Building.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
+extern BuildingManager* buildingManager;
 
 using namespace playerState;
 
@@ -168,11 +170,11 @@ GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 	{
 		if (e == Event::KeyUp)
 		{
-			isKeyUp = true;
+			isKeyUp = GL_TRUE;
 		}
 		else if (e == Event::KeyDown)
 		{
-			isKeyUp = false;
+			isKeyUp = GL_FALSE;
 			if (key == GLUT_KEY_SHIFT_L)
 			{
 				mPlayer->StopRun();
@@ -389,7 +391,7 @@ GLvoid Player::Move()
 	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ * correction);
 
 	// xz collision
-	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE)
+	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE || buildingManager->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
 		mObject->SetPosX(prevPos.x);
 		mObject->SetPosZ(prevPos.z);

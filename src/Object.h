@@ -45,12 +45,12 @@ public:
 	inline constexpr GLvoid SetPosY(const GLfloat& y) { mPosition.y = y; }
 	inline constexpr GLvoid SetPosZ(const GLfloat& z) { mPosition.z = z; }
 
-	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = true);
-	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = true);
-	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = true);
-	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = GL_TRUE);
+	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
+	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
+	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
 	/* look벡터 영향 없는 글로벌 좌표계에서 이동 */
-	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = true);
+	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = GL_TRUE);
 	GLvoid SetPivot(const glm::vec3* pivot);
 
 	//********** [ Rotation ] **********//
@@ -229,7 +229,7 @@ public:
 class SharedObject : public ShaderObject {
 protected:
 	const IdentityObject* mObject = nullptr;
-	GLboolean mIsChangeColor = false;
+	GLboolean mIsChangeColor = GL_FALSE;
 public:
 	SharedObject() {};
 	SharedObject(const IdentityObject* object);
@@ -379,7 +379,7 @@ public:
 
 	/* Side에 대한 값 리턴 (Left -> 왼쪽 경계값, Top -> 위쪽 경계값, ...) */
 	GLfloat GetSide(const Dir& dir) const;
-	/* true if collision */
+	/* GL_TRUE if collision */
 	GLboolean CheckCollide(const glm::vec3& center, const GLfloat& radius = 0.0f) const;
 	GLboolean CheckCollide(const GLrect& rect) const;
 

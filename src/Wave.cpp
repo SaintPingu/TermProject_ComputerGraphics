@@ -27,6 +27,7 @@ GLvoid WaveManager::Start()
 
 	const GLuint numOfBlooper = crntWave * 3;
 	const GLuint numOfEgg = crntWave * 3;
+	const GLuint numOfKoromon = crntWave * 3;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -38,6 +39,12 @@ GLvoid WaveManager::Start()
 	{
 		glm::vec2 pos = GetRandomMonsterPos(mapWidth, mapTop);
 		monsterManager->Create(MonsterType::Egg, glm::vec3(pos.x, 40, pos.y));
+	}
+
+	for (GLuint i = 0; i < numOfKoromon; ++i)
+	{
+		glm::vec2 pos = GetRandomMonsterPos(mapWidth, mapTop);
+		monsterManager->Create(MonsterType::Koromon, glm::vec3(pos.x, 0, pos.y));
 	}
 }
 
