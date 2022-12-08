@@ -2,6 +2,7 @@
 #include "Wave.h"
 #include "Monster.h"
 #include "Map.h"
+#include "Player.h"
 #include "Turret.h"
 #include <random>
 
@@ -54,9 +55,8 @@ GLvoid WaveManager::Update()
 	if (monsterManager->CheckEnemyEmpty())
 	{
 		crntWave++;
-		turret_x += 10;
+		//mPlayer->addturret; 나중에 물어보자
 		// 포탑 지름 20.0f
-		turretManager->Create(glm::vec3(turret_x, 0, 100));
 		// player upgrade or Turret upgrade
 
 
