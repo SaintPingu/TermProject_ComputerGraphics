@@ -22,7 +22,7 @@ glm::mat4 xform::GetView(const Camera* camera)
 extern glm::vec3 worldPosition;
 glm::mat4 xform::GetProj(const Camera* camera)
 {
-	constexpr GLfloat farLength = 2000;
+	constexpr GLfloat farLength = 1500;
 
 	const glm::vec3 cameraPos = camera->GetPviotedPosition();
 	const GLfloat size = glm::length(worldPosition - cameraPos) / 2;

@@ -17,14 +17,11 @@ Map::Map()
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
-
-	mCoins = new SharedObject(GetIdentityTextureObject(Textures::Coin));
-	mCoins->SetPosition({ 0, 0, 550 });
-	AddObject(Shader::Texture, mCoins);
 }
 
 GLvoid Map::Draw()
 {
+	mMapObject->Draw();
 }
 
 GLboolean Map::CheckCollision(const Circle* boundingCircle)

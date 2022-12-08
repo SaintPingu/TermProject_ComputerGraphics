@@ -15,7 +15,7 @@ TurretManager::Turret::Turret(const glm::vec3& position)
 	mObject_Head = new SharedObject(GetIdentityTextureObject(Textures::Turret_Head));
 	mObject_Body->SetPosition(position);
 	mObject_Head->SetPosition(position);
-	mObject_Head->MoveY(10, GL_FALSE);
+	mObject_Head->MoveY(10, false);
 }
 TurretManager::Turret::~Turret()
 {

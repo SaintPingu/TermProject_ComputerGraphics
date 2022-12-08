@@ -45,12 +45,12 @@ public:
 	inline constexpr GLvoid SetPosY(const GLfloat& y) { mPosition.y = y; }
 	inline constexpr GLvoid SetPosZ(const GLfloat& z) { mPosition.z = z; }
 
-	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = GL_TRUE);
-	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
-	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
-	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = GL_TRUE);
+	GLvoid Move(const glm::vec3& vector, const GLboolean& applyTime = true);
+	GLvoid MoveX(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid MoveY(const GLfloat& amount, const GLboolean& applyTime = true);
+	GLvoid MoveZ(const GLfloat& amount, const GLboolean& applyTime = true);
 	/* look벡터 영향 없는 글로벌 좌표계에서 이동 */
-	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = GL_TRUE);
+	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = true);
 	GLvoid SetPivot(const glm::vec3* pivot);
 
 	//********** [ Rotation ] **********//
@@ -78,7 +78,6 @@ public:
 	GLvoid RotatePosition(const glm::vec3& pivot, const glm::vec3& axis, const GLfloat& degree);
 	
 	GLvoid ResetRotation();
-	GLvoid ResetModelRotation();
 	glm::quat GetRotation() const;
 	GLvoid SetRotationPivot(const glm::vec3* pivot);
 
@@ -230,14 +229,12 @@ public:
 class SharedObject : public ShaderObject {
 protected:
 	const IdentityObject* mObject = nullptr;
-	GLboolean mIsChangeColor = GL_FALSE;
-
-	GLuint mTexture = 0;
+	GLboolean mIsChangeColor = false;
 public:
+	SharedObject() {};
 	SharedObject(const IdentityObject* object);
 
 	GLvoid Draw() const override;
-	GLvoid SetTexture(const Textures& textureModel);
 
 	inline GLfloat GetWidth() const override { return mObject->GetWidth(); }
 	inline GLfloat GetHeight() const override { return mObject->GetHeight(); }
@@ -382,7 +379,7 @@ public:
 
 	/* Side에 대한 값 리턴 (Left -> 왼쪽 경계값, Top -> 위쪽 경계값, ...) */
 	GLfloat GetSide(const Dir& dir) const;
-	/* GL_TRUE if collision */
+	/* true if collision */
 	GLboolean CheckCollide(const glm::vec3& center, const GLfloat& radius = 0.0f) const;
 	GLboolean CheckCollide(const GLrect& rect) const;
 
@@ -450,10 +447,10 @@ public:
 
 
 /************************************************** [ OTHER OBJECTS ] **************************************************/
-class PaintPlane : public SharedObject {
+class PaintPlane : public ModelObject {
 	GLfloat dt = 0.0f;
 public:
-	PaintPlane(const IdentityObject* object, const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal);
+	PaintPlane(const COLORREF& color, const glm::vec3& pos, const glm::vec3& normal);
 	GLboolean Update();
 };
 

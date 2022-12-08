@@ -15,6 +15,10 @@ class Player;
 class Circle;
 class Gun;
 
+class Shotgun;
+
+enum class GunType;
+
 namespace playerState {
 	/* ±âº» State  */
 	class PlayerState abstract {
@@ -51,7 +55,7 @@ namespace playerState {
 		const GLfloat jumpTime = 0.5f; // jump up N sec
 		GLfloat t = 0;
 
-		GLboolean isKeyUp = GL_FALSE;
+		GLboolean isKeyUp = false;
 	public:
 		Jump(Player* player) : PlayerState(player) {};
 		GLvoid Enter(const Event& e = Event::None, const GLint& value = 0) override;
@@ -79,6 +83,7 @@ private:
 	// childs
 	SharedObject* mObject = nullptr;
 	Gun* mGun = nullptr;
+	Shotgun* mShotGun = nullptr;
 
 	// camera
 	const CameraMode* mCameraMode = nullptr;
@@ -88,9 +93,10 @@ private:
 	GLfloat mTpCameraPitch = 0.0f;
 
 	// values
-	GLfloat mHp = 0.0f;
+	GLfloat mHp = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
+	GLint mHoldTurret = 0;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -102,6 +108,10 @@ private:
 	// rotation
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
+
+
+	// item?
+	
 
 public:
 	Player(const glm::vec3& position, const CameraMode* cameraMode);
@@ -152,5 +162,18 @@ public:
 	{
 		return mTpCamera;
 	}
+
+	// Set
+	GLvoid add_HoldTurret(GLint addTurret);
+
+
+	// Get information
+	GLfloat GetHp() const;
 	GLint GetAmmo() const;
+	GLint GetMaxAmmo() const;
+	GunType GetGunType() const;
+
+
+	// Action...?
+	GLvoid install_Turret();
 };

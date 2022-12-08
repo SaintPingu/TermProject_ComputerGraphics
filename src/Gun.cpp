@@ -17,8 +17,8 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 
 GLvoid Gun::Update()
 {
+
 	if (mIsFire == false)
-	if (mIsFire == GL_FALSE)
 	{
 		return;
 	}
@@ -32,7 +32,7 @@ GLvoid Gun::Update()
 	if (mAmmo >= 0) mAmmo--;
 	else {
 		cout << "ÃÑ¾Ë ºÎÁ·" << endl;
-		mAmmo = 60;
+		mAmmo = mMaxAmmo;
 	}
 
 
@@ -59,4 +59,12 @@ GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 
 	mObject->Rotate(Vector3::Up(), mPitch);
 	mObject->RotateLocal(mYaw, 0, 0);
+}
+
+ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
+{
+	mType = GunType::Blue;
+
+
+
 }

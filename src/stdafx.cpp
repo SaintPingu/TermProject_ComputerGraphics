@@ -69,10 +69,10 @@ GLboolean IsOutOfIndex(const size_t& index, const size_t& size)
 {
 	if (index >= size)
 	{
-		return GL_FALSE;
+		return false;
 	}
 
-	return GL_TRUE;
+	return true;
 }
 
 GLvoid CheckOutOfIndex(const GLint& index, const GLint& min, const GLint& max)
@@ -152,7 +152,7 @@ GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm
 
 	if (discriminant < 0)
 	{
-		return GL_FALSE; // no intersection
+		return false; // no intersection
 	}
 	else
 	{
@@ -166,15 +166,15 @@ GLboolean CheckCollision(const glm::vec2& start, const glm::vec2& end, const glm
 
 		if (t1 >= 0 && t1 <= 1)
 		{
-			return GL_TRUE;
+			return true;
 		}
 		if (t2 >= 0 && t2 <= 1)
 		{
-			return GL_TRUE;
+			return true;
 		}
 	}
 
-	return GL_FALSE;
+	return false;
 }
 
 /* https://gamedev.stackexchange.com/questions/26004/how-to-detect-2d-line-on-line-collision */
@@ -217,14 +217,12 @@ glm::vec2 GetLineIntersection(const glm::vec2& v1, const glm::vec2& v2, const gl
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius)
 {
 	GLfloat distance = glm::length(v - u);
-	GLfloat radius = (vRadius + uRadius);
-
-	if (distance <= radius)
+	if (distance < vRadius + uRadius)
 	{
-		return GL_TRUE;
+		return true;
 	}
 
-	return GL_FALSE;
+	return false;
 }
 
 /* https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection */
@@ -241,20 +239,20 @@ GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& 
 
 	if (circleDistance.x > rectHalfWidth + vRadius)
 	{
-		return GL_FALSE;
+		return false;
 	}
 	if (circleDistance.y > rectHalfHeight + vRadius)
 	{
-		return GL_FALSE;
+		return false;
 	}
 
 	if (circleDistance.x <= rectHalfWidth)
 	{
-		return GL_TRUE;
+		return true;
 	}
 	if (circleDistance.y <= rectHalfHeight)
 	{
-		return GL_TRUE;
+		return true;
 	}
 
 	GLfloat a = (v.x - rectHalfWidth);
@@ -269,39 +267,23 @@ GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint,
 {
 	const glm::vec2 vCylinderCenter = ConvertVec2(vCylinderPos);
 	const glm::vec2 uPointCenter = ConvertVec2(uPoint);
-	if (CheckCollision(vCylinderCenter, uPointCenter, vRadius, uRadius) == GL_FALSE)
+	if (CheckCollision(vCylinderCenter, uPointCenter, vRadius, uRadius) == false)
 	{
-		return GL_FALSE;
+		return false;
 	}
 
 	GLfloat minHeight = vCylinderPos.y;
 	GLfloat maxHeight = minHeight + vHeight;
 	if ((uPoint.y <= maxHeight) && (uPoint.y >= minHeight))
 	{
-		return GL_TRUE;
+		return true;
 	}
 
-	return GL_FALSE;
+	return false;
 }
 
 void SetConsoleCursor(short x, short y)
 {
 	COORD cursor = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
-}
-
-
-GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id)
-{
-	if (emptyCore.empty() == GL_FALSE)
-	{
-		m.lock();
-		id = *emptyCore.begin();
-		emptyCore.erase(id);
-		m.unlock();
-		return GL_TRUE;
-	}
-
-	this_thread::yield();
-	return GL_FALSE;
 }
