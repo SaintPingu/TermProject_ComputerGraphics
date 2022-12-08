@@ -2,14 +2,10 @@
 #include "Wave.h"
 #include "Monster.h"
 #include "Map.h"
-#include "Player.h"
-#include "Turret.h"
-#include <random>
 
 
 extern MonsterManager* monsterManager;
 extern Map* crntMap;
-extern TurretManager* turretManager;
 
 WaveManager::WaveManager()
 {
@@ -26,14 +22,12 @@ glm::vec2 WaveManager::GetRandomMonsterPos(const GLint& mapWidth, const GLfloat&
 
 GLvoid WaveManager::Start()
 {
-
-
 	GLint mapWidth = static_cast<GLint>(crntMap->GetMaxWidth());
 	GLfloat mapTop = crntMap->GetTop();
 
-
-	const GLuint numOfBlooper = crntWave * 1;
-	const GLuint numOfEgg = crntWave * 1;
+	const GLuint numOfBlooper = crntWave * 3;
+	const GLuint numOfEgg = crntWave * 3;
+	const GLuint numOfKoromon = crntWave * 3;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -46,21 +40,15 @@ GLvoid WaveManager::Start()
 		glm::vec2 pos = GetRandomMonsterPos(mapWidth, mapTop);
 		monsterManager->Create(MonsterType::Egg, glm::vec3(pos.x, 40, pos.y));
 	}
+
+	for (GLuint i = 0; i < numOfKoromon; ++i)
+	{
+		glm::vec2 pos = GetRandomMonsterPos(mapWidth, mapTop);
+		monsterManager->Create(MonsterType::Koromon, glm::vec3(pos.x, 0, pos.y));
+	}
 }
 
 GLvoid WaveManager::Update()
 {
-	static GLfloat turret_x = 0.0f;
 
-	if (monsterManager->CheckEnemyEmpty())
-	{
-		crntWave++;
-		//mPlayer->addturret; 나중에 물어보자
-		// 포탑 지름 20.0f
-		// player upgrade or Turret upgrade
-
-
-		WaveManager::Start();
-		cout << crntWave << endl;
-	}
 }

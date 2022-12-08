@@ -4,7 +4,7 @@
 class Light : public Object{
 private:
 	SharedObject* mObject = nullptr;
-	GLboolean isLightOn = true;
+	GLboolean isLightOn = GL_TRUE;
 public:
 	Light();
 	GLvoid Draw() const;

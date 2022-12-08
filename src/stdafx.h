@@ -152,9 +152,9 @@ public:
 	{
 		if (lhs.x < rhs.x) // sort by x
 		{
-			return true;
+			return GL_TRUE;
 		}
-		return false;
+		return GL_FALSE;
 	}
 };
 
@@ -205,11 +205,11 @@ public:
 	}
 	inline constexpr const GLboolean& operator==(const Vector2& rhs) const
 	{
-		return (x == rhs.x && y == rhs.y) ? true : false;
+		return (x == rhs.x && y == rhs.y) ? GL_TRUE : GL_FALSE;
 	}
 	inline constexpr const GLboolean& operator!=(const Vector2& rhs) const
 	{
-		return (x != rhs.x || y != rhs.y) ? true : false;
+		return (x != rhs.x || y != rhs.y) ? GL_TRUE : GL_FALSE;
 	}
 
 	inline Vector2 Normalized() const
@@ -326,11 +326,11 @@ public:
 	}
 	inline constexpr GLboolean operator==(const Vector3& rhs) const
 	{
-		return (x == rhs.x && y == rhs.y && z == rhs.z) ? true : false;
+		return (x == rhs.x && y == rhs.y && z == rhs.z) ? GL_TRUE : GL_FALSE;
 	}
 	inline constexpr GLboolean operator!=(const Vector3& rhs) const
 	{
-		return (x != rhs.x || y != rhs.y || z != rhs.z) ? true : false;
+		return (x != rhs.x || y != rhs.y || z != rhs.z) ? GL_TRUE : GL_FALSE;
 	}
 	inline Vector3& operator+=(const Vector3& rhs)
 	{
@@ -621,6 +621,14 @@ public:
 		GLfloat y = top + GetHeight() / 2;
 		return { x,y };
 	}
+	GLfloat GetRadius() const
+	{
+		glm::vec2 center = GetCenter();
+		GLfloat v = glm::length(center - glm::vec2(left, top));
+		GLfloat u = glm::length(center - glm::vec2(right, bottom));
+
+		return (v > u) ? v : u;
+	}
 	inline constexpr GLfloat GetWidth() const { return (right - left); }
 	inline constexpr GLfloat GetHeight() const { return (bottom - top); }
 };
@@ -652,7 +660,7 @@ typedef struct GLpoint {
 	}
 	inline constexpr const GLboolean operator==(const GLpoint& rhs) const
 	{
-		return (x == rhs.x && y == rhs.y) ? true : false;
+		return (x == rhs.x && y == rhs.y) ? GL_TRUE : GL_FALSE;
 	}
 }GLpoint;
 
@@ -722,7 +730,7 @@ GLvoid RotatePosition(glm::vec3& position, const glm::vec3& pivot, const glm::ve
 
 
 
-/* Check Collision 2D Line-Point */
+/* Check Collision 2D Line-Circle */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const glm::vec2& center, const  GLfloat& radius);
 
 /* Check Collision 2D Line-Line */
@@ -730,13 +738,16 @@ GLboolean CheckCollision(const glm::vec2& v1, const glm::vec2& v2, const glm::ve
 /* Must be call when collisioned */
 glm::vec2 GetLineIntersection(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& u1, const glm::vec2& u2);
 
-/* Check Collision 2D Circle-Point */
+/* Check Collision 2D Circle-Circle */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius);
 
 /* Check Collision 2D Rect-Point */
 GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius);
 
-/* Check Collision 3D Cylinder-Point */
+/* Check Collision 3D Cylinder-Circle */
 GLboolean CheckCollision(const glm::vec3& vCylinderPos, const glm::vec3& uPoint, const GLfloat& vRadius, const GLfloat& uRadius, const GLfloat& vHeight);
 
 void SetConsoleCursor(short x, short y);
+
+
+GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id);

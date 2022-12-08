@@ -16,7 +16,7 @@ static unordered_map<Timer, GLboolean(*)(GLint)> timerTable = {
 };
 
 static set<GLboolean(*)(GLint)> timers;
-static GLboolean isUpdate = false;
+static GLboolean isUpdate = GL_FALSE;
 
 
 
@@ -102,17 +102,17 @@ GLvoid timer::StartUpdate()
 		return;
 	}
 
-	isUpdate = true;
+	isUpdate = GL_TRUE;
 }
 GLvoid timer::StopUpdate()
 {
-	isUpdate = false;
+	isUpdate = GL_FALSE;
 }
 
 
 GLvoid timer::Update()
 {
-	if (isUpdate == false)
+	if (isUpdate == GL_FALSE)
 	{
 		return;
 	}
@@ -122,7 +122,7 @@ GLvoid timer::Update()
 
 	for (GLboolean(*timerFunc)(GLint) : timers)
 	{
-		if (timerFunc(0) == false)
+		if (timerFunc(0) == GL_FALSE)
 		{
 			exitTimers.emplace_back(timerFunc);
 		}
@@ -190,10 +190,10 @@ GLboolean LightRotation_Y(GLint value)
 		break;
 	case INIT:
 		dir = LEFT;
-		return false;
+		return GL_FALSE;
 	case EXIT:
 		dir *= -1;
-		return false;
+		return GL_FALSE;
 	default:
 		break;
 	}
@@ -201,5 +201,5 @@ GLboolean LightRotation_Y(GLint value)
 	extern Light* light;
 	light->RotatePosition({ 0, 0, 0 }, Vector3::Up(), 100 * timer::DeltaTime() * dir);
 
-	return true;
+	return GL_TRUE;
 }
