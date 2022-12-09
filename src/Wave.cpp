@@ -50,5 +50,15 @@ GLvoid WaveManager::Start()
 
 GLvoid WaveManager::Update()
 {
+	if (monsterManager->CheckEnemyEmpty())
+	{
+		crntWave++;
+		//mPlayer->addturret(); 나중에 물어보자
+		// 포탑 지름 20.0f
+		// player upgrade or Turret upgrade
 
+
+		WaveManager::Start();
+		cout << crntWave << endl;
+	}
 }

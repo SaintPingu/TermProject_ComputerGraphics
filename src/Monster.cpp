@@ -391,3 +391,9 @@ GLvoid MonsterManager::CheckCollision(Monster* monster)
 		}
 	}
 }
+
+
+bool MonsterManager::CheckEnemyEmpty()
+{
+	return mMonsterList.empty(); 
+}

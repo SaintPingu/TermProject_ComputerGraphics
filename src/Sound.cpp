@@ -23,6 +23,9 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\sound_hit.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Hit)]);
 	CheckResult(result);
 
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\run\\run_snow(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Run)]);
+	CheckResult(result);
+
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
 	{
 		soundChannel[i] = 0;

@@ -104,5 +104,6 @@ public:
 	GLvoid Draw() const;
 	GLvoid SetPlayer(Player* player);
 	GLboolean GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const;
-	GLvoid CheckCollision(Monster* monster);
+	GLvoid CheckPlayerCollision(Monster* monster);
+	bool CheckEnemyEmpty();
 };
