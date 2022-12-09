@@ -1,7 +1,7 @@
 #pragma once
 
 enum class BGMSound { Normal = 0, _count };
-enum class EffectSound { Fire = 0, Hit, Damaged, _count };
+enum class EffectSound { Fire = 0, Hit, Damaged, Run ,_count };
 enum class SoundChannel { Bgm = 0, Effect, _count };
 
 // has Channel

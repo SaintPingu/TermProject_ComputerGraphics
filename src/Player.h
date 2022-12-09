@@ -7,6 +7,9 @@
 #define PLAYER_RUN_SPEED 100 // 10m/s
 #define PLAYER_JUMP_SPEED 30 // 3 m/s
 
+#define RUN_SOUND_TERM 0.5 // 1초에 1번씩
+
+
 class SharedObject;
 class Camera;
 class Cuboid;
@@ -91,6 +94,7 @@ private:
 	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
+	GLint mHoldTurret = 0;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -144,7 +148,14 @@ public:
 	inline constexpr Camera* GetFirstPersonCamera() { return mFpCamera; }
 	inline constexpr Camera* GetThirdPersonCamera() { return mTpCamera; }
 	GLint GetAmmo() const;
-
+	GLint GetMaxAmmo() const;
 	GLfloat GetRadius() const;
 	GLvoid GetDamage(const GLfloat& damage);
+	GLfloat GetHp() const;
+
+//	GLvoid Add_Hold_turret(const GLint value);
+
+
+	// Skills
+	GLvoid Install_Turret();
 };

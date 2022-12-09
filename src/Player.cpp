@@ -7,6 +7,7 @@
 #include "Gun.h"
 #include "Building.h"
 #include "Sound.h"
+#include "Turret.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
@@ -14,6 +15,7 @@
 extern Map* crntMap;
 extern BuildingManager* buildingManager;
 extern SoundManager* soundManager;
+extern TurretManager* turretManager;
 
 using namespace playerState;
 
@@ -398,6 +400,15 @@ GLvoid Player::Move()
 		mObject->SetPosX(prevPos.x);
 		mObject->SetPosZ(prevPos.z);
 	}
+
+
+	static float frameTime = 0;
+	if (frameTime > RUN_SOUND_TERM)
+	{
+		soundManager->PlayEffectSound(EffectSound::Run);
+		frameTime = 0;
+	}
+	else frameTime += timer::DeltaTime();
 }
 GLvoid Player::Stop()
 {
@@ -433,6 +444,11 @@ GLint Player::GetAmmo() const
 	return mGun->GetAmmo();
 }
 
+GLint Player::GetMaxAmmo() const
+{
+	return mGun->GetMaxAmmo();
+}
+
 GLvoid Player::GetDamage(const GLfloat& damage)
 {
 	//mHP -= damage;
@@ -446,4 +462,19 @@ GLvoid Player::GetDamage(const GLfloat& damage)
 GLfloat Player::GetRadius() const
 {
 	return mObject->GetRadius();
+}
+
+GLfloat Player::GetHp() const
+{
+	return mHP;
+}
+
+
+GLvoid Player::Install_Turret()
+{
+	if (mHoldTurret > 0)
+	{
+		turretManager->Create(GetPosition());
+		mHoldTurret--;
+	}
 }

@@ -360,3 +360,9 @@ GLvoid MonsterManager::CheckPlayerCollision(Monster* monster)
 		monster->Attack(mPlayer);
 	}
 }
+
+
+bool MonsterManager::CheckEnemyEmpty()
+{
+	return mMonsterList.empty(); 
+}
