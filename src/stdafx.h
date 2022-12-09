@@ -743,7 +743,7 @@ glm::vec2 GetLineIntersection(const glm::vec2& v1, const glm::vec2& v2, const gl
 /* Check Collision 2D Circle-Circle */
 GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& vRadius, const GLfloat& uRadius);
 
-/* Check Collision 2D Rect-Point */
+/* Check Collision 2D Rect-Circle */
 GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius);
 
 /* Check Collision 3D Cylinder-Circle */

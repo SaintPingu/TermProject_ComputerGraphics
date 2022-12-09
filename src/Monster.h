@@ -5,6 +5,7 @@
 enum class MonsterType { Blooper, Egg, Koromon };
 
 class Player;
+class Building;
 class SharedObject;
 
 class Monster : public IBulletCollisionable {
@@ -33,16 +34,16 @@ public:
 
 	virtual GLvoid Update(const glm::vec3* target);
 	virtual GLvoid Look(const glm::vec3* target);
-	GLvoid MoveToTarget(const glm::vec3* target);
 	GLvoid Draw() const;
 
 	GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
 	glm::vec3 GetPosition() const;
 	glm::vec3 GetCenter() const;
 
-	GLvoid GetDamage(const GLfloat& damage);
+	GLvoid Damage(const GLfloat& damage);
 
 	GLvoid Attack(Player* player);
+	GLvoid Attack(Building* building);
 	inline constexpr GLboolean CanAttack() const { return mCrntAttackDelay >= mAttackDelay; }
 	inline GLfloat GetRadius() const { return mObject->GetRadius(); }
 	inline constexpr GLfloat GetDetectRadius() const { return mDetectRadius; }
@@ -81,7 +82,7 @@ private:
 	const GLfloat mJumpDelay = 2.0f;
 	const GLfloat mJumpTime = 1.0f;
 	GLfloat mCrntJumpTime = 0.0f;
-	GLfloat mCrntDelay = 0.0f;
+	GLfloat mCrntJumpDelay = 0.0f;
 public:
 	Koromon(const MonsterType& monsterType, const glm::vec3& position);
 	GLvoid Update(const glm::vec3* target) override;
@@ -103,6 +104,6 @@ public:
 	GLvoid Draw() const;
 	GLvoid SetPlayer(Player* player);
 	GLboolean GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const;
-	GLvoid CheckPlayerCollision(Monster* monster);
+	GLvoid CheckCollision(Monster* monster);
 	bool CheckEnemyEmpty();
 };

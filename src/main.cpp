@@ -157,7 +157,7 @@ GLvoid Init()
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	waveManager->Start();
-	soundManager->PlayBGMSound(BGMSound::Normal, 1.0f, GL_TRUE);
+	soundManager->PlayBGMSound(BGMSound::Normal, 0.5f, GL_TRUE);
 	//system("cls");
 }
 
@@ -558,7 +558,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		SetCameraMode(CameraMode::FirstPerson);
 		break;
 	case '3':
-		//SetCameraMode(CameraMode::ThirdPerson);
+		SetCameraMode(CameraMode::ThirdPerson);
 		break;
 	case '0':
 		SetCameraMode(CameraMode::Light);

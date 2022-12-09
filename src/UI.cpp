@@ -63,14 +63,15 @@ GLvoid UIManager::DrawPlane(const UITexture& texture)
 GLvoid UIManager::Draw()
 {
 	GLint ammo = mPlayer->GetAmmo();
-	GLint ammo_ten = ammo * 0.1f;
+	
+	GLint ammo_ten = static_cast<GLint>(ammo * 0.1f);
 	GLint ammo_Unit = ammo % 10;
 
 	m_ammo_Tens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_ten);
 	m_ammo_Units.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_Unit);
 
 	GLint max_ammo = mPlayer->GetMaxAmmo();
-	GLint max_ammo_ten = max_ammo * 0.1f;
+	GLint max_ammo_ten = static_cast<GLint>(max_ammo * 0.1f);
 	GLint max_ammo_units = max_ammo % 10;
 
 	m_max_ammo_Tens.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + max_ammo_ten));
@@ -89,7 +90,7 @@ GLvoid UIManager::Draw()
 	GLfloat ui_HP = mPlayer->GetHp();
 
 
-	for (size_t i = 0; i < (int)ui_HP/10; i++)
+	for (GLuint i = 0; i < (GLuint)ui_HP/10; i++)
 	{
 		mPlane->SetPosition(glm::vec3(mhp_bar.pos.x + i * (0.04), mhp_bar.pos.y, 0));
 		mPlane->SetTexture(mhp_bar.texture);

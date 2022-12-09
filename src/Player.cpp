@@ -130,7 +130,6 @@ GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
 	mPlayer->SetDir(KEY_SPACEBAR, UP);
-	soundManager->PlayEffectSound(EffectSound::Jump);
 }
 GLvoid Jump::Exit()
 {
@@ -228,6 +227,13 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mFpCamera->SetFovY(110.0f);
 	mFpCamera->SetLook(mObject->GetLook());
 
+	mTpCamera = new Camera();
+	mTpCamera->SetPivot(&mPosition);
+	mTpCamera->SetPosY(100);
+	mTpCamera->SetPosZ(-50);
+	mTpCamera->SetFovY(110.0f);
+	mTpCamera->Look(mObject->GetPosition());
+
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
 
@@ -239,6 +245,8 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 Player::~Player()
 {
 	delete mObject;
+	delete mFpCamera;
+	delete mTpCamera;
 }
 
 
@@ -336,10 +344,6 @@ GLvoid Player::Update()
 	mCrntState->Update();
 
 	mPosition = mObject->GetPviotedPosition();
-	mTpCameraPosition = mObject->GetPviotedPosition();
-	mTpCameraPosition.y += 0.5f;
-	mTpCameraPosition.z -= 0.5f;
-	RotatePosition(mTpCameraPosition, mObject->GetPviotedPosition(), mObject->GetUp(), mTpCameraPitch);
 
 	mGun->Update();
 }
@@ -402,14 +406,14 @@ GLvoid Player::Move()
 		mObject->SetPosZ(prevPos.z);
 	}
 
-	// 걷기 소리 출력을 제한
-	static float soundTime = 0;
-	if (soundTime > RUN_SOUND_TERM)
+
+	static float frameTime = 0;
+	if (frameTime > RUN_SOUND_TERM)
 	{
-		soundManager->PlayEffectSound(EffectSound::Run);
-		soundTime = 0;
+		soundManager->PlayEffectSound(EffectSound::Run, 10.0f, GL_TRUE);
+		frameTime = 0;
 	}
-	else soundTime += timer::DeltaTime();
+	else frameTime += timer::DeltaTime();
 }
 GLvoid Player::Stop()
 {
@@ -431,6 +435,11 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 	mFpCamera->SetLook(mObject->GetLook());
 	mFpCamera->RotateLocal(mYaw, 0, 0);
 
+	mTpCamera->SetLook(mObject->GetLook());
+	mTpCamera->SetPosition({ 0, 100, -50 });
+	mTpCamera->RotatePosition({ 0,0,0 }, Vector3::Up(), mPitch);
+	mTpCamera->RotateLocal(mYaw -15.0f, 0, 0);
+
 	mGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
 }
@@ -450,13 +459,13 @@ GLint Player::GetMaxAmmo() const
 	return mGun->GetMaxAmmo();
 }
 
-GLvoid Player::GetDamage(const GLfloat& damage)
+GLvoid Player::Damage(const GLfloat& damage)
 {
-	//mHP -= damage;
+	mHP -= damage;
 	soundManager->PlayEffectSound(EffectSound::Hit);
 	if (mHP <= 0)
 	{
-		glutLeaveMainLoop();
+		//glutLeaveMainLoop();
 	}
 }
 

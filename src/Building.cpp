@@ -2,12 +2,22 @@
 #include "stdafx.h"
 #include "Building.h"
 
+extern BulletManager* bulletManager;
+
+
 unordered_map<BuildingType, Textures> modelMap{
 	{BuildingType::Core, Textures::Core}
 };
 
-BuildingManager::Building::Building(const BuildingType& type, const glm::vec3& position, const glm::vec3 look)
+Building::Building(const BuildingType& type, const glm::vec3& position, const glm::vec3 look)
 {
+	switch (type)
+	{
+	case BuildingType::Core:
+		mHP = 10.0f;
+		mExplosionColor = BLUE;
+		break;
+	}
 	mCollisionType = CollisionType::Rect;
 	mObject = new SharedObject(GetIdentityTextureObject(modelMap[type]));
 	mObject->SetPosition(position);
@@ -25,22 +35,22 @@ BuildingManager::Building::Building(const BuildingType& type, const glm::vec3& p
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
 }
-BuildingManager::Building::~Building()
+Building::~Building()
 {
 
 }
 
-GLvoid BuildingManager::Building::Draw() const
+GLvoid Building::Draw() const
 {
 }
 
-GLvoid BuildingManager::Building::Update()
+GLvoid Building::Update()
 {
 
 }
 
 
-GLboolean BuildingManager::Building::CheckCollision(const Circle* boundingCircle) const
+GLboolean Building::CheckCollision(const Circle* boundingCircle) const
 {
 	glm::vec2 targetCenter = boundingCircle->GetCenter();
 	GLfloat targetRadius = boundingCircle->GetRadius();
@@ -69,7 +79,7 @@ GLboolean BuildingManager::Building::CheckCollision(const Circle* boundingCircle
 
 	return GL_TRUE;
 }
-GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
+GLboolean Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
 	switch(mCollisionType)
 	{
@@ -144,6 +154,19 @@ GLboolean BuildingManager::Building::CheckCollisionBullet(const BulletAtt& bulle
 	return GL_FALSE;
 }
 
+GLvoid Building::Damage(const GLfloat& damage)
+{
+	mHP -= damage;
+	if (mHP <= 0)
+	{
+		Destroy();
+		bulletManager->CreateExplosion(mExplosionColor, mObject->GetCenterPos(), mObject->GetRadius(), 50);
+	}
+}
+
+
+
+
 
 BuildingManager::BuildingManager()
 {
@@ -160,9 +183,25 @@ BuildingManager::~BuildingManager()
 
 GLvoid BuildingManager::Update()
 {
-	for (Building* building : buildings)
+	for (auto it = buildings.begin(); it != buildings.end();)
 	{
-		building->Update();
+		Building* building = *it;
+		if (building->IsDestroyed() == GL_TRUE)
+		{
+			it = buildings.erase(it);
+			if (building == mCore)
+			{
+				DeleteBlendObject(building->GetBuildingObject());
+				delete mCore;
+				mCore = nullptr;
+			}
+		}
+		else
+		{
+			building->Update();
+
+			++it;
+		}
 	}
 }
 GLvoid BuildingManager::Draw() const
@@ -180,7 +219,7 @@ GLvoid BuildingManager::Create(const BuildingType& type, const glm::vec3& positi
 
 	if (type == BuildingType::Core)
 	{
-		mCorePos = building->GetBuildingObject()->GetRefPos();
+		mCore = building;
 	}
 }
 
@@ -195,4 +234,14 @@ GLboolean BuildingManager::CheckCollision(const Circle* boundingCircle) const
 	}
 
 	return GL_FALSE;
+}
+
+const glm::vec3* BuildingManager::GetCorePos() const
+{
+	if (mCore == nullptr)
+	{
+		return nullptr;
+	}
+
+	return mCore->GetBuildingObject()->GetRefPos();
 }

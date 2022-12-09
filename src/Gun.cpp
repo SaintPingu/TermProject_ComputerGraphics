@@ -25,8 +25,8 @@ GLvoid Gun::Update()
 		return;
 	}
 
-	mCrntDelay += timer::DeltaTime();
-	if (mCrntDelay < mFireDelay)
+	mCrntJumpDelay += timer::DeltaTime();
+	if (mCrntJumpDelay < mFireDelay)
 	{
 		return;
 	}
@@ -43,7 +43,7 @@ GLvoid Gun::Update()
 	}
 
 
-	mCrntDelay = 0.0f;
+	mCrntJumpDelay = 0.0f;
 
 	// ----------------------------------
 	extern BulletManager* bulletManager;

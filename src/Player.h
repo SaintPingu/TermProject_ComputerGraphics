@@ -150,7 +150,7 @@ public:
 	GLint GetAmmo() const;
 	GLint GetMaxAmmo() const;
 	GLfloat GetRadius() const;
-	GLvoid GetDamage(const GLfloat& damage);
+	GLvoid Damage(const GLfloat& damage);
 	GLfloat GetHp() const;
 
 //	GLvoid Add_Hold_turret(const GLint value);
