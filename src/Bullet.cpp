@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Bullet.h"
 #include "Timer.h"
+#include "Sound.h"
 
+extern SoundManager* soundManager;
 
 GLvoid IBulletCollisionable::Destroy()
 {
@@ -151,6 +153,7 @@ GLvoid BulletManager::Update()
 					GLuint randPaint = rand() % NUM_PAINT;
 					Textures texture = static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint);
 					const IdentityObject* object = GetIdentityTextureObject(texture);
+					soundManager->PlayEffectSound(EffectSound::Drawing_ink);
 
 					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
 					mPaints.emplace_back(plane);

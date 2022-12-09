@@ -49,6 +49,7 @@ GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 		}
 		else if (key == KEY_SPACEBAR)
 		{
+			soundManager->PlayEffectSound(EffectSound::Jump);
 			mPlayer->ChangeState(Player::State::Jump);
 		}
 		break;
