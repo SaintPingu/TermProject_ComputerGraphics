@@ -3,6 +3,9 @@
 #include "Object.h"
 #include "Bullet.h"
 #include "Timer.h"
+#include "Sound.h"
+
+extern SoundManager* soundManager;
 
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
@@ -17,7 +20,6 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 
 GLvoid Gun::Update()
 {
-	if (mIsFire == false)
 	if (mIsFire == GL_FALSE)
 	{
 		return;
@@ -29,7 +31,12 @@ GLvoid Gun::Update()
 		return;
 	}
 
-	if (mAmmo >= 0) mAmmo--;
+	if (mAmmo > 0) // shot
+	{
+		soundManager->PlayEffectSound(EffectSound::Normal_shot);
+		mAmmo--;
+	}
+
 	else {
 		//cout << "ÃÑ¾Ë ºÎÁ·" << endl;
 		mAmmo = mMaxAmmo;

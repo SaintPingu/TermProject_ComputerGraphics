@@ -5,20 +5,23 @@ enum class GunType { None=0, Red, Blue, Green, White };
 
 class Gun {
 private:
-	GunType mType = GunType::None;
 	SharedObject* mObject = nullptr;
 	glm::vec3 mGunPosition = { 0,0,0 };
 
 	GLboolean mIsFire = GL_FALSE;
 
-	GLfloat mFireDelay = 0.0f;
 	GLfloat mCrntDelay = 0.0f;
 
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
 
+
+protected:
+	GunType mType = GunType::None;
+	GLfloat mFireDelay = 0.0f;
 	GLint mAmmo = 30;
 	GLint mMaxAmmo = 30;
+
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 
@@ -30,4 +33,9 @@ public:
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch);
 	inline constexpr GLint GetAmmo() const { return mAmmo; };
 	inline constexpr GLint GetMaxAmmo() const { return mMaxAmmo; };
+};
+
+class Shotgun : public Gun {
+public:
+	Shotgun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 };

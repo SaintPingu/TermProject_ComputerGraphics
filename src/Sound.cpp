@@ -23,8 +23,19 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\sound_hit.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Hit)]);
 	CheckResult(result);
 
-	result = FMOD_System_CreateSound(soundSystem, "Sounds\\run\\run_snow(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Run)]);
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_run_snow(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Run)]);
 	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_jump.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Jump)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_normal_fire_02(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Normal_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bullet\\Bullet_middle_Ink_hit.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Drawing_ink)]);
+	CheckResult(result);
+
+	
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
 	{

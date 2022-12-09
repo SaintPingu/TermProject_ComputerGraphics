@@ -130,6 +130,7 @@ GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
 	mPlayer->SetDir(KEY_SPACEBAR, UP);
+	soundManager->PlayEffectSound(EffectSound::Jump);
 }
 GLvoid Jump::Exit()
 {
@@ -401,14 +402,14 @@ GLvoid Player::Move()
 		mObject->SetPosZ(prevPos.z);
 	}
 
-
-	static float frameTime = 0;
-	if (frameTime > RUN_SOUND_TERM)
+	// 걷기 소리 출력을 제한
+	static float soundTime = 0;
+	if (soundTime > RUN_SOUND_TERM)
 	{
 		soundManager->PlayEffectSound(EffectSound::Run);
-		frameTime = 0;
+		soundTime = 0;
 	}
-	else frameTime += timer::DeltaTime();
+	else soundTime += timer::DeltaTime();
 }
 GLvoid Player::Stop()
 {
