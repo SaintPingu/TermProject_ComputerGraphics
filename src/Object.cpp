@@ -329,7 +329,13 @@ GLvoid ShaderObject::SetScaleZ(const GLfloat& scale)
 {
 	mScale.z = scale;
 }
+GLfloat ShaderObject::GetRadius() const
+{
+	GLfloat width = GetWidth();
+	GLfloat depth = GetDepth();
 
+	return (width > depth) ? (width / 2) : (depth / 2);
+}
 GLrect ShaderObject::GetRect() const
 {
 	GLfloat halfWidth = GetWidth() / 2;

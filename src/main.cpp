@@ -532,10 +532,6 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case '`':
 		Reset();
 		break;
-	case 'q':
-	case 'Q':
-		glutLeaveMainLoop();
-		break;
 	case 'h':
 	case 'H':
 		ToggleDepthTest();
@@ -573,6 +569,10 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case 'z':
 	case 'Z':
 		timer::ToggleTimer(Timer::LightRotation_Y);
+		break;
+
+	case KEY_ESCAPE:
+		glutLeaveMainLoop();
 		break;
 	default:
 		break;

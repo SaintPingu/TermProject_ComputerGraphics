@@ -13,8 +13,8 @@ constexpr GLuint NUM_SOUND_CHEENEL = NUM_SOUND_BGM + NUM_SOUND_EFFECT;
 class SoundManager {
 private:
 	FMOD_SYSTEM* soundSystem = nullptr;
-	FMOD_SOUND* bgmSoundList[NUM_SOUND_BGM]{};
-	FMOD_SOUND* effectSoundList[NUM_SOUND_EFFECT]{};
+	FMOD_SOUND* bgmSounds[NUM_SOUND_BGM]{};
+	FMOD_SOUND* effectSounds[NUM_SOUND_EFFECT]{};
 	FMOD_CHANNEL* soundChannel[NUM_SOUND_CHEENEL]{};
 
 

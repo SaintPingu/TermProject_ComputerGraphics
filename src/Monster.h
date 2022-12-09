@@ -16,6 +16,11 @@ protected:
 	GLfloat mHeight = 0.0f;
 	GLfloat mSpeed = 0.0f;
 	GLfloat mDetectRadius = 0.0f;
+
+	GLfloat mDamage = 0.0f;
+	GLfloat mAttackDelay = 3.0f;
+	GLfloat mCrntAttackDelay = 0.0f;
+
 	CollisionType mCollisionType = CollisionType::None;
 	COLORREF mExplosionColor = WHITE;
 
@@ -28,6 +33,7 @@ public:
 
 	virtual GLvoid Update(const glm::vec3* target);
 	virtual GLvoid Look(const glm::vec3* target);
+	GLvoid MoveToTarget(const glm::vec3* target);
 	GLvoid Draw() const;
 
 	GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal);
@@ -36,6 +42,9 @@ public:
 
 	GLvoid GetDamage(const GLfloat& damage);
 
+	GLvoid Attack(Player* player);
+	inline constexpr GLboolean CanAttack() const { return mCrntAttackDelay >= mAttackDelay; }
+	inline GLfloat GetRadius() const { return mObject->GetRadius(); }
 	inline constexpr GLfloat GetDetectRadius() const { return mDetectRadius; }
 };
 
@@ -94,5 +103,5 @@ public:
 	GLvoid Draw() const;
 	GLvoid SetPlayer(Player* player);
 	GLboolean GetShortestMonsterPos(const glm::vec3& srcPos, const GLfloat& radius, glm::vec3& targetPos) const;
-	GLvoid CheckPlayerCollision(const Monster* monster);
+	GLvoid CheckPlayerCollision(Monster* monster);
 };

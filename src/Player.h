@@ -88,7 +88,7 @@ private:
 	GLfloat mTpCameraPitch = 0.0f;
 
 	// values
-	GLfloat mHp = 0.0f;
+	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
 
@@ -139,18 +139,12 @@ public:
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
 
 	// Variables
-	const glm::vec3* GetRefPos() const
-	{
-		return &mPosition;
-	}
+	const glm::vec3* GetRefPos() const { return &mPosition; }
 	glm::vec3 GetPosition() const;
-	inline constexpr Camera* GetFirstPersonCamera()
-	{
-		return mFpCamera;
-	}
-	inline constexpr Camera* GetThirdPersonCamera()
-	{
-		return mTpCamera;
-	}
+	inline constexpr Camera* GetFirstPersonCamera() { return mFpCamera; }
+	inline constexpr Camera* GetThirdPersonCamera() { return mTpCamera; }
 	GLint GetAmmo() const;
+
+	GLfloat GetRadius() const;
+	GLvoid GetDamage(const GLfloat& damage);
 };

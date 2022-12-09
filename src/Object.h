@@ -145,6 +145,7 @@ public:
 	virtual GLfloat GetWidth() const abstract;
 	virtual GLfloat GetHeight() const abstract;
 	virtual GLfloat GetDepth() const abstract;
+	GLfloat GetRadius() const;
 	/* Object¿« 2D Rect (collision-box) π›»Ø */
 	GLrect GetRect() const;
 

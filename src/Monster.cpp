@@ -33,16 +33,19 @@ Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 		mHP = 100.0f;
 		mSpeed = 30.0f;
 		mDetectRadius = 200.0f;
+		mDamage = 10.0f;
 		break;
 	case MonsterType::Egg:
 		mHP = 50.0f;
 		mSpeed = 40.0f;
 		mDetectRadius = 100.0f;
+		mDamage = 5.0f;
 		break;
 	case MonsterType::Koromon:
 		mHP = 150.0f;
 		mSpeed = 150.0f;
 		mDetectRadius = 150.0f;
+		mDamage = 15.0f;
 		break;
 	default:
 		assert(0);
@@ -71,6 +74,8 @@ GLvoid Monster::Look(const glm::vec3* target)
 }
 GLvoid Monster::Update(const glm::vec3* target)
 {
+	mCrntAttackDelay += timer::DeltaTime();
+
 	Look(target);
 	mObject->MoveZ(mSpeed);
 }
@@ -119,6 +124,11 @@ GLvoid Monster::GetDamage(const GLfloat& damage)
 		explosionPos.y += mObject->GetHeight() / 2;
 		bulletManager->CreateExplosion(mExplosionColor, explosionPos, mRadius);
 	}
+}
+GLvoid Monster::Attack(Player* player)
+{
+	mCrntAttackDelay = 0;
+	player->GetDamage(mDamage);
 }
 
 GLvoid Floatable::InitFloat(SharedObject* object, const GLfloat& floatingSpeed, const GLfloat& floatingRange, const GLfloat& floatingOrigin)
@@ -185,6 +195,7 @@ Koromon::Koromon(const MonsterType& monsterType, const glm::vec3& position) : Mo
 }
 GLvoid Koromon::Update(const glm::vec3* target)
 {
+	mCrntAttackDelay += timer::DeltaTime();
 	mCrntDelay += timer::DeltaTime();
 	if (mCrntDelay < mJumpDelay)
 	{
@@ -292,6 +303,7 @@ GLvoid MonsterManager::Update()
 		{
 			const glm::vec3* target = FindTargetPos(monster->GetPosition(), monster->GetDetectRadius());
 			monster->Update(target);
+			CheckPlayerCollision(monster);
 
 
 			++it;
@@ -334,6 +346,17 @@ GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const G
 	return GL_TRUE;
 }
 
-GLvoid MonsterManager::CheckPlayerCollision(const Monster* monster)
+GLvoid MonsterManager::CheckPlayerCollision(Monster* monster)
 {
+	if (monster->CanAttack() == GL_FALSE)
+	{
+		return;
+	}
+
+	glm::vec2 v = ConvertVec2(mPlayer->GetPosition());
+	glm::vec2 u = ConvertVec2(monster->GetPosition());
+	if (::CheckCollision(v, u, mPlayer->GetRadius(), monster->GetRadius()) == GL_TRUE)
+	{
+		monster->Attack(mPlayer);
+	}
 }

@@ -6,12 +6,14 @@
 #include "Map.h"
 #include "Gun.h"
 #include "Building.h"
+#include "Sound.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <myGL/stb_image.h>
 // extern
 extern Map* crntMap;
 extern BuildingManager* buildingManager;
+extern SoundManager* soundManager;
 
 using namespace playerState;
 
@@ -43,7 +45,7 @@ GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->ChangeState(Player::State::Walk, e, key);
 		}
-		else if (key == GLUT_KEY_SPACEBAR)
+		else if (key == KEY_SPACEBAR)
 		{
 			mPlayer->ChangeState(Player::State::Jump);
 		}
@@ -93,7 +95,7 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->ChangeState(Player::State::Idle, e, key);
 		}
-		else if (key == GLUT_KEY_SPACEBAR)
+		else if (key == KEY_SPACEBAR)
 		{
 			mPlayer->ChangeState(Player::State::Jump);
 		}
@@ -125,7 +127,7 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
-	mPlayer->SetDir(GLUT_KEY_SPACEBAR, UP);
+	mPlayer->SetDir(KEY_SPACEBAR, UP);
 }
 GLvoid Jump::Exit()
 {
@@ -138,13 +140,13 @@ GLvoid Jump::Update()
 		if (mPlayer->GetDirY() == UP)
 		{
 			t = 0;
-			mPlayer->SetDir(GLUT_KEY_SPACEBAR, DOWN);
+			mPlayer->SetDir(KEY_SPACEBAR, DOWN);
 		}
 		else
 		{
 			if (isKeyUp)
 			{
-				mPlayer->SetDir(GLUT_KEY_SPACEBAR, 0);
+				mPlayer->SetDir(KEY_SPACEBAR, 0);
 				if (mPlayer->GetDirX() == 0 && mPlayer->GetDirZ() == 0)
 				{
 					mPlayer->ChangeState(Player::State::Idle);
@@ -157,7 +159,7 @@ GLvoid Jump::Update()
 			else
 			{
 				t = 0;
-				mPlayer->SetDir(GLUT_KEY_SPACEBAR, UP);
+				mPlayer->SetDir(KEY_SPACEBAR, UP);
 			}
 		}
 		return;
@@ -166,7 +168,7 @@ GLvoid Jump::Update()
 }
 GLvoid Jump::HandleEvent(const Event& e, const GLint& key)
 {
-	if (key == GLUT_KEY_SPACEBAR)
+	if (key == KEY_SPACEBAR)
 	{
 		if (e == Event::KeyUp)
 		{
@@ -290,7 +292,7 @@ GLvoid Player::SetDir(const GLint& key, const GLint& value)
 {
 	switch (key)
 	{
-	case GLUT_KEY_SPACEBAR:
+	case KEY_SPACEBAR:
 		mDirY = value;
 		break;
 	}
@@ -429,4 +431,19 @@ glm::vec3 Player::GetPosition() const
 GLint Player::GetAmmo() const
 {
 	return mGun->GetAmmo();
+}
+
+GLvoid Player::GetDamage(const GLfloat& damage)
+{
+	//mHP -= damage;
+	soundManager->PlayEffectSound(EffectSound::Hit);
+	if (mHP <= 0)
+	{
+		glutLeaveMainLoop();
+	}
+}
+
+GLfloat Player::GetRadius() const
+{
+	return mObject->GetRadius();
 }

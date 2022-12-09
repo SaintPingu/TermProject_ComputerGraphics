@@ -17,7 +17,10 @@ SoundManager::SoundManager()
 	FMOD_RESULT result = FMOD_OK;
 
 	// bgmSound
-	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bgm_intro.wav", FMOD_LOOP_NORMAL, 0, &bgmSoundList[static_cast<GLint>(BGMSound::Normal)]);
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bgm_intro.wav", FMOD_LOOP_NORMAL, 0, &bgmSounds[static_cast<GLint>(BGMSound::Normal)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\sound_hit.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Hit)]);
 	CheckResult(result);
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
@@ -31,12 +34,12 @@ GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const GLflo
 	FMOD_System_Update(soundSystem);
 	if (isNewChannel == GL_TRUE)
 	{
-		FMOD_System_PlaySound(soundSystem, effectSoundList[static_cast<GLint>(effectSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Effect)]);
+		FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Effect)]);
 		FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Effect)], volume);
 	}
 	else
 	{
-		FMOD_System_PlaySound(soundSystem, effectSoundList[static_cast<GLint>(effectSound)], 0, GL_FALSE, NULL);
+		FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, NULL);
 	}
 }
 GLvoid SoundManager::StopEffectSound()
@@ -49,7 +52,7 @@ GLvoid SoundManager::PlayBGMSound(const BGMSound& bgmSound, const GLfloat& volum
 	FMOD_System_Update(soundSystem);
 	if (isNewChannel == GL_TRUE)
 	{
-		FMOD_System_PlaySound(soundSystem, bgmSoundList[static_cast<GLint>(bgmSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Bgm)]);
+		FMOD_System_PlaySound(soundSystem, bgmSounds[static_cast<GLint>(bgmSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Bgm)]);
 		FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Bgm)], volume);
 	}
 }
