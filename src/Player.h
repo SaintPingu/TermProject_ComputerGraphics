@@ -146,5 +146,5 @@ public:
 	GLint GetAmmo() const;
 
 	GLfloat GetRadius() const;
-	GLvoid GetDamage(const GLfloat& damage);
+	GLvoid Damage(const GLfloat& damage);
 };

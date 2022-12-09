@@ -402,7 +402,12 @@ GLvoid ShaderObject::ModelTransform() const
 	glm::mat4 transform = GetTransform();
 	shd::SetShader(mShader, "modelTransform", transform);
 }
-
+glm::vec3 ShaderObject::GetCenterPos() const
+{
+	glm::vec3 explosionPos = GetTransformedPos();
+	explosionPos.y += GetHeight() / 2;
+	return explosionPos;
+}
 
 
 
@@ -1434,6 +1439,18 @@ GLvoid AddObject(const Shader& shader, ShaderObject* object)
 GLvoid AddBlendObject(ShaderObject* object)
 {
 	blendObjects.emplace_back(object);
+}
+GLvoid DeleteBlendObject(ShaderObject* object)
+{
+	for(auto it = blendObjects.begin(); it != blendObjects.end(); ++it)
+	{
+		ShaderObject* o = *it;
+		if (object == o)
+		{
+			blendObjects.erase(it);
+			return;
+		}
+	}
 }
 GLvoid DeleteObject(const Shader& shader, ShaderObject* object)
 {

@@ -76,6 +76,10 @@ GLvoid Monster::Update(const glm::vec3* target)
 {
 	mCrntAttackDelay += timer::DeltaTime();
 
+	if (target == nullptr)
+	{
+		return;
+	}
 	Look(target);
 	mObject->MoveZ(mSpeed);
 }
@@ -93,7 +97,7 @@ GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitP
 		glm::vec3 monsterPos = mObject->GetTransformedPos();
 		if (::CheckCollision(monsterPos, bullet.crntPos, mRadius, bullet.radius, mHeight) == GL_TRUE)
 		{
-			GetDamage(bullet.damage);
+			Damage(bullet.damage);
 			return GL_TRUE;
 		}
 	}
@@ -114,21 +118,23 @@ glm::vec3 Monster::GetCenter() const
 	glm::vec3 pos = mObject->GetPosition();
 	return glm::vec3(pos.x, pos.y + mObject->GetHeight() / 2.0f, pos.z);
 }
-GLvoid Monster::GetDamage(const GLfloat& damage)
+GLvoid Monster::Damage(const GLfloat& damage)
 {
 	mHP -= damage;
 	if (mHP <= 0)
 	{
 		Destroy();
-		glm::vec3 explosionPos = mObject->GetTransformedPos();
-		explosionPos.y += mObject->GetHeight() / 2;
-		bulletManager->CreateExplosion(mExplosionColor, explosionPos, mRadius);
+		bulletManager->CreateExplosion(mExplosionColor, mObject->GetCenterPos(), mRadius);
 	}
 }
 GLvoid Monster::Attack(Player* player)
 {
 	mCrntAttackDelay = 0;
-	player->GetDamage(mDamage);
+	player->Damage(mDamage);
+}
+GLvoid Monster::Attack(Building* building)
+{
+	building->Damage(mDamage);
 }
 
 GLvoid Floatable::InitFloat(SharedObject* object, const GLfloat& floatingSpeed, const GLfloat& floatingRange, const GLfloat& floatingOrigin)
@@ -211,6 +217,11 @@ GLvoid Koromon::Update(const glm::vec3* target)
 		return;
 	}
 
+	if (target == nullptr)
+	{
+		return;
+	}
+
 	constexpr GLfloat yaw = 30.0f;
 	constexpr GLfloat weight = 45.0f;
 	GLfloat t = mCrntJumpTime;
@@ -233,10 +244,16 @@ const glm::vec3* MonsterManager::FindTargetPos(const glm::vec3& monsterPos, cons
 	const glm::vec3* corePos = buildingManager->GetCorePos();
 
 	glm::vec2 playerCenter = ConvertVec2(mPlayer->GetPosition());
-	glm::vec2 coreCenter = ConvertVec2(*corePos);
 	glm::vec2 monsterCenter = { monsterPos.x, monsterPos.z };
 	GLfloat distanceToPlayer = glm::length(playerCenter - monsterCenter);
-	GLfloat distanceToCore = glm::length(coreCenter - monsterCenter);
+
+	GLfloat distanceToCore = FLOAT_MAX;
+	if (corePos != nullptr)
+	{
+		glm::vec2 coreCenter = ConvertVec2(*corePos);
+		distanceToCore = glm::length(coreCenter - monsterCenter);
+
+	}
 
 	if (distanceToPlayer < radius)
 	{
@@ -303,8 +320,7 @@ GLvoid MonsterManager::Update()
 		{
 			const glm::vec3* target = FindTargetPos(monster->GetPosition(), monster->GetDetectRadius());
 			monster->Update(target);
-			CheckPlayerCollision(monster);
-
+			MonsterManager::CheckCollision(monster);
 
 			++it;
 		}
@@ -346,17 +362,32 @@ GLboolean MonsterManager::GetShortestMonsterPos(const glm::vec3& srcPos, const G
 	return GL_TRUE;
 }
 
-GLvoid MonsterManager::CheckPlayerCollision(Monster* monster)
+GLvoid MonsterManager::CheckCollision(Monster* monster)
 {
 	if (monster->CanAttack() == GL_FALSE)
 	{
 		return;
 	}
 
-	glm::vec2 v = ConvertVec2(mPlayer->GetPosition());
-	glm::vec2 u = ConvertVec2(monster->GetPosition());
-	if (::CheckCollision(v, u, mPlayer->GetRadius(), monster->GetRadius()) == GL_TRUE)
+	glm::vec2 playerCenter = ConvertVec2(mPlayer->GetPosition());
+	glm::vec2 monsterCenter = ConvertVec2(monster->GetPosition());
+	GLfloat playerRadius = mPlayer->GetRadius();
+	GLfloat monsterRadius = monster->GetRadius();
+
+	if (::CheckCollision(playerCenter, monsterCenter, playerRadius, monsterRadius) == GL_TRUE)
 	{
 		monster->Attack(mPlayer);
+		return;
+	}
+
+	Building* core = buildingManager->GetCore();
+	if (core != nullptr)
+	{
+		if (::CheckCollision(core->GetBuildingObject()->GetRect(), monsterCenter, monsterRadius) == GL_TRUE)
+		{
+			monster->Attack(core);
+			monster->Destroy();
+			return;
+		}
 	}
 }

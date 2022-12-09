@@ -433,13 +433,13 @@ GLint Player::GetAmmo() const
 	return mGun->GetAmmo();
 }
 
-GLvoid Player::GetDamage(const GLfloat& damage)
+GLvoid Player::Damage(const GLfloat& damage)
 {
-	//mHP -= damage;
+	mHP -= damage;
 	soundManager->PlayEffectSound(EffectSound::Hit);
 	if (mHP <= 0)
 	{
-		glutLeaveMainLoop();
+		//glutLeaveMainLoop();
 	}
 }
 

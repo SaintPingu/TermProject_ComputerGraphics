@@ -26,7 +26,7 @@ GLvoid UIManager::Draw()
 {
 	GLint ammo = mPlayer->GetAmmo();
 	
-	GLint ammo_ten = ammo * 0.1f;
+	GLint ammo_ten = static_cast<GLint>(ammo * 0.1f);
 	GLint ammo_Unit = ammo % 10;
 
 	mTens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_ten);

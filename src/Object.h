@@ -154,6 +154,8 @@ public:
 	glm::mat4 GetTransform() const;
 	/* Object의 최종 Transform 적용 */
 	GLvoid ModelTransform() const;
+	/* Object의 중앙 위치 리턴 */
+	glm::vec3 GetCenterPos() const;
 
 	/* Transform이 적용된 mPosition 리턴 */
 	inline glm::vec3 GetTransformedPos() const{ return glm::vec3(GetTransform() * glm::vec4(0, 0, 0, 1.0f)); }
@@ -471,6 +473,7 @@ const ModelObject* GetIdentityTextureObject(const Textures& textureModel);
 
 GLvoid AddObject(const Shader& shader, ShaderObject* object);
 GLvoid AddBlendObject(ShaderObject* object);
+GLvoid DeleteBlendObject(ShaderObject* object);
 GLvoid DeleteObject(const Shader& shader, ShaderObject* object);
 GLvoid DeleteObjects();
 GLvoid DrawObjects(const Shader& shader);

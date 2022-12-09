@@ -231,6 +231,13 @@ GLboolean CheckCollision(const glm::vec2& v, const glm::vec2& u, const GLfloat& 
 GLboolean CheckCollision(const GLrect& rect, const glm::vec2& v, const GLfloat& vRadius)
 {
 	glm::vec2 rectCenter = rect.GetCenter();
+	GLfloat rectRadius = rect.GetRadius();
+
+	if (::CheckCollision(rectCenter, v, rectRadius, vRadius) == GL_FALSE)
+	{
+		return GL_FALSE;
+	}
+
 	GLfloat rectHalfWidth = rect.GetWidth() / 2;
 	GLfloat rectHalfHeight = rect.GetHeight() / 2;
 

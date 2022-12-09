@@ -6,7 +6,7 @@
 GLvoid IBulletCollisionable::Destroy()
 {
 	extern BulletManager* bulletManager;
-	isDestroyed = GL_TRUE;
+	mIsDestroyed = GL_TRUE;
 	bulletManager->DelCollisionObject(this);
 };
 
@@ -192,5 +192,5 @@ GLvoid BulletManager::AddCollisionObject(IBulletCollisionable* object)
 	object->SetID(mID++);
 }
 GLvoid BulletManager::DelCollisionObject(IBulletCollisionable* object) {
-	mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end(), [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
+	mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end() - 1, [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
 };
