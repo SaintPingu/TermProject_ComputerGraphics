@@ -449,7 +449,7 @@ GLint Player::GetMaxAmmo() const
 	return mGun->GetMaxAmmo();
 }
 
-GLvoid Player::GetDamage(const GLfloat& damage)
+GLvoid Player::Damage(const GLfloat& damage)
 {
 	mHP -= damage;
 	soundManager->PlayEffectSound(EffectSound::Hit);
