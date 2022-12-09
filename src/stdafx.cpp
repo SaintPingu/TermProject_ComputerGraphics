@@ -305,3 +305,14 @@ GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id
 	this_thread::yield();
 	return GL_FALSE;
 }
+
+chrono::steady_clock::time_point start;
+GLvoid StartTimeRecord()
+{
+	start = chrono::high_resolution_clock::now();
+}
+GLvoid PrintTimeDuration()
+{
+	auto duration = chrono::high_resolution_clock::now() - start;
+	cout << "Duration : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
+}

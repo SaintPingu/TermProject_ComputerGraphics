@@ -128,7 +128,8 @@ enum class Dir { None, Left, Right, Up, Down, Front, Back };
 enum class CameraMode { Free, FirstPerson, ThirdPerson, Light };
 enum class CollisionType { None, Circle, Rect, };
 
-const GLuint NUM_CORE = thread::hardware_concurrency();
+//const GLuint NUM_CORE = thread::hardware_concurrency();
+const GLuint NUM_CORE = 4;
 constexpr GLint NUM_OF_SHADER = static_cast<GLint>(Shader::_count) - 1;	// exclusive Shader::None
 
 
@@ -751,3 +752,6 @@ void SetConsoleCursor(short x, short y);
 
 
 GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id);
+
+GLvoid StartTimeRecord();
+GLvoid PrintTimeDuration();

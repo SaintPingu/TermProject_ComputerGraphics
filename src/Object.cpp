@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Bullet.h"
 
-#define PAINT_DISAPEAR_TIME 100.0f
+#define PAINT_DISAPEAR_TIME 10.0f
 
 #define INIT_LOOK Vector3::Front()
 
@@ -1487,72 +1487,67 @@ GLvoid DrawObjects(const Shader& shader)
 }
 
 
+typedef pair<ShaderObject*, GLfloat> blendObject;
 
-
-
-
-
-
-GLvoid MergeSort(const GLuint& id)
+GLvoid Sort(vector<blendObject>& objects)
 {
-
+	std::sort(objects.begin(), objects.end(), [](const blendObject& lhs, const blendObject& rhs) { return lhs.second < rhs.second; });
 }
 
-vector<ShaderObject*> GetSorted()
-{ 
-	vector<ShaderObject*> result;
-
-	const size_t size = blendObjects.size();
-	pair<ShaderObject*, GLfloat>* objects = new pair<ShaderObject*, GLfloat>[size];
-
-	extern const Camera* crntCamera;
-	glm::vec3 cameraPos = crntCamera->GetPosition();
-
-	
-	for (size_t i = 0; i < size; ++i)
-	{
-		ShaderObject* object = blendObjects[i];
-		const GLfloat distance = glm::length(cameraPos - object->GetTransformedPos());
-		objects[i] = make_pair(object, distance);
-	}
-
-	vector<thread*> threads;
-	threads.resize(NUM_CORE);
-	for (GLuint i = 0; i < NUM_CORE; ++i)
-	{
-
-	}
-
-	return result;
-}
-
-
+/* paints는 삽입/제거가 빈번하게 일어나기 때문에 */
+/* 속도 향상을 위해 paints와 blendObjects를 분리 후 Draw 시에 병합 */
 GLvoid DrawBlendObjects()
 {
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 
+	constexpr GLfloat maxPaintDistance = 100.0f;
+
+	/* Camera 위치 */
 	extern const Camera* crntCamera;
 	glm::vec3 cameraPos = crntCamera->GetPosition();
 
-	map<GLfloat, ShaderObject*> sorted;
-	for (auto it = blendObjects.begin(); it != blendObjects.end(); ++it)
-	{
-		GLfloat distance = glm::length(cameraPos - (*it)->GetTransformedPos());
-		sorted[distance] = *it;
-	}
-
+	/* Paints 불러오기 */
 	extern BulletManager* bulletManager;
 	const vector<PaintPlane*>& paints = bulletManager->GetPaints();
-	for (auto it = paints.begin(); it != paints.end(); ++it)
+
+	/* size 계산 */
+	const size_t blendObjectSize = blendObjects.size();
+	const size_t totalSize = blendObjectSize + paints.size();
+
+	/* 멀리 있는 Paints는 정렬하지 않음 */
+	vector<blendObject> nearObjects;
+	vector<ShaderObject*> farObjects;
+	for (size_t i = 0; i < blendObjectSize; ++i)
 	{
-		GLfloat distance = glm::length(cameraPos - (*it)->GetTransformedPos());
-		sorted[distance] = *it;
+		ShaderObject* object = blendObjects[i];
+		GLfloat distance = glm::length(cameraPos - object->GetTransformedPos());
+		nearObjects.emplace_back(make_pair(object, distance));
 	}
 
-	for (map<GLfloat, ShaderObject*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+	for (size_t i = blendObjectSize; i < totalSize; ++i)
 	{
-		(*it).second->Draw();
+		ShaderObject* object = paints[i - blendObjectSize];
+		GLfloat distance = glm::length(cameraPos - object->GetPosition());
+		if (distance < maxPaintDistance)
+		{
+			nearObjects.emplace_back(make_pair(object, distance));
+		}
+		else
+		{
+			farObjects.emplace_back(object);
+		}
+	}
+
+	Sort(nearObjects);
+
+	for (size_t i = 0; i < nearObjects.size(); ++i)
+	{
+		nearObjects[i].first->Draw();
+	}
+	for (size_t i = 0; i < farObjects.size(); ++i)
+	{
+		farObjects[i]->Draw();
 	}
 
 	glEnable(GL_CULL_FACE);

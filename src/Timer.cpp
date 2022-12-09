@@ -25,11 +25,10 @@ static GLfloat deltaTime = 0;
 static DWORD lastTime = 0;
 static DWORD fps_lastTime = 0;
 
-GLvoid PrintFPS(const GLfloat& fps)
+inline GLvoid PrintFPS(const GLfloat& fps)
 {
 	SetConsoleCursor(0, 0);
 	printf("fps : %.3f\n", fps);
-	printf("delta time : %lf\n", deltaTime);
 }
 GLvoid timer::CalculateFPS()
 {
@@ -54,7 +53,7 @@ GLvoid timer::CalculateFPS()
 	}
 
 	lastTime = crntTime;
-	//PrintFPS(fps);
+	PrintFPS(fps);
 }
 GLfloat timer::DeltaTime()
 {

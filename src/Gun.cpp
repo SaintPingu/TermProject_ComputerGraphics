@@ -31,7 +31,7 @@ GLvoid Gun::Update()
 
 	if (mAmmo >= 0) mAmmo--;
 	else {
-		cout << "ÃÑ¾Ë ºÎÁ·" << endl;
+		//cout << "ÃÑ¾Ë ºÎÁ·" << endl;
 		mAmmo = 60;
 	}
 
