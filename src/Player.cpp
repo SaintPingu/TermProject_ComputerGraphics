@@ -106,6 +106,11 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->Run();
 		}
+		else if (key == 'r' || key == 'R')
+		{
+			mPlayer->Install_Turret();
+		}
+
 		break;
 	case Event::KeyUp:
 		if (movKeys.find(key) != movKeys.end())
@@ -458,6 +463,11 @@ GLint Player::GetAmmo() const
 GLint Player::GetMaxAmmo() const
 {
 	return mGun->GetMaxAmmo();
+}
+
+GLint Player::GetHoldTullet() const
+{
+	return mHoldTurret;
 }
 
 GLvoid Player::Damage(const GLfloat& damage)

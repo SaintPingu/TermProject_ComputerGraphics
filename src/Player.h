@@ -94,7 +94,7 @@ private:
 	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
-	GLint mHoldTurret = 0;
+	GLint mHoldTurret = 3;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -149,6 +149,7 @@ public:
 	inline constexpr Camera* GetThirdPersonCamera() { return mTpCamera; }
 	GLint GetAmmo() const;
 	GLint GetMaxAmmo() const;
+	GLint GetHoldTullet() const;
 	GLfloat GetRadius() const;
 	GLvoid Damage(const GLfloat& damage);
 	GLfloat GetHp() const;

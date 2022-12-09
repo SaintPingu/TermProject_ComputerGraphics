@@ -35,7 +35,11 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bullet\\Bullet_middle_Ink_hit.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Drawing_ink)]);
 	CheckResult(result);
 
-	
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\turret\\turret_Install.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Turret_install)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\turret\\turret_FindEnemy.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Turret_FindEnemy)]);
+	CheckResult(result);
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
 	{
