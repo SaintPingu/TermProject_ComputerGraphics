@@ -90,6 +90,11 @@ GLvoid Monster::Draw() const
 
 GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
+	if (bullet.damage <= 0)
+	{
+		return GL_FALSE;
+	}
+
 	switch (mCollisionType)
 	{
 	case CollisionType::Circle:
@@ -202,8 +207,16 @@ Koromon::Koromon(const MonsterType& monsterType, const glm::vec3& position) : Mo
 GLvoid Koromon::Update(const glm::vec3* target)
 {
 	mCrntAttackDelay += timer::DeltaTime();
-	mCrntDelay += timer::DeltaTime();
-	if (mCrntDelay < mJumpDelay)
+	mCrntJumpDelay += timer::DeltaTime();
+
+	if (target == nullptr)
+	{
+		mCrntJumpTime = 0;
+		mObject->SetPosY(0.0f);
+		return;
+	}
+
+	if (mCrntJumpDelay < mJumpDelay)
 	{
 		return;
 	}
@@ -211,16 +224,13 @@ GLvoid Koromon::Update(const glm::vec3* target)
 	mCrntJumpTime += timer::DeltaTime();
 	if (mCrntJumpTime > mJumpTime)
 	{
-		mCrntDelay = 0;
+		mCrntJumpDelay = 0;
 		mCrntJumpTime = 0;
 		mObject->SetPosY(0.0f);
 		return;
 	}
 
-	if (target == nullptr)
-	{
-		return;
-	}
+	
 
 	constexpr GLfloat yaw = 30.0f;
 	constexpr GLfloat weight = 45.0f;

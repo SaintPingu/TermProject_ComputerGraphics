@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Bullet.h"
 
-#define PAINT_DISAPEAR_TIME 10.0f
+#define PAINT_DISAPEAR_TIME 8.0f
 
 #define INIT_LOOK Vector3::Front()
 
@@ -112,6 +112,7 @@ GLvoid Object::RotateModel(const glm::vec3& axis, const GLfloat& degree)
 GLvoid Object::ResetRotation()
 {
 	mRotation = glm::quat(1, 0, 0, 0);
+	mLook = INIT_LOOK;
 }
 GLvoid Object::ResetModelRotation()
 {

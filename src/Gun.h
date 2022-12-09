@@ -11,8 +11,8 @@ private:
 
 	GLboolean mIsFire = GL_FALSE;
 
-	GLfloat mFireDelay = 0.0f;
-	GLfloat mCrntDelay = 0.0f;
+	GLfloat mFireDelay = 0.1f;
+	GLfloat mCrntJumpDelay = 0.0f;
 
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;

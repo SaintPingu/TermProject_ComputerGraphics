@@ -82,7 +82,7 @@ private:
 	const GLfloat mJumpDelay = 2.0f;
 	const GLfloat mJumpTime = 1.0f;
 	GLfloat mCrntJumpTime = 0.0f;
-	GLfloat mCrntDelay = 0.0f;
+	GLfloat mCrntJumpDelay = 0.0f;
 public:
 	Koromon(const MonsterType& monsterType, const glm::vec3& position);
 	GLvoid Update(const glm::vec3* target) override;

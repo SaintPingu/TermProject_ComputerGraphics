@@ -227,6 +227,13 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mFpCamera->SetFovY(110.0f);
 	mFpCamera->SetLook(mObject->GetLook());
 
+	mTpCamera = new Camera();
+	mTpCamera->SetPivot(&mPosition);
+	mTpCamera->SetPosY(100);
+	mTpCamera->SetPosZ(-50);
+	mTpCamera->SetFovY(110.0f);
+	mTpCamera->Look(mObject->GetPosition());
+
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
 
@@ -238,6 +245,8 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 Player::~Player()
 {
 	delete mObject;
+	delete mFpCamera;
+	delete mTpCamera;
 }
 
 
@@ -335,10 +344,6 @@ GLvoid Player::Update()
 	mCrntState->Update();
 
 	mPosition = mObject->GetPviotedPosition();
-	mTpCameraPosition = mObject->GetPviotedPosition();
-	mTpCameraPosition.y += 0.5f;
-	mTpCameraPosition.z -= 0.5f;
-	RotatePosition(mTpCameraPosition, mObject->GetPviotedPosition(), mObject->GetUp(), mTpCameraPitch);
 
 	mGun->Update();
 }
@@ -405,7 +410,7 @@ GLvoid Player::Move()
 	static float frameTime = 0;
 	if (frameTime > RUN_SOUND_TERM)
 	{
-		soundManager->PlayEffectSound(EffectSound::Run);
+		soundManager->PlayEffectSound(EffectSound::Run, 10.0f, GL_TRUE);
 		frameTime = 0;
 	}
 	else frameTime += timer::DeltaTime();
@@ -429,6 +434,11 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 	mFpCamera->SetLook(mObject->GetLook());
 	mFpCamera->RotateLocal(mYaw, 0, 0);
+
+	mTpCamera->SetLook(mObject->GetLook());
+	mTpCamera->SetPosition({ 0, 100, -50 });
+	mTpCamera->RotatePosition({ 0,0,0 }, Vector3::Up(), mPitch);
+	mTpCamera->RotateLocal(mYaw -15.0f, 0, 0);
 
 	mGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
