@@ -18,6 +18,10 @@ class Player;
 class Circle;
 class Gun;
 
+class ShotGun;
+class Sniper;
+class Launcher;
+
 namespace playerState {
 	/* ±âº» State  */
 	class PlayerState abstract {
@@ -81,7 +85,13 @@ private:
 
 	// childs
 	SharedObject* mObject = nullptr;
+	Gun* mPlayGun = nullptr;
+
+	// weapons
 	Gun* mGun = nullptr;
+	Sniper* mSniper = nullptr;
+	ShotGun* mShotGun = nullptr;
+	Launcher* mLauncher = nullptr;
 
 	// camera
 	const CameraMode* mCameraMode = nullptr;
@@ -159,4 +169,5 @@ public:
 
 	// Skills
 	GLvoid Install_Turret();
+	GLvoid ChaingeGun();
 };

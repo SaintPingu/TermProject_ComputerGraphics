@@ -4,7 +4,7 @@
 enum class GunType { None=0, Red, Blue, Green, White };
 
 class Gun {
-private:
+protected:
 	GunType mType = GunType::None;
 	SharedObject* mObject = nullptr;
 	glm::vec3 mGunPosition = { 0,0,0 };
@@ -22,7 +22,7 @@ private:
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 
-	GLvoid Update();
+	virtual GLvoid Update();
 
 	inline constexpr GLvoid StartFire() { mIsFire = GL_TRUE; }
 	inline constexpr GLvoid StopFire() { mIsFire = GL_FALSE; }
@@ -30,4 +30,29 @@ public:
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch);
 	inline constexpr GLint GetAmmo() const { return mAmmo; };
 	inline constexpr GLint GetMaxAmmo() const { return mMaxAmmo; };
+};
+
+
+class ShotGun : public Gun
+{
+public:
+	ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot);
+	GLvoid Update();
+
+
+};
+
+class Sniper : public Gun
+{
+public:
+	Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot);
+	GLvoid Update();
+};
+
+
+class Launcher : public Gun
+{
+public:
+	Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot);
+	GLvoid Update();
 };

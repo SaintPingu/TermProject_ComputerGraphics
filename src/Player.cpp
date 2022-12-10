@@ -110,6 +110,10 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->Install_Turret();
 		}
+		else if (key == 'q' || key == 'Q')
+		{
+			mPlayer->ChaingeGun();
+		}
 
 		break;
 	case Event::KeyUp:
@@ -241,7 +245,23 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mTpCamera->Look(mObject->GetPosition());
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
+	
 	mGun = new Gun(gunPosition, &mPosition);
+	mSniper = new Sniper(gunPosition, &mPosition);
+	mShotGun = new ShotGun(gunPosition, &mPosition);
+	mLauncher = new Launcher(gunPosition, &mPosition);
+
+
+	// Gun* mPlayGun = nullptr
+	mPlayGun = mGun;
+	// 총 교체에 따라 
+	// mPlayGun =  mShotgun
+	// mPlayGun =  mPistol
+	// mplayGun  = mSniper 해서
+	// 
+	// mPlayGun->StartFire();
+	// 으로 되도록
+
 
 	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 0.1f, 0 });
 	mBoundingCircle->SetColor(BLUE);
@@ -351,7 +371,7 @@ GLvoid Player::Update()
 
 	mPosition = mObject->GetPviotedPosition();
 
-	mGun->Update();
+	mPlayGun->Update();
 }
 GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
@@ -382,11 +402,11 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			mGun->StartFire();
+			mPlayGun->StartFire();
 		}
 		else if (state == GLUT_UP)
 		{
-			mGun->StopFire();
+			mPlayGun->StopFire();
 		}
 		break;
 	}
@@ -446,7 +466,7 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 	mTpCamera->RotatePosition({ 0,0,0 }, Vector3::Up(), mPitch);
 	mTpCamera->RotateLocal(mYaw -15.0f, 0, 0);
 
-	mGun->Rotate(mYaw, mPitch);
+	mPlayGun->Rotate(mYaw, mPitch);
 	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
 }
 
@@ -457,12 +477,12 @@ glm::vec3 Player::GetPosition() const
 
 GLint Player::GetAmmo() const
 {
-	return mGun->GetAmmo();
+	return mPlayGun->GetAmmo();
 }
 
 GLint Player::GetMaxAmmo() const
 {
-	return mGun->GetMaxAmmo();
+	return mPlayGun->GetMaxAmmo();
 }
 
 GLint Player::GetHoldTullet() const
@@ -498,4 +518,27 @@ GLvoid Player::Install_Turret()
 		turretManager->Create(GetPosition());
 		mHoldTurret--;
 	}
+}
+
+GLvoid Player::ChaingeGun()
+{
+	static int gun_num = 0;
+	if (++gun_num > 3) gun_num = 0;
+	switch (gun_num)
+	{
+	case 0:
+		mPlayGun = mGun;
+		break;
+	case 1:
+		mPlayGun = mShotGun;
+		break;
+	case 2:
+		mPlayGun = mLauncher;
+		break;
+	case 3:
+		mPlayGun = mSniper;
+		break;
+	}
+
+
 }
