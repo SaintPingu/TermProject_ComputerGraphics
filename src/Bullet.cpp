@@ -3,7 +3,10 @@
 #include "Timer.h"
 #include "Sound.h"
 
+#define BULLET_RADIUS 10.0f
+
 extern SoundManager* soundManager;
+extern BulletManager* bulletManager;
 
 GLvoid IBulletCollisionable::Destroy()
 {
@@ -13,22 +16,43 @@ GLvoid IBulletCollisionable::Destroy()
 };
 
 
-BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject(GetIdentityModelObject(Models::LowSphere))
+BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject()
 {
+	mType = type;
+
+	GLfloat scale = 0.0f;
 	switch (type)
 	{
 	case BulletType::Normal:
 		mWeight = 30.0f;
-		mRadius = 0.1f;
+		scale = 0.1f;
 		mVelocity = 300.0f;
 		mDamage = 10.0f;
+		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
 		break;
 	case BulletType::Particle_Explosion:
 		mWeight = 100.0f;
-		mRadius = 0.1f;
+		scale = 0.1f;
 		mVelocity = 150.0f;
 		mDamage = 0.0f;
+		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
 		break;
+	case BulletType::Bullet_Explosion:
+		mWeight = 130.0f;
+		scale = 1.5f;
+		mVelocity = 300.0f;
+		mDamage = 20.0f;
+		SharedObject::Init(GetIdentityModelObject(Models::GeoSphere));
+		break;
+
+	case BulletType::Sniper:
+		mWeight = 10.0f;
+		scale = 0.1f;
+		mVelocity = 500.0f;
+		mDamage = 50.0f;
+		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
+		break;
+
 	default:
 		assert(0);
 		break;
@@ -37,7 +61,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
 
-	SetScale(mRadius);
+	SetScale(scale);
 	RotateLocal(0, resultPitch, 0);
 	SetColor(color);
 
@@ -50,6 +74,11 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 	mAngleZ = cos(DEGREE_TO_RADIAN(resultYaw));
 
 }
+BulletManager::Bullet::~Bullet()
+{
+	
+}
+
 GLvoid BulletManager::Bullet::Update()
 {
 	mPrevPos = GetTransformedPos();
@@ -64,7 +93,7 @@ BulletAtt BulletManager::Bullet::GetAttribute() const
 	BulletAtt result;
 	result.prevPos = mPrevPos;
 	result.crntPos = GetTransformedPos();
-	result.radius = mRadius;
+	result.radius = BULLET_RADIUS * GetScale().x;
 	result.damage = mDamage;
 
 	return result;
@@ -156,7 +185,13 @@ GLvoid BulletManager::Update()
 					soundManager->PlayEffectSound(EffectSound::Drawing_ink);
 
 					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
+					plane->SetScale(BULLET_RADIUS * bullet->GetScale());
 					mPaints.emplace_back(plane);
+				}
+
+				if (bullet->GetType() == BulletType::Bullet_Explosion)
+				{
+					bulletManager->CreateExplosion(RED, bullet->GetCenterPos(), bullet->GetRadius());
 				}
 
 				delete bullet;

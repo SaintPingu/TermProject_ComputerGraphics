@@ -164,7 +164,9 @@ public:
 	GLvoid Damage(const GLfloat& damage);
 	GLfloat GetHp() const;
 
-//	GLvoid Add_Hold_turret(const GLint value);
+
+	// Add
+	GLvoid AddHoldturret(const GLint& value);
 
 
 	// Skills

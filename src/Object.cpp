@@ -551,6 +551,10 @@ GLfloat IdentityObject::GetDepth() const
 
 SharedObject::SharedObject(const IdentityObject* object) : ShaderObject()
 {
+	Init(object);
+}
+GLvoid SharedObject::Init(const IdentityObject* object)
+{
 	SetObject(object);
 	SetShader(object->GetShader());
 	mTexture = object->GetTexture();
@@ -1332,7 +1336,6 @@ PaintPlane::PaintPlane(const IdentityObject* object, const COLORREF& color, cons
 	
 	SetLook(normal);
 
-	Scale(0.5f);
 	GLfloat randZ = ((rand() % 1000)*0.0001f) + 0.2f;	// 0.2 ~ 0.0999 + 0.2
 	MoveZ(randZ, GL_FALSE);
 

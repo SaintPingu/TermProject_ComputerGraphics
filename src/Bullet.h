@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Object.h"
 
-enum class BulletType { Normal, Particle_Explosion };
+enum class BulletType { Normal, Particle_Explosion, Bullet_Explosion, Sniper};
 
 typedef struct BulletAtt {
 	glm::vec3 prevPos = glm::vec3(0, 0, 0);
@@ -28,10 +28,11 @@ public:
 class BulletManager {
 private:
 	class Bullet : public SharedObject {
+		BulletType mType = BulletType::Normal;
+
 		/* 무게, 중력의 영향을 받는 정도 (n배) */
 		GLfloat mWeight = 0.0f;
 
-		GLfloat mRadius = 0.0f;
 		GLfloat mDamage = 0.0f;
 
 		/* 이전 좌표값 */
@@ -51,10 +52,12 @@ private:
 		GLfloat mVelocity = 0.0f;
 	public:
 		Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+		~Bullet();
 		GLvoid Update();
 
 		BulletAtt GetAttribute() const;
 		COLORREF GetColor() const;
+		inline constexpr BulletType GetType() const { return mType; }
 	};
 
 	GLint mID = 0;

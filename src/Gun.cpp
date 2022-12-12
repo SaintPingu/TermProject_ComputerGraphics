@@ -11,13 +11,12 @@ extern BulletManager* bulletManager;
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
 	mObject = new SharedObject(GetIdentityTextureObject(Textures::Gun));
+	//mObject->SetColor(WHITE);
 
 	mObject->SetPivot(pivot);
 	mObject->SetPosition(gunPosition);
 
 	mGunPosition = gunPosition;
-	AddObject(Shader::Texture, mObject); // 이거하면 총 개수만큼 계속 그리게 됨
-	// 삭제후 Draw함수 추가
 }
 
 GLvoid Gun::Update()
@@ -35,7 +34,6 @@ GLvoid Gun::Update()
 
 	if (mAmmo > 0) // shot
 	{
-		soundManager->PlayEffectSound(EffectSound::Normal_shot);
 		mAmmo--;
 	}
 
@@ -43,17 +41,16 @@ GLvoid Gun::Update()
 		//cout << "총알 부족" << endl;
 		mAmmo = mMaxAmmo;
 	}
-
+	 
 
 	mCrntJumpDelay = 0.0f;
+	soundManager->PlayEffectSound(EffectSound::Normal_shot);
+	Shot();
+}
 
-	// ----------------------------------
-	glm::vec3 origin = { 0, 9, 0 };
-	glm::vec3 bulletPos = { 0, 9, 38 };
-
-	MultiplyVector(mObject->GetTransform(), bulletPos);
-	MultiplyVector(mObject->GetTransform(), origin);
-	bulletManager->Create(BulletType::Normal, WHITE, origin, bulletPos, mYaw, mPitch);
+GLvoid Gun::Draw()
+{
+	mObject->Draw();
 }
 GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 {
@@ -70,6 +67,19 @@ GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 }
 
 
+GLvoid Gun::Shot()
+{
+	// ----------------------------------
+	glm::vec3 origin = { 0, 9, 0 };
+	glm::vec3 bulletPos = { 0, 9, 38 };
+
+	MultiplyVector(mObject->GetTransform(), bulletPos);
+	MultiplyVector(mObject->GetTransform(), origin);
+	bulletManager->Create(BulletType::Normal, WHITE, origin, bulletPos, mYaw, mPitch);
+
+}
+
+
 ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
 {
 	mType = GunType::Blue;
@@ -77,42 +87,21 @@ ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gun
 	mAmmo = mMaxAmmo;
 }
 
-GLvoid ShotGun::Update() 
+GLvoid ShotGun::Shot() 
 {
-	if (mIsFire == GL_FALSE)
-	{
-		return;
-	}
-
-	mCrntJumpDelay += timer::DeltaTime();
-	if (mCrntJumpDelay < mFireDelay)
-	{
-		return;
-	}
-
-	if (mAmmo > 0) // shot
-	{
-		soundManager->PlayEffectSound(EffectSound::Normal_shot);
-		mAmmo--;
-	}
-
-	else {
-		//cout << "총알 부족" << endl;
-		mAmmo = mMaxAmmo;
-	}
-
-
-	mCrntJumpDelay = 0.0f;
-
-	// ----------------------------------
+	
 	glm::vec3 origin = { 0, 9, 0 };
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
 	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch);
-	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch + 15);
-	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch - 15);
+	for (size_t i = 0; i < mBuckbullets; i++)
+	{
+		GLfloat m_b_angle = mBuckAngle - (i * mBuckAngle/mBuckbullets * 2);
+		bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch + m_b_angle);
+		// mPitch + m_b_angle 부터 mPitch - m_b_angle 까지 mBuckbullets 만큼 발사
+	}
 
 }
 
@@ -123,34 +112,9 @@ Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPo
 	mAmmo = mMaxAmmo;
 }
 
-GLvoid Sniper::Update()
+GLvoid Sniper::Shot()
 {
-	if (mIsFire == GL_FALSE)
-	{
-		return;
-	}
-
-	mCrntJumpDelay += timer::DeltaTime();
-	if (mCrntJumpDelay < mFireDelay)
-	{
-		return;
-	}
-
-	if (mAmmo > 0) // shot
-	{
-		soundManager->PlayEffectSound(EffectSound::Normal_shot);
-		mAmmo--;
-	}
-
-	else {
-		//cout << "총알 부족" << endl;
-		mAmmo = mMaxAmmo;
-	}
-
-
-	mCrntJumpDelay = 0.0f;
-
-	// ----------------------------------
+	
 	glm::vec3 origin = { 0, 9, 0 };
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
@@ -167,39 +131,15 @@ Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(g
 	mAmmo = mMaxAmmo;
 }
 
-GLvoid Launcher::Update()
+GLvoid Launcher::Shot()
 {
-	if (mIsFire == GL_FALSE)
-	{
-		return;
-	}
-
-	mCrntJumpDelay += timer::DeltaTime();
-	if (mCrntJumpDelay < mFireDelay)
-	{
-		return;
-	}
-
-	if (mAmmo > 0) // shot
-	{
-		soundManager->PlayEffectSound(EffectSound::Normal_shot);
-		mAmmo--;
-	}
-
-	else {
-		//cout << "총알 부족" << endl;
-		mAmmo = mMaxAmmo;
-	}
-
-
-	mCrntJumpDelay = 0.0f;
-
+	
 	// ----------------------------------
 	glm::vec3 origin = { 0, 9, 0 };
 	glm::vec3 bulletPos = { 0, 9, 38 };
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	bulletManager->Create(BulletType::Normal, RED, origin, bulletPos, mYaw, mPitch);
+	bulletManager->Create(BulletType::Bullet_Explosion, RED, origin, bulletPos, mYaw, mPitch);
 
 }

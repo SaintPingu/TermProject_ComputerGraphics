@@ -2,7 +2,7 @@
 #include "Wave.h"
 #include "Monster.h"
 #include "Map.h"
-
+#include "Player.h"
 
 extern MonsterManager* monsterManager;
 extern Map* crntMap;
@@ -26,8 +26,8 @@ GLvoid WaveManager::Start()
 	GLfloat mapTop = crntMap->GetTop();
 
 	const GLuint numOfBlooper = crntWave * 3;
-	const GLuint numOfEgg = crntWave * 3;
-	const GLuint numOfKoromon = crntWave * 3;
+	const GLuint numOfEgg = crntWave * 2;
+	const GLuint numOfKoromon = crntWave * 2;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -53,10 +53,7 @@ GLvoid WaveManager::Update()
 	if (monsterManager->CheckEnemyEmpty())
 	{
 		crntWave++;
-		//mPlayer->addturret(); 나중에 물어보자
-		// 포탑 지름 20.0f
-		// player upgrade or Turret upgrade
-
+		mPlayer->AddHoldturret(3);
 
 		WaveManager::Start();
 		cout << crntWave << endl;

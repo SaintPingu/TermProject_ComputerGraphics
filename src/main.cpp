@@ -218,7 +218,7 @@ GLvoid InitMeshes()
 	player = new Player({ 0,0,0 }, &cameraMode);
 	uiManager->SetPlayer(player);
 	monsterManager->SetPlayer(player);
-
+	waveManager->SetPlayer(player);
 }
 
 GLvoid Reset()

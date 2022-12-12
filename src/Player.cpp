@@ -106,14 +106,6 @@ GLvoid Walk::HandleEvent(const Event& e, const GLint& key)
 		{
 			mPlayer->Run();
 		}
-		else if (key == 'r' || key == 'R')
-		{
-			mPlayer->Install_Turret();
-		}
-		else if (key == 'q' || key == 'Q')
-		{
-			mPlayer->ChaingeGun();
-		}
 
 		break;
 	case Event::KeyUp:
@@ -377,10 +369,12 @@ GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
 	if (cameraMode == CameraMode::FirstPerson)
 	{
+		mPlayGun->Draw();
 		return;
 	}
 
 	mObject->Draw();
+	mPlayGun->Draw();
 	mBoundingCircle->Draw();
 }
 GLvoid Player::DrawIcon() const
@@ -389,6 +383,17 @@ GLvoid Player::DrawIcon() const
 
 GLvoid Player::ProcessKeyDown(const GLint& key)
 {
+	if (key == 'r' || key == 'R')
+	{
+		Install_Turret();
+		return;
+	}
+	else if (key == 'q' || key == 'Q')
+	{
+		ChaingeGun();
+		return;
+	}
+
 	mCrntState->HandleEvent(Event::KeyDown, key);
 }
 GLvoid Player::ProcessKeyUp(const GLint& key)
@@ -523,22 +528,29 @@ GLvoid Player::Install_Turret()
 GLvoid Player::ChaingeGun()
 {
 	static int gun_num = 0;
+
 	if (++gun_num > 3) gun_num = 0;
 	switch (gun_num)
 	{
 	case 0:
 		mPlayGun = mGun;
 		break;
+
 	case 1:
 		mPlayGun = mShotGun;
 		break;
+
 	case 2:
 		mPlayGun = mLauncher;
 		break;
+
 	case 3:
 		mPlayGun = mSniper;
 		break;
 	}
+}
 
-
+GLvoid Player::AddHoldturret(const GLint& value)
+{ 
+	mHoldTurret += value;
 }

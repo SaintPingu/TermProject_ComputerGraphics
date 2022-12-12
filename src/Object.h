@@ -237,8 +237,10 @@ protected:
 
 	GLuint mTexture = 0;
 public:
+	SharedObject() {};
 	SharedObject(const IdentityObject* object);
 
+	GLvoid Init(const IdentityObject* object);
 	GLvoid Draw() const override;
 	GLvoid SetTexture(const Textures& textureModel);
 
