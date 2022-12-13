@@ -287,6 +287,7 @@ unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::UI_TEXT_SLASH, "ui_text_slash.png" },
 	{Textures::UI_TEXT_X, "ui_text_X.png" },
 	{Textures::UI_COLOR_HP, "ui_HP_color.png" },
+	{Textures::UI_RIFLE_SYMBOL, "ui_weapon_Rifle.png" },
 	{Textures::UI_SHOTGUN_SYMBOL, "ui_weapon_Shotgun.png" },
 	{Textures::UI_LAUNCHER_SYMBOL, "ui_weapon_Launcher.png" },
 	{Textures::UI_SNIPER_SYMBOL, "ui_weapon_Sniper.png" },

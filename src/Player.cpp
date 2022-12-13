@@ -490,6 +490,13 @@ GLint Player::GetMaxAmmo() const
 	return mPlayGun->GetMaxAmmo();
 }
 
+GunType Player::GetGunType() const
+{
+	if (mPlayGun != nullptr) return mPlayGun->GetType();
+	else return GunType::None;
+}
+
+
 GLint Player::GetHoldTullet() const
 {
 	return mHoldTurret;
@@ -514,6 +521,7 @@ GLfloat Player::GetHp() const
 {
 	return mHP;
 }
+
 
 
 GLvoid Player::Install_Turret()

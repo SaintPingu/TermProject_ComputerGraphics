@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "Model.h"
 #include "Player.h"
-
+#include "Gun.h"
 UIManager::UIManager()
 {
 	const Model* planeModel = GetModel(Models::Plane);
@@ -34,8 +34,8 @@ UIManager::UIManager()
 
 	// create HP text
 	mhp_text.texture = Textures::UI_TEXT_HP;
-	mhp_text.pos = glm::vec2(-0.6f, -0.65f);
-	mhp_text.scale = 0.005f;
+	mhp_text.pos = glm::vec2(-0.65f, -0.65f);
+	mhp_text.scale = 0.01f;
 
 	// create HP_Bar
 	mhp_bar.texture = Textures::UI_COLOR_HP;
@@ -44,12 +44,12 @@ UIManager::UIManager()
 
 	// create mGun_symble
 	mgun_symbol.texture = Textures::UI_SHOTGUN_SYMBOL;
-	mgun_symbol.pos = glm::vec2(0.7f, -0.6f);
-	mgun_symbol.scale = 0.006f;
+	mgun_symbol.pos = glm::vec2(0.6f, -0.6f);
+	mgun_symbol.scale = 0.01f;
 
 	// create mTurret_symbol
 	mTurret_symbol.texture = Textures::UI_TURRET_SYMBOL;
-	mTurret_symbol.pos = glm::vec2(-0.77f, 0.8f);
+	mTurret_symbol.pos = glm::vec2(-0.78f, 0.8f);
 	mTurret_symbol.scale = 0.01f;
 
 	// create m X Text
@@ -58,8 +58,9 @@ UIManager::UIManager()
 	mText_X.scale = 0.01f;
 
 	// create HoldTurret
-	mHoldTurret.pos = glm::vec2(-0.631f, 0.8f);
+	mHoldTurret.pos = glm::vec2(-0.64f, 0.8f);
 	mHoldTurret.scale = 0.01f;
+
 }
 
 GLvoid UIManager::DrawPlane(const UITexture& texture)
@@ -105,15 +106,37 @@ GLvoid UIManager::Draw()
 	DrawPlane(mHoldTurret);
 
 	GLfloat ui_HP = mPlayer->GetHp();
-
-
 	DrawPlane(mhp_text);
+	if (ui_HP > 0)
+	{
 	for (GLuint i = 0; i < (GLuint)ui_HP/10; i++)
 	{
-		mhp_bar.pos = glm::vec2(-0.6 + i * (0.04),-0.7);
+		mhp_bar.pos = glm::vec2(-0.6 + i * (0.03),-0.7);
 		DrawPlane(mhp_bar);
 	}
-	
+	}
+	GunType type = mPlayer->GetGunType();
+	switch (type)
+	{
+	case GunType::None:
+		mgun_symbol.texture = Textures::UI_RIFLE_SYMBOL;
+		break;
+	case GunType::Red:
+		mgun_symbol.texture = Textures::UI_LAUNCHER_SYMBOL;
+		break;
+	case GunType::Blue:
+		mgun_symbol.texture = Textures::UI_SHOTGUN_SYMBOL;
+		break;
+	case GunType::Green:
+		mgun_symbol.texture = Textures::UI_SNIPER_SYMBOL;
+		break;
+	case GunType::White:
+		break;
+	default:
+		break;
+	}
+
+	DrawPlane(mgun_symbol);
 
 
 	glDisable(GL_BLEND);

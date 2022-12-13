@@ -17,6 +17,7 @@ class TriangleObject;
 class Player;
 class Circle;
 class Gun;
+enum class GunType;
 
 class ShotGun;
 class Sniper;
@@ -163,6 +164,7 @@ public:
 	GLfloat GetRadius() const;
 	GLvoid Damage(const GLfloat& damage);
 	GLfloat GetHp() const;
+	GunType GetGunType() const;
 
 
 	// Add

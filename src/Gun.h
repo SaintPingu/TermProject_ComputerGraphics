@@ -33,6 +33,7 @@ public:
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch);
 	inline constexpr GLint GetAmmo() const { return mAmmo; };
 	inline constexpr GLint GetMaxAmmo() const { return mMaxAmmo; };
+	inline constexpr GunType GetType() const { return mType; };
 
 };
 

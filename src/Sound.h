@@ -1,7 +1,10 @@
 #pragma once
 
 enum class BGMSound { Normal = 0, _count };
-enum class EffectSound { Fire = 0, Hit, Damaged, Run, Normal_shot, Jump ,Drawing_ink
+
+enum class EffectSound { Fire = 0, Hit, Damaged, Run,Drawing_ink,
+	Normal_shot, Shotgun_shot, Launcher_shot, Sniper_shot ,Jump , 
+	M_BlooperDead , M_EggDead, M_KoromonDead
 	,Turret_install, Turret_FindEnemy ,_count };
 enum class SoundChannel { Bgm = 0, Effect, _count };
 

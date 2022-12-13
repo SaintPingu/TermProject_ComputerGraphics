@@ -44,7 +44,6 @@ GLvoid Gun::Update()
 	 
 
 	mCrntJumpDelay = 0.0f;
-	soundManager->PlayEffectSound(EffectSound::Normal_shot);
 	Shot();
 }
 
@@ -75,6 +74,7 @@ GLvoid Gun::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
+	soundManager->PlayEffectSound(EffectSound::Normal_shot);
 	bulletManager->Create(BulletType::Normal, WHITE, origin, bulletPos, mYaw, mPitch);
 
 }
@@ -84,7 +84,8 @@ ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gun
 {
 	mType = GunType::Blue;
 	mMaxAmmo = 20;
-	mAmmo = mMaxAmmo;
+	mAmmo = mMaxAmmo; 
+	mFireDelay = 0.4f;
 }
 
 GLvoid ShotGun::Shot() 
@@ -96,6 +97,7 @@ GLvoid ShotGun::Shot()
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
 	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch);
+	soundManager->PlayEffectSound(EffectSound::Shotgun_shot);
 	for (size_t i = 0; i < mBuckbullets; i++)
 	{
 		GLfloat m_b_angle = mBuckAngle - (i * mBuckAngle/mBuckbullets * 2);
@@ -110,6 +112,7 @@ Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPo
 	mType = GunType::Green;
 	mMaxAmmo = 10;
 	mAmmo = mMaxAmmo;
+	mFireDelay = 0.8f;
 }
 
 GLvoid Sniper::Shot()
@@ -120,6 +123,7 @@ GLvoid Sniper::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
+	soundManager->PlayEffectSound(EffectSound::Sniper_shot);
 	bulletManager->Create(BulletType::Normal, GREEN, origin, bulletPos, mYaw, mPitch);
 
 }
@@ -129,6 +133,7 @@ Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(g
 	mType = GunType::Red;
 	mMaxAmmo = 5;
 	mAmmo = mMaxAmmo;
+	mFireDelay = 0.6f;
 }
 
 GLvoid Launcher::Shot()
@@ -140,6 +145,7 @@ GLvoid Launcher::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
+	soundManager->PlayEffectSound(EffectSound::Sniper_shot);
 	bulletManager->Create(BulletType::Bullet_Explosion, RED, origin, bulletPos, mYaw, mPitch);
 
 }
