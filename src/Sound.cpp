@@ -53,6 +53,14 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\turret\\turret_FindEnemy.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Turret_FindEnemy)]);
 	CheckResult(result);
 
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Blooper_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_BlooperDead)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Egg_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_EggDead)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Koromon_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_KoromonDead)]);
+	CheckResult(result);
 
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
