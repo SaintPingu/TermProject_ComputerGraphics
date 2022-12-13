@@ -23,8 +23,48 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\sound_hit.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Hit)]);
 	CheckResult(result);
 
-	result = FMOD_System_CreateSound(soundSystem, "Sounds\\run\\run_snow(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Run)]);
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_run_snow(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Run)]);
 	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_jump.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Jump)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_normal_fire_02(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Normal_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_normal_fire_02(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Normal_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_shotgun_fire(cut).wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Shotgun_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_launcher_fire(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Launcher_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_Sniper_fire.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Sniper_shot)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bullet\\Bullet_middle_Ink_hit.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Drawing_ink)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bullet\\Bullet_big_Ink_hit.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Drawing_Bigink)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\turret\\turret_Install.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Turret_install)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\turret\\turret_FindEnemy.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Turret_FindEnemy)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Blooper_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_BlooperDead)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Egg_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_EggDead)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Koromon_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_KoromonDead)]);
+	CheckResult(result);
+
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
 	{

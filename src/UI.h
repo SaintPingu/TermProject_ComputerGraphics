@@ -14,20 +14,22 @@ class UIManager {
 private:
 	ModelObject* mPlane = nullptr;
 	/* Ammo */
-	GLint ammo = 0;
-	GLint max_ammo = 0;
 
-	UITexture m_max_ammo_Tens;
-	UITexture m_max_ammo_Units;
+	UITexture mMax_ammo_Tens;
+	UITexture mMax_ammo_Units;
 
-	UITexture m_ammo_Tens;
-	UITexture m_ammo_Units;
+	UITexture mAmmo_Tens;
+	UITexture mAmmo_Units;
 
 	UITexture mhp_text;
 	UITexture mhp_bar;
 
 	UITexture mslash_text;
 	UITexture mgun_symbol;
+	UITexture mTurret_symbol;
+
+	UITexture mText_X;
+	UITexture mHoldTurret;
 	const Player* mPlayer = nullptr;
 
 

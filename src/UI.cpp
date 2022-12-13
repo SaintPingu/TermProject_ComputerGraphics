@@ -3,50 +3,63 @@
 #include "Object.h"
 #include "Model.h"
 #include "Player.h"
-
+#include "Gun.h"
 UIManager::UIManager()
 {
 	const Model* planeModel = GetModel(Models::Plane);
 	mPlane = new ModelObject(planeModel, Shader::Back);
 
 	// create max_ammo text
-	m_ammo_Tens.texture = Textures::UI_NUM_1;
-	m_ammo_Units.texture = Textures::UI_NUM_0;
+	mAmmo_Tens.texture = Textures::UI_NUM_1;
+	mAmmo_Units.texture = Textures::UI_NUM_0;
 
-	m_max_ammo_Tens.pos = glm::vec2(0.8f, -0.5f);
-	m_max_ammo_Units.pos = glm::vec2(0.83f, -0.5f);
-	m_max_ammo_Tens.scale = 0.005f;
-	m_max_ammo_Units.scale = 0.005f;
+	mMax_ammo_Tens.pos = glm::vec2(0.8f, -0.6f);
+	mMax_ammo_Units.pos = glm::vec2(0.83f, -0.6f);
+	mMax_ammo_Tens.scale = 0.005f;
+	mMax_ammo_Units.scale = 0.005f;
 
 	// create current_ammo text
-	m_ammo_Tens.texture = Textures::UI_NUM_5;
-	m_ammo_Units.texture = Textures::UI_NUM_0;
+	mAmmo_Tens.texture = Textures::UI_NUM_5;
+	mAmmo_Units.texture = Textures::UI_NUM_0;
 
-	m_ammo_Tens.pos = glm::vec2(0.7f, -0.5f);
-	m_ammo_Units.pos = glm::vec2(0.73f, -0.5f);
-	m_ammo_Tens.scale = 0.005f;
-	m_ammo_Units.scale = 0.005f;
+	mAmmo_Tens.pos = glm::vec2(0.7f, -0.6f);
+	mAmmo_Units.pos = glm::vec2(0.73f, -0.6f);
+	mAmmo_Tens.scale = 0.005f;
+	mAmmo_Units.scale = 0.005f;
 
 	// create slash_text
 	mslash_text.texture = Textures::UI_TEXT_SLASH;
-	mslash_text.pos = glm::vec2(0.765f, -0.5f);
+	mslash_text.pos = glm::vec2(0.765f, -0.6f);
 	mslash_text.scale = 0.005f;
 
 	// create HP text
 	mhp_text.texture = Textures::UI_TEXT_HP;
-	mhp_text.pos = glm::vec2(-0.6f, -0.45f);
-	mhp_text.scale = 0.005f;
+	mhp_text.pos = glm::vec2(-0.65f, -0.65f);
+	mhp_text.scale = 0.01f;
 
 	// create HP_Bar
 	mhp_bar.texture = Textures::UI_COLOR_HP;
-	mhp_bar.pos = glm::vec2(-0.6f, -0.5f);
+	mhp_bar.pos = glm::vec2(-0.6f, -0.7f);
 	mhp_bar.scale = 0.005f;
-
 
 	// create mGun_symble
 	mgun_symbol.texture = Textures::UI_SHOTGUN_SYMBOL;
-	mgun_symbol.pos = glm::vec2(0.7f, -0.4f);
-	mgun_symbol.scale = 0.006f;
+	mgun_symbol.pos = glm::vec2(0.6f, -0.6f);
+	mgun_symbol.scale = 0.01f;
+
+	// create mTurret_symbol
+	mTurret_symbol.texture = Textures::UI_TURRET_SYMBOL;
+	mTurret_symbol.pos = glm::vec2(-0.78f, 0.8f);
+	mTurret_symbol.scale = 0.01f;
+
+	// create m X Text
+	mText_X.texture = Textures::UI_TEXT_X;
+	mText_X.pos = glm::vec2(-0.7f, 0.8f);
+	mText_X.scale = 0.01f;
+
+	// create HoldTurret
+	mHoldTurret.pos = glm::vec2(-0.64f, 0.8f);
+	mHoldTurret.scale = 0.01f;
 
 }
 
@@ -63,42 +76,67 @@ GLvoid UIManager::DrawPlane(const UITexture& texture)
 GLvoid UIManager::Draw()
 {
 	GLint ammo = mPlayer->GetAmmo();
-	
 	GLint ammo_ten = static_cast<GLint>(ammo * 0.1f);
 	GLint ammo_Unit = ammo % 10;
 
-	m_ammo_Tens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_ten);
-	m_ammo_Units.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_Unit);
+	mAmmo_Tens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_ten);
+	mAmmo_Units.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + ammo_Unit);
 
 	GLint max_ammo = mPlayer->GetMaxAmmo();
 	GLint max_ammo_ten = static_cast<GLint>(max_ammo * 0.1f);
 	GLint max_ammo_units = max_ammo % 10;
 
-	m_max_ammo_Tens.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + max_ammo_ten));
-	m_max_ammo_Units.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + max_ammo_units));
+	mMax_ammo_Tens.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + max_ammo_ten));
+	mMax_ammo_Units.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + max_ammo_units));
+
+
+	GLint hold_turret = mPlayer->GetHoldTullet();
+	mHoldTurret.texture = (static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + hold_turret));
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
-	DrawPlane(m_max_ammo_Tens);
-	DrawPlane(m_max_ammo_Units);
-	DrawPlane(m_ammo_Tens);
-	DrawPlane(m_ammo_Units);
+	DrawPlane(mAmmo_Tens);
+	DrawPlane(mAmmo_Units);
+	DrawPlane(mMax_ammo_Tens);
+	DrawPlane(mMax_ammo_Units);
 	DrawPlane(mslash_text);
-	DrawPlane(mhp_text);
+	DrawPlane(mTurret_symbol);
+	DrawPlane(mText_X);
+	DrawPlane(mHoldTurret);
 
 	GLfloat ui_HP = mPlayer->GetHp();
-
-
+	DrawPlane(mhp_text);
+	if (ui_HP > 0)
+	{
 	for (GLuint i = 0; i < (GLuint)ui_HP/10; i++)
 	{
-		mPlane->SetPosition(glm::vec3(mhp_bar.pos.x + i * (0.04), mhp_bar.pos.y, 0));
-		mPlane->SetTexture(mhp_bar.texture);
-		mPlane->SetScale(mhp_bar.scale);
-		mPlane->SetScaleX(mhp_bar.scale);
-		mPlane->Draw();
+		mhp_bar.pos = glm::vec2(-0.6 + i * (0.03),-0.7);
+		DrawPlane(mhp_bar);
 	}
-	
+	}
+	GunType type = mPlayer->GetGunType();
+	switch (type)
+	{
+	case GunType::None:
+		mgun_symbol.texture = Textures::UI_RIFLE_SYMBOL;
+		break;
+	case GunType::Red:
+		mgun_symbol.texture = Textures::UI_LAUNCHER_SYMBOL;
+		break;
+	case GunType::Blue:
+		mgun_symbol.texture = Textures::UI_SHOTGUN_SYMBOL;
+		break;
+	case GunType::Green:
+		mgun_symbol.texture = Textures::UI_SNIPER_SYMBOL;
+		break;
+	case GunType::White:
+		break;
+	default:
+		break;
+	}
+
+	DrawPlane(mgun_symbol);
 
 
 	glDisable(GL_BLEND);

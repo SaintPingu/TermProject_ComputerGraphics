@@ -4,9 +4,11 @@
 #include "Player.h"
 #include "Timer.h"
 #include "Building.h"
+#include "Sound.h"
 
 extern BulletManager* bulletManager;
 extern BuildingManager* buildingManager;
+extern SoundManager* soundManager;
 
 unordered_map<MonsterType, Textures> modelMap{
 	{MonsterType::Blooper, Textures::Blooper},
@@ -30,18 +32,21 @@ Monster::Monster(const MonsterType& monsterType, const glm::vec3& position)
 	switch (monsterType)
 	{
 	case MonsterType::Blooper:
+		mType = monsterType;
 		mHP = 100.0f;
 		mSpeed = 30.0f;
 		mDetectRadius = 200.0f;
 		mDamage = 10.0f;
 		break;
 	case MonsterType::Egg:
+		mType = monsterType;
 		mHP = 50.0f;
 		mSpeed = 40.0f;
 		mDetectRadius = 100.0f;
 		mDamage = 5.0f;
 		break;
 	case MonsterType::Koromon:
+		mType = monsterType;
 		mHP = 150.0f;
 		mSpeed = 150.0f;
 		mDetectRadius = 150.0f;
@@ -128,7 +133,23 @@ GLvoid Monster::Damage(const GLfloat& damage)
 	mHP -= damage;
 	if (mHP <= 0)
 	{
+		switch (mType)
+		{
+		case MonsterType::Blooper:
+			soundManager->PlayEffectSound(EffectSound::M_BlooperDead);
+			break;
+		case MonsterType::Egg:
+			soundManager->PlayEffectSound(EffectSound::M_EggDead);
+			break;
+		case MonsterType::Koromon:
+			soundManager->PlayEffectSound(EffectSound::M_KoromonDead);
+			break;
+		default:
+			break;
+		}
+
 		Destroy();
+
 		bulletManager->CreateExplosion(mExplosionColor, mObject->GetCenterPos(), mRadius);
 	}
 }
@@ -176,11 +197,16 @@ Blooper::Blooper(const MonsterType& monsterType, const glm::vec3& position) : Mo
 
 	InitFloat(mObject, 5.0f, 5.0f, position.y);
 }
+Blooper::~Blooper()
+{
+}
 GLvoid Blooper::Update(const glm::vec3* target)
 {
 	Monster::Update(target);
 	UpdateFloat();
 }
+
+
 
 Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
 {
@@ -190,6 +216,10 @@ Egg::Egg(const MonsterType& monsterType, const glm::vec3& position) : Monster(mo
 	mObject->RotateModel(Vector3::Up(), randRotation);
 
 	InitFloat(mObject, 10.0f, 8.0f, position.y);
+}
+Egg::~Egg()
+{
+
 }
 GLvoid Egg::Update(const glm::vec3* target)
 {
@@ -203,6 +233,9 @@ GLvoid Egg::Update(const glm::vec3* target)
 Koromon::Koromon(const MonsterType& monsterType, const glm::vec3& position) : Monster(monsterType, position)
 {
 	mExplosionColor = PINK;
+}
+Koromon::~Koromon()
+{
 }
 GLvoid Koromon::Update(const glm::vec3* target)
 {

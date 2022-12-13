@@ -17,6 +17,11 @@ class TriangleObject;
 class Player;
 class Circle;
 class Gun;
+enum class GunType;
+
+class ShotGun;
+class Sniper;
+class Launcher;
 
 namespace playerState {
 	/* ±âº» State  */
@@ -86,6 +91,9 @@ private:
 	SharedObject* mLegL = nullptr;
 	SharedObject* mLegR = nullptr;
 	Gun* mGun = nullptr;
+	Sniper* mSniper = nullptr;
+	ShotGun* mShotGun = nullptr;
+	Launcher* mLauncher = nullptr;
 
 	// camera
 	const CameraMode* mCameraMode = nullptr;
@@ -94,11 +102,13 @@ private:
 	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
 	GLfloat mTpCameraPitch = 0.0f;
 
+	Camera* mZoomFPCamera = nullptr;
+
 	// values
 	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
-	GLint mHoldTurret = 0;
+	GLint mHoldTurret = 3;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -151,15 +161,21 @@ public:
 	glm::vec3 GetPosition() const;
 	inline constexpr Camera* GetFirstPersonCamera() { return mFpCamera; }
 	inline constexpr Camera* GetThirdPersonCamera() { return mTpCamera; }
+	inline constexpr Camera* GetZoomFirstPersonCamera() { return mZoomFPCamera; }
 	GLint GetAmmo() const;
 	GLint GetMaxAmmo() const;
+	GLint GetHoldTullet() const;
 	GLfloat GetRadius() const;
 	GLvoid Damage(const GLfloat& damage);
 	GLfloat GetHp() const;
+	GunType GetGunType() const;
 
-//	GLvoid Add_Hold_turret(const GLint value);
+
+	// Add
+	GLvoid AddHoldturret(const GLint& value);
 
 
 	// Skills
 	GLvoid Install_Turret();
+	GLvoid ChaingeGun();
 };

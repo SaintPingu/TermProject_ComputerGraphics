@@ -5,9 +5,11 @@
 #include "Bullet.h"
 #include "Monster.h"
 #include "Timer.h"
+#include "Sound.h"
 
 extern MonsterManager* monsterManager;
 extern BulletManager* bulletManager;
+extern SoundManager* soundManager;
 
 TurretManager::Turret::Turret(const glm::vec3& position)
 {
@@ -35,6 +37,11 @@ GLvoid TurretManager::Turret::Update()
 	glm::vec3 targetPos;
 	if (monsterManager->GetShortestMonsterPos(mObject_Head->GetPosition(), mRadius, targetPos) == GL_TRUE)
 	{
+		if (!mTargetOn)
+		{
+			mTargetOn = true;
+			soundManager->PlayEffectSound(EffectSound::Turret_FindEnemy);
+		}
 		mObject_Head->Look(targetPos);
 
 		if (mCrntJumpDelay >= mFireDelay)
@@ -44,6 +51,7 @@ GLvoid TurretManager::Turret::Update()
 	}
 	else
 	{
+		mTargetOn = false;
 		mObject_Head->SetLook(Vector3::Front());
 	}
 }
@@ -61,6 +69,7 @@ GLvoid TurretManager::Turret::Fire()
 	GLfloat pitch = 0.0f;
 	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
 
+	soundManager->PlayEffectSound(EffectSound::Normal_shot);
 	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch);
 }
 
@@ -96,5 +105,6 @@ GLvoid TurretManager::Draw() const
 GLvoid TurretManager::Create(const glm::vec3& position)
 {
 	Turret* turret = new Turret(position);
+	soundManager->PlayEffectSound(EffectSound::Turret_install);
 	turrets.emplace_back(turret);
 }

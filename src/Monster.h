@@ -22,6 +22,8 @@ protected:
 	GLfloat mAttackDelay = 3.0f;
 	GLfloat mCrntAttackDelay = 0.0f;
 
+	MonsterType mType;
+
 	CollisionType mCollisionType = CollisionType::None;
 	COLORREF mExplosionColor = WHITE;
 
@@ -31,7 +33,7 @@ protected:
 
 public:
 	Monster(const MonsterType& monsterType, const glm::vec3& position);
-
+	virtual ~Monster() = 0 {};
 	virtual GLvoid Update(const glm::vec3* target);
 	virtual GLvoid Look(const glm::vec3* target);
 	GLvoid Draw() const;
@@ -64,6 +66,7 @@ public:
 class Blooper : public Monster, Floatable {
 public:
 	Blooper(const MonsterType& monsterType, const glm::vec3& position);
+	~Blooper();
 	GLvoid Update(const glm::vec3* target) override;
 };
 
@@ -74,6 +77,7 @@ private:
 	
 public:
 	Egg(const MonsterType& monsterType, const glm::vec3& position);
+	~Egg();
 	GLvoid Update(const glm::vec3* target) override;
 };
 
@@ -85,6 +89,7 @@ private:
 	GLfloat mCrntJumpDelay = 0.0f;
 public:
 	Koromon(const MonsterType& monsterType, const glm::vec3& position);
+	~Koromon();
 	GLvoid Update(const glm::vec3* target) override;
 };
 

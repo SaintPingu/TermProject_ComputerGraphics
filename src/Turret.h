@@ -13,6 +13,9 @@ private:
 
 		SharedObject* mObject_Body = nullptr;
 		SharedObject* mObject_Head = nullptr;
+
+		bool mTargetOn = false;
+
 	public:
 		Turret(const glm::vec3& position);
 		~Turret();
