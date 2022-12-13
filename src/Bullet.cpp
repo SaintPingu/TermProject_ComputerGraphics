@@ -184,11 +184,11 @@ GLvoid BulletManager::Update()
 					const IdentityObject* object = GetIdentityTextureObject(texture);
 					if (bullet->GetType() != BulletType::Rocket)
 					{
-						soundManager->PlayEffectSound(EffectSound::Drawing_ink);
+						soundManager->PlayEffectSound(EffectSound::Drawing_ink, 0.05f, GL_TRUE);
 					}
 					else
 					{
-						soundManager->PlayEffectSound(EffectSound::Drawing_Bigink);
+						soundManager->PlayEffectSound(EffectSound::Drawing_Bigink, 0.05f, GL_TRUE);
 					}
 					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
 					plane->SetScale(BULLET_RADIUS * bullet->GetScale());

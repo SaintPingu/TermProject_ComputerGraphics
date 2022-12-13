@@ -40,7 +40,7 @@ GLvoid TurretManager::Turret::Update()
 		if (!mTargetOn)
 		{
 			mTargetOn = true;
-			soundManager->PlayEffectSound(EffectSound::Turret_FindEnemy);
+			soundManager->PlayEffectSound(EffectSound::Turret_FindEnemy, 0.1f, GL_TRUE);
 		}
 		mObject_Head->Look(targetPos);
 
@@ -69,7 +69,7 @@ GLvoid TurretManager::Turret::Fire()
 	GLfloat pitch = 0.0f;
 	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
 
-	soundManager->PlayEffectSound(EffectSound::Normal_shot);
+	soundManager->PlayEffectSound(EffectSound::Normal_shot, 0.1f, GL_TRUE);
 	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch);
 }
 
@@ -105,6 +105,6 @@ GLvoid TurretManager::Draw() const
 GLvoid TurretManager::Create(const glm::vec3& position)
 {
 	Turret* turret = new Turret(position);
-	soundManager->PlayEffectSound(EffectSound::Turret_install);
+	soundManager->PlayEffectSound(EffectSound::Turret_install, 0.1f, GL_TRUE);
 	turrets.emplace_back(turret);
 }

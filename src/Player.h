@@ -90,6 +90,7 @@ private:
 	SharedObject* mArms = nullptr;
 	SharedObject* mLegL = nullptr;
 	SharedObject* mLegR = nullptr;
+	Gun* mPlayGun = nullptr;
 	Gun* mGun = nullptr;
 	Sniper* mSniper = nullptr;
 	ShotGun* mShotGun = nullptr;

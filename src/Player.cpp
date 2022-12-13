@@ -249,7 +249,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mZoomFPCamera->SetPosY(38);
 	mZoomFPCamera->SetPosZ(100);
 	mZoomFPCamera->SetFovY(110.0f);
-	mZoomFPCamera->SetLook(mObject->GetLook());
+	mZoomFPCamera->SetLook(mBody->GetLook());
 
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
@@ -466,7 +466,7 @@ GLvoid Player::Move()
 	static float frameTime = 0;
 	if (frameTime > RUN_SOUND_TERM)
 	{
-		soundManager->PlayEffectSound(EffectSound::Run, 10.0f, GL_TRUE);
+		soundManager->PlayEffectSound(EffectSound::Run, 1.0f, GL_TRUE);
 		frameTime = 0;
 	}
 	else frameTime += timer::DeltaTime();

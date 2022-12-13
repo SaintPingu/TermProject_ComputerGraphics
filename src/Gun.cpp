@@ -74,7 +74,7 @@ GLvoid Gun::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	soundManager->PlayEffectSound(EffectSound::Normal_shot);
+	soundManager->PlayEffectSound(EffectSound::Normal_shot, 0.5f, GL_TRUE);
 	bulletManager->Create(BulletType::Normal, WHITE, origin, bulletPos, mYaw, mPitch);
 
 }
@@ -97,7 +97,7 @@ GLvoid ShotGun::Shot()
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
 	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch);
-	soundManager->PlayEffectSound(EffectSound::Shotgun_shot);
+	soundManager->PlayEffectSound(EffectSound::Shotgun_shot, 0.5f, GL_TRUE);
 	for (size_t i = 0; i < mBuckbullets; i++)
 	{
 		GLfloat m_b_angle = mBuckAngle - (i * mBuckAngle/mBuckbullets * 2);
@@ -123,7 +123,7 @@ GLvoid Sniper::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	soundManager->PlayEffectSound(EffectSound::Sniper_shot);
+	soundManager->PlayEffectSound(EffectSound::Sniper_shot, 0.25f, GL_TRUE);
 	bulletManager->Create(BulletType::Normal, GREEN, origin, bulletPos, mYaw, mPitch);
 
 }
@@ -145,7 +145,7 @@ GLvoid Launcher::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	soundManager->PlayEffectSound(EffectSound::Launcher_shot);
+	soundManager->PlayEffectSound(EffectSound::Launcher_shot, 0.5f, GL_TRUE);
 	bulletManager->Create(BulletType::Rocket, RED, origin, bulletPos, mYaw, mPitch);
 
 }

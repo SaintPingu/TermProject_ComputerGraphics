@@ -157,7 +157,7 @@ GLvoid Init()
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	waveManager->Start();
-	soundManager->PlayBGMSound(BGMSound::Normal, 0.5f, GL_TRUE);
+	soundManager->PlayBGMSound(BGMSound::Normal, 0.25f, GL_TRUE);
 	//system("cls");
 }
 
