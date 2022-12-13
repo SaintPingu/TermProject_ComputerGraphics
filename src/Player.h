@@ -80,7 +80,11 @@ private:
 	glm::vec3 mPosition = { 0, 0, 0 };
 
 	// childs
-	SharedObject* mObject = nullptr;
+	SharedObject* mHead = nullptr;
+	SharedObject* mBody = nullptr;
+	SharedObject* mArms = nullptr;
+	SharedObject* mLegL = nullptr;
+	SharedObject* mLegR = nullptr;
 	Gun* mGun = nullptr;
 
 	// camera

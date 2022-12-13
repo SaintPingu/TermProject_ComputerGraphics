@@ -318,11 +318,6 @@ GLvoid DrawScene()
 	shd::SetShader(crntShader, "viewPos", crntCamera->GetPviotedPosition());
 	DrawObjects(crntShader);
 	bulletManager->Draw();
-		
-	if (player != nullptr)
-	{
-		player->Draw(cameraMode);
-	}
 
 	light->Draw();
 
@@ -336,6 +331,11 @@ GLvoid DrawScene()
 	turretManager->Draw();
 	monsterManager->Draw();
 	buildingManager->Draw();
+
+	if (player != nullptr)
+	{
+		player->Draw(cameraMode);
+	}
 
 	glCullFace(GL_FRONT);
 	cubeMap->Draw();

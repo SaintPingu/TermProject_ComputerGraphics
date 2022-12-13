@@ -217,34 +217,46 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mPosition = position;
 	mTpCameraPosition = position;
 	mCameraMode = cameraMode;
-	mObject = new SharedObject(GetIdentityModelObject(Models::Player));
-	mObject->SetColor(WHITE);
+	mHead = new SharedObject(GetIdentityTextureObject(Textures::Player_Head));
+	mBody = new SharedObject(GetIdentityTextureObject(Textures::Player_Body));
+	mArms = new SharedObject(GetIdentityTextureObject(Textures::Player_Arms));
+	mLegL = new SharedObject(GetIdentityTextureObject(Textures::Player_Leg_L));
+	mLegR = new SharedObject(GetIdentityTextureObject(Textures::Player_Leg_R));
 
+	mHead->SetPivot(mBody->GetRefPos());
+	mArms->SetPivot(mBody->GetRefPos());
+	mLegL->SetPivot(mBody->GetRefPos());
+	mLegR->SetPivot(mBody->GetRefPos());
 
 	mFpCamera = new Camera();
 	mFpCamera->SetPivot(&mPosition);
 	mFpCamera->SetPosY(38);
 	mFpCamera->SetFovY(110.0f);
-	mFpCamera->SetLook(mObject->GetLook());
+	mFpCamera->SetLook(mBody->GetLook());
 
 	mTpCamera = new Camera();
 	mTpCamera->SetPivot(&mPosition);
 	mTpCamera->SetPosY(100);
 	mTpCamera->SetPosZ(-50);
 	mTpCamera->SetFovY(110.0f);
-	mTpCamera->Look(mObject->GetPosition());
+	mTpCamera->Look(mBody->GetPosition());
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	mGun = new Gun(gunPosition, &mPosition);
 
-	mBoundingCircle = new Circle(mObject->GetRefPos(), PLAYER_RADIUS, { 0, 0.1f, 0 });
+	mBoundingCircle = new Circle(mBody->GetRefPos(), PLAYER_RADIUS, { 0, 0.1f, 0 });
 	mBoundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
 }
 Player::~Player()
 {
-	delete mObject;
+	delete mHead;
+	delete mBody;
+	delete mArms;
+	delete mLegL;
+	delete mLegR;
+
 	delete mFpCamera;
 	delete mTpCamera;
 }
@@ -343,7 +355,7 @@ GLvoid Player::Update()
 {
 	mCrntState->Update();
 
-	mPosition = mObject->GetPviotedPosition();
+	mPosition = mBody->GetPviotedPosition();
 
 	mGun->Update();
 }
@@ -354,7 +366,11 @@ GLvoid Player::Draw(const CameraMode& cameraMode) const
 		return;
 	}
 
-	mObject->Draw();
+	mHead->Draw();
+	mBody->Draw();
+	mArms->Draw();
+	mLegL->Draw();
+	mLegR->Draw();
 	mBoundingCircle->Draw();
 }
 GLvoid Player::DrawIcon() const
@@ -394,16 +410,16 @@ GLvoid Player::Move()
 		correction = 0.8f;
 	}
 
-	glm::vec3 prevPos = mObject->GetPosition();
-	if (mDirX != 0.0f) mObject->MoveX(mSpeed * mDirX * correction);
-	if (mDirY != 0.0f) mObject->MoveY(mJumpSpeed * mDirY);
-	if (mDirZ != 0.0f) mObject->MoveZ(mSpeed * mDirZ * correction);
+	glm::vec3 prevPos = mBody->GetPosition();
+	if (mDirX != 0.0f) mBody->MoveX(mSpeed * mDirX * correction);
+	if (mDirY != 0.0f) mBody->MoveY(mJumpSpeed * mDirY);
+	if (mDirZ != 0.0f) mBody->MoveZ(mSpeed * mDirZ * correction);
 
 	// xz collision
 	if (crntMap->CheckCollision(mBoundingCircle) == GL_TRUE || buildingManager->CheckCollision(mBoundingCircle) == GL_TRUE)
 	{
-		mObject->SetPosX(prevPos.x);
-		mObject->SetPosZ(prevPos.z);
+		mBody->SetPosX(prevPos.x);
+		mBody->SetPosZ(prevPos.z);
 	}
 
 
@@ -430,12 +446,16 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 		mYaw = 89.0f * GetSign(mYaw);
 	}
 
-	mObject->RotateLocal(0, pitch, 0);
+	mHead->RotateLocal(0, pitch, 0);
+	mBody->RotateLocal(0, pitch, 0);
+	mArms->RotateLocal(0, pitch, 0);
+	mLegL->RotateLocal(0, pitch, 0);
+	mLegR->RotateLocal(0, pitch, 0);
 
-	mFpCamera->SetLook(mObject->GetLook());
+	mFpCamera->SetLook(mBody->GetLook());
 	mFpCamera->RotateLocal(mYaw, 0, 0);
 
-	mTpCamera->SetLook(mObject->GetLook());
+	mTpCamera->SetLook(mBody->GetLook());
 	mTpCamera->SetPosition({ 0, 100, -50 });
 	mTpCamera->RotatePosition({ 0,0,0 }, Vector3::Up(), mPitch);
 	mTpCamera->RotateLocal(mYaw -15.0f, 0, 0);
@@ -446,7 +466,7 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 glm::vec3 Player::GetPosition() const
 {
-	return mObject->GetPosition();
+	return mBody->GetPosition();
 }
 
 GLint Player::GetAmmo() const
@@ -471,7 +491,7 @@ GLvoid Player::Damage(const GLfloat& damage)
 
 GLfloat Player::GetRadius() const
 {
-	return mObject->GetRadius();
+	return PLAYER_RADIUS;
 }
 
 GLfloat Player::GetHp() const

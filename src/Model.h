@@ -2,7 +2,7 @@
 #include "stdafx.h"
 
 class Cuboid;
-enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, Player, _count };
+enum class Models { Plane = 0, Circle, Cube, LowSphere, GeoSphere, _count };
 enum class Textures { 
 	Gun,
 	Map,
@@ -15,8 +15,13 @@ enum class Textures {
 	Turret_Head,
 	Paint,
 	Paint2,
-	/* must be ui */
 	Coin,
+	Player_Head,
+	Player_Body,
+	Player_Arms,
+	Player_Leg_L,
+	Player_Leg_R,
+	/* must be ui */
 	UI_NUM_0,
 	UI_NUM_1,
 	UI_NUM_2,

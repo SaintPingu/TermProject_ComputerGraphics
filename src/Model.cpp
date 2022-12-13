@@ -215,16 +215,16 @@ static Model* cubeModel = new Model();
 static Model* lowSphereModel = new Model();
 static Model* geoSphereModel = new Model();
 
-// player
-static Model* playerModel = new Model();
-static Model* gunModel = new Model();
-
 
 // [ texture models ] //
-static Model* mapModel = new Model();
-static Model* cubeMapModel = new Model();
-static Model* paintModel = new Model();
-static Model* coinModel = new Model();
+
+// player
+static Model* playerHeadModel = new Model();
+static Model* playerBodyModel = new Model();
+static Model* playerArmsModel = new Model();
+static Model* playerLegLModel = new Model();
+static Model* playerLegRModel = new Model();
+static Model* gunModel = new Model();
 
 // monster
 static Model* blooperModel = new Model();
@@ -238,6 +238,13 @@ static Model* coreModel = new Model();
 static Model* turretBodyModel = new Model();
 static Model* turretHeadModel = new Model();
 
+// other
+static Model* mapModel = new Model();
+static Model* cubeMapModel = new Model();
+static Model* paintModel = new Model();
+static Model* coinModel = new Model();
+
+
 static GLuint textures[NUM_TEXTURE];
 
 unordered_map<Models, Model*> modelMap{
@@ -246,7 +253,6 @@ unordered_map<Models, Model*> modelMap{
 	{Models::Cube, cubeModel},
 	{Models::LowSphere, lowSphereModel},
 	{Models::GeoSphere, geoSphereModel},
-	{Models::Player, playerModel},
 };
 unordered_map<Textures, Model*> textureModelMap{
 	{Textures::Gun, gunModel },
@@ -259,6 +265,11 @@ unordered_map<Textures, Model*> textureModelMap{
 	{Textures::Turret_Body, turretBodyModel },
 	{Textures::Turret_Head, turretHeadModel },
 	{Textures::Coin, coinModel },
+	{Textures::Player_Head, playerHeadModel},
+	{Textures::Player_Body, playerBodyModel},
+	{Textures::Player_Arms, playerArmsModel},
+	{Textures::Player_Leg_L, playerLegLModel},
+	{Textures::Player_Leg_R, playerLegRModel},
 };
 unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::Gun, "gun.png" },
@@ -273,6 +284,11 @@ unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::Turret_Body, "turret_body.png" },
 	{Textures::Turret_Head, "turret_head.png" },
 	{Textures::Coin, "coin.png" },
+	{Textures::Player_Head, "player.png" },
+	{Textures::Player_Body, "player.png" },
+	{Textures::Player_Arms, "player.png" },
+	{Textures::Player_Leg_L, "player.png" },
+	{Textures::Player_Leg_R, "player.png" },
 	{Textures::UI_NUM_0, "ui_num_0.png" },
 	{Textures::UI_NUM_1, "ui_num_1.png" },
 	{Textures::UI_NUM_2, "ui_num_2.png" },
@@ -293,7 +309,7 @@ unordered_map<Textures, const GLchar*> textureMap{
 };
 
 /* Should be arrange by obj file size (faster) */
-enum class ObjList { Coin, Gun, Egg, Turret_Head, Blooper, Turret_Body, Koromon, Player, GeoSphere, Circle, LowSphere, Cube, Core, Map, Plane, _count };
+enum class ObjList { Coin, Gun, Egg, Turret_Head, Blooper, Turret_Body, Koromon, GeoSphere, Circle, LowSphere, Cube, Core, Map, Plane, Player_Head, Player_Body, Player_Arms, Player_Leg_L, Player_Leg_R,_count };
 constexpr GLuint NUM_OBJ = static_cast<GLuint>(ObjList::_count);
 
 unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
@@ -304,7 +320,11 @@ unordered_map<ObjList, pair<Model*, const GLchar*>> objMap{
 	{ObjList::Koromon, make_pair(koromonModel, "koromon.obj")},
 	{ObjList::Coin, make_pair(coinModel, "coin.obj")},
 	{ObjList::Core, make_pair(coreModel, "core.obj")},
-	{ObjList::Player, make_pair(playerModel, "player.obj")},
+	{ObjList::Player_Head, make_pair(playerHeadModel, "player_head.obj")},
+	{ObjList::Player_Body, make_pair(playerBodyModel, "player_body.obj")},
+	{ObjList::Player_Arms, make_pair(playerArmsModel, "player_arms.obj")},
+	{ObjList::Player_Leg_L, make_pair(playerLegLModel, "player_leg_l.obj")},
+	{ObjList::Player_Leg_R, make_pair(playerLegRModel, "player_leg_r.obj")},
 	{ObjList::GeoSphere, make_pair(geoSphereModel, "geo_sphere.obj")},
 	{ObjList::Circle, make_pair(circleModel, "circle.obj")},
 	{ObjList::LowSphere, make_pair(lowSphereModel, "low_sphere.obj")},
@@ -431,6 +451,7 @@ GLvoid InitModels()
 			t = nullptr;
 		}
 	}
+	// end of thread
 
 	for (GLsizei i = 0; i < NUM_TEXTURE; ++i)
 	{

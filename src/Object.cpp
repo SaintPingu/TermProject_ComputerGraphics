@@ -462,7 +462,6 @@ GLvoid IdentityObject::BindBuffers()
 	PullVertices(vertices);
 	Pull_Indices_Vertex(indices);
 
-	shd::Use(mShader);
 	switch (mShader)
 	{
 	case Shader::Back:
