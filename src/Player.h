@@ -101,6 +101,8 @@ private:
 	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
 	GLfloat mTpCameraPitch = 0.0f;
 
+	Camera* mZoomFPCamera = nullptr;
+
 	// values
 	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
@@ -158,6 +160,7 @@ public:
 	glm::vec3 GetPosition() const;
 	inline constexpr Camera* GetFirstPersonCamera() { return mFpCamera; }
 	inline constexpr Camera* GetThirdPersonCamera() { return mTpCamera; }
+	inline constexpr Camera* GetZoomFirstPersonCamera() { return mZoomFPCamera; }
 	GLint GetAmmo() const;
 	GLint GetMaxAmmo() const;
 	GLint GetHoldTullet() const;

@@ -27,7 +27,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		mWeight = 30.0f;
 		scale = 0.1f;
 		mVelocity = 300.0f;
-		mDamage = 10.0f;
+		mDamage = 20.0f;
 		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
 		break;
 	case BulletType::Particle_Explosion:
@@ -37,11 +37,11 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		mDamage = 0.0f;
 		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
 		break;
-	case BulletType::Bullet_Explosion:
-		mWeight = 130.0f;
+	case BulletType::Rocket:
+		mWeight = 100.0f;
 		scale = 1.5f;
 		mVelocity = 300.0f;
-		mDamage = 20.0f;
+		mDamage = 60.0f;
 		SharedObject::Init(GetIdentityModelObject(Models::GeoSphere));
 		break;
 
@@ -49,7 +49,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		mWeight = 10.0f;
 		scale = 0.1f;
 		mVelocity = 500.0f;
-		mDamage = 50.0f;
+		mDamage = 150.0f;
 		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
 		break;
 
@@ -182,14 +182,20 @@ GLvoid BulletManager::Update()
 					GLuint randPaint = rand() % NUM_PAINT;
 					Textures texture = static_cast<Textures>(static_cast<GLuint>(Textures::Paint) + randPaint);
 					const IdentityObject* object = GetIdentityTextureObject(texture);
-					soundManager->PlayEffectSound(EffectSound::Drawing_ink);
-
+					if (bullet->GetType() != BulletType::Rocket)
+					{
+						soundManager->PlayEffectSound(EffectSound::Drawing_ink);
+					}
+					else
+					{
+						soundManager->PlayEffectSound(EffectSound::Drawing_Bigink);
+					}
 					PaintPlane* plane = new PaintPlane(object, bullet->GetColor(), hitPoint, normal);
 					plane->SetScale(BULLET_RADIUS * bullet->GetScale());
 					mPaints.emplace_back(plane);
 				}
 
-				if (bullet->GetType() == BulletType::Bullet_Explosion)
+				if (bullet->GetType() == BulletType::Rocket)
 				{
 					bulletManager->CreateExplosion(RED, bullet->GetCenterPos(), bullet->GetRadius());
 				}

@@ -236,6 +236,15 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mTpCamera->SetFovY(110.0f);
 	mTpCamera->Look(mObject->GetPosition());
 
+
+	mZoomFPCamera = new Camera();
+	mZoomFPCamera->SetPivot(&mPosition);
+	mZoomFPCamera->SetPosY(38);
+	mZoomFPCamera->SetPosZ(100);
+	mZoomFPCamera->SetFovY(110.0f);
+	mZoomFPCamera->SetLook(mObject->GetLook());
+
+
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	
 	mGun = new Gun(gunPosition, &mPosition);

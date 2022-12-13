@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Object.h"
 
-enum class BulletType { Normal, Particle_Explosion, Bullet_Explosion, Sniper};
+enum class BulletType { Normal, Particle_Explosion, Rocket, Sniper};
 
 typedef struct BulletAtt {
 	glm::vec3 prevPos = glm::vec3(0, 0, 0);

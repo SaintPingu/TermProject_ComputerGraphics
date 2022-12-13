@@ -560,6 +560,9 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case '3':
 		SetCameraMode(CameraMode::ThirdPerson);
 		break;
+	case '4':
+		SetCameraMode(CameraMode::ZoomFirstPerson);
+		break;
 	case '0':
 		SetCameraMode(CameraMode::Light);
 		break;
@@ -650,6 +653,13 @@ GLvoid SetCameraMode(const CameraMode& mode)
 		{
 			cameraMain = player->GetThirdPersonCamera();
 		}
+		break;
+	case CameraMode::ZoomFirstPerson:
+		if (player != nullptr)
+		{
+			cameraMain = player->GetZoomFirstPersonCamera();
+		}
+
 		break;
 	case CameraMode::Light:
 		cameraMain = cameraFree;

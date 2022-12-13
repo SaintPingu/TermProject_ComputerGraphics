@@ -85,7 +85,7 @@ ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gun
 	mType = GunType::Blue;
 	mMaxAmmo = 20;
 	mAmmo = mMaxAmmo; 
-	mFireDelay = 0.4f;
+	mFireDelay = 0.2f;
 }
 
 GLvoid ShotGun::Shot() 
@@ -110,9 +110,9 @@ GLvoid ShotGun::Shot()
 Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
 {
 	mType = GunType::Green;
-	mMaxAmmo = 10;
+	mMaxAmmo = 8;
 	mAmmo = mMaxAmmo;
-	mFireDelay = 0.8f;
+	mFireDelay = 0.5f;
 }
 
 GLvoid Sniper::Shot()
@@ -133,7 +133,7 @@ Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(g
 	mType = GunType::Red;
 	mMaxAmmo = 5;
 	mAmmo = mMaxAmmo;
-	mFireDelay = 0.6f;
+	mFireDelay = 0.4f;
 }
 
 GLvoid Launcher::Shot()
@@ -145,7 +145,7 @@ GLvoid Launcher::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	soundManager->PlayEffectSound(EffectSound::Sniper_shot);
-	bulletManager->Create(BulletType::Bullet_Explosion, RED, origin, bulletPos, mYaw, mPitch);
+	soundManager->PlayEffectSound(EffectSound::Launcher_shot);
+	bulletManager->Create(BulletType::Rocket, RED, origin, bulletPos, mYaw, mPitch);
 
 }
