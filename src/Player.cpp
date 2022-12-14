@@ -650,6 +650,7 @@ GLvoid Player::ChaingeGun()
 {
 	static int gun_num = 0;
 
+	soundManager->PlayEffectSound(EffectSound::CheageWeapon, 0.2f, GL_TRUE);
 	if (mCrntGun->IsReloading())
 	{
 		mCrntGun->Reload();

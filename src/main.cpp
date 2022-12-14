@@ -587,7 +587,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		SetCameraMode(CameraMode::ThirdPerson);
 		break;
 	case '4':
-		SetCameraMode(CameraMode::ZoomFirstPerson);
+	//	SetCameraMode(CameraMode::ZoomFirstPerson);
 		break;
 	case '0':
 		//SetCameraMode(CameraMode::Light);

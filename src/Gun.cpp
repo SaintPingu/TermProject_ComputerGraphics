@@ -26,6 +26,7 @@ GLvoid Gun::Update()
 		if (IsReloading() == GL_FALSE)
 		{
 			mAmmo = mMaxAmmo;
+			soundManager->PlayEffectSound(EffectSound::Reload, 0.2f, GL_TRUE);
 		}
 		return;
 	}
@@ -114,6 +115,7 @@ GLvoid Gun::Shot()
 
 GLvoid Gun::Reload()
 {
+	soundManager->PlayEffectSound(EffectSound::EmptyBullet, 0.2f, GL_TRUE);
 	mCrntReloadTime = mReloadTime;
 }
 
@@ -138,7 +140,7 @@ Rifle::Rifle(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosi
 ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
 {
 	mType = GunType::Shotgun;
-	mMaxAmmo = 20;
+	mMaxAmmo = 20; 
 	mAmmo = mMaxAmmo; 
 	mFireDelay = 0.2f;
 	mReloadTime = 1.0f;

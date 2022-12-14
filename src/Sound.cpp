@@ -33,6 +33,15 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_jump.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Jump)]);
 	CheckResult(result);
 
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_reload.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Reload)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_Empty_bullet.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::EmptyBullet)]);
+	CheckResult(result);
+
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Action\\Action_WeaponChange.wav", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::CheageWeapon)]);
+	CheckResult(result);
+
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\fire\\gun_normal_fire_02(cut).mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Normal_shot)]);
 	CheckResult(result);
 
@@ -69,6 +78,9 @@ SoundManager::SoundManager()
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\Monster\\m_Koromon_dead.ogg", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::M_KoromonDead)]);
 	CheckResult(result);
 
+
+
+	
 
 	for (GLint i = 0; i < NUM_SOUND_CHEENEL; ++i)
 	{
