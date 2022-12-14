@@ -2,7 +2,8 @@
 
 enum class BGMSound { Normal = 0, _count };
 
-enum class EffectSound { Fire = 0, Hit, Damaged, Run,Drawing_ink, Drawing_Bigink,
+enum class EffectSound { Fire = 0, Hit, Damaged, Run, Reload, CheageWeapon, EmptyBullet,
+	Drawing_ink, Drawing_Bigink,
 	Normal_shot, Shotgun_shot, Launcher_shot, Sniper_shot ,Jump , 
 	M_BlooperDead , M_EggDead, M_KoromonDead
 	,Turret_install, Turret_FindEnemy ,_count };
