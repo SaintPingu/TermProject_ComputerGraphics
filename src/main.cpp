@@ -157,7 +157,7 @@ GLvoid Init()
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	waveManager->Start();
-	soundManager->PlayBGMSound(BGMSound::Normal, 0.25f, GL_TRUE);
+	soundManager->PlayBGMSound(BGMSound::Normal, 0.05f, GL_TRUE);
 	//system("cls");
 }
 
@@ -531,11 +531,7 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	{
 		// controls
 	case '`':
-		Reset();
-		break;
-	case 'h':
-	case 'H':
-		ToggleDepthTest();
+		//Reset();
 		break;
 	case 'm':
 	case 'M':
@@ -564,16 +560,9 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 		SetCameraMode(CameraMode::ZoomFirstPerson);
 		break;
 	case '0':
-		SetCameraMode(CameraMode::Light);
+		//SetCameraMode(CameraMode::Light);
 		break;
 		// objects
-
-	
-		// timers
-	case 'z':
-	case 'Z':
-		timer::ToggleTimer(Timer::LightRotation_Y);
-		break;
 
 	case KEY_ESCAPE:
 		glutLeaveMainLoop();

@@ -106,12 +106,25 @@ GLboolean Monster::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitP
 	{
 		return GL_FALSE;
 	}
+	
+	glm::vec3 monsterPos = mObject->GetPosition();
+	GLfloat radius = mObject->GetRadius();
+	/* x로 충돌이 없을 경우 */
+	if (fabs(monsterPos.x - bullet.crntPos.x) > radius + bullet.radius)
+	{
+		return GL_FALSE;
+	}
+
+	/* y로 충돌이 없을 경우 */
+	if (bullet.crntPos.y > monsterPos.y + mObject->GetHeight())
+	{
+		return GL_FALSE;
+	}
 
 	switch (mCollisionType)
 	{
 	case CollisionType::Circle:
 	{
-		glm::vec3 monsterPos = mObject->GetTransformedPos();
 		if (::CheckCollision(monsterPos, bullet.crntPos, mRadius, bullet.radius, mHeight) == GL_TRUE)
 		{
 			Damage(bullet.damage);
@@ -143,13 +156,13 @@ GLvoid Monster::Damage(const GLfloat& damage)
 		switch (mType)
 		{
 		case MonsterType::Blooper:
-			soundManager->PlayEffectSound(EffectSound::M_BlooperDead);
+			soundManager->PlayEffectSound(EffectSound::M_BlooperDead, mObject->GetPosition());
 			break;
 		case MonsterType::Egg:
-			soundManager->PlayEffectSound(EffectSound::M_EggDead);
+			soundManager->PlayEffectSound(EffectSound::M_EggDead, mObject->GetPosition());
 			break;
 		case MonsterType::Koromon:
-			soundManager->PlayEffectSound(EffectSound::M_KoromonDead);
+			soundManager->PlayEffectSound(EffectSound::M_KoromonDead, mObject->GetPosition());
 			break;
 		default:
 			break;

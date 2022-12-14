@@ -26,6 +26,7 @@ public:
 	SoundManager();
 
 	/* volume을 수정할 경우 new channel을 True로 해야 함. */
+	GLvoid PlayEffectSound(const EffectSound& effectSound, const glm::vec3& position, const GLfloat& volume = 1.0f);
 	GLvoid PlayEffectSound(const EffectSound& effectSound, const GLfloat& volume = 1.0f, GLboolean isNewChannel = GL_FALSE);
 	GLvoid StopEffectSound();
 

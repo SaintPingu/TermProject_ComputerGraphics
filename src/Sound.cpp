@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "Sound.h"
+#include "Camera.h"
 
+#define EFFECT_MAX_DISTANCE 600
+
+extern const Camera* crntCamera;
 
 inline constexpr GLvoid CheckResult(const FMOD_RESULT& result)
 {
@@ -72,9 +76,28 @@ SoundManager::SoundManager()
 	}
 }
 
-GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const GLfloat& volume, GLboolean isNewChannel)
+GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const glm::vec3& position, const GLfloat& volume)
 {
 	FMOD_System_Update(soundSystem);
+	GLfloat v = volume;
+	if (crntCamera != nullptr)
+	{
+		GLfloat distance = glm::length(crntCamera->GetPviotedPosition() - position);
+		if (distance > EFFECT_MAX_DISTANCE)
+		{
+			return;
+		}
+		else
+		{
+			GLfloat t = 1 - (distance / EFFECT_MAX_DISTANCE);
+			v *= t;
+		}
+	}
+
+	PlayEffectSound(effectSound, v, GL_TRUE);
+}
+GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const GLfloat& volume, GLboolean isNewChannel)
+{
 	if (isNewChannel == GL_TRUE)
 	{
 		FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Effect)]);
@@ -85,6 +108,7 @@ GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const GLflo
 		FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, NULL);
 	}
 }
+
 GLvoid SoundManager::StopEffectSound()
 {
 	FMOD_Channel_Stop(soundChannel[static_cast<GLint>(SoundChannel::Effect)]);

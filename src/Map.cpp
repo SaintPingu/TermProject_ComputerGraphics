@@ -17,6 +17,7 @@ Map::Map()
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
+	bulletManager->AddParticleCollision(this);
 
 	mCoins = new SharedObject(GetIdentityTextureObject(Textures::Coin));
 	mCoins->SetPosition({ 0, 0, 550 });

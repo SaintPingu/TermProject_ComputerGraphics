@@ -50,7 +50,6 @@ GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
 		}
 		else if (key == KEY_SPACEBAR)
 		{
-			soundManager->PlayEffectSound(EffectSound::Jump);
 			mPlayer->ChangeState(Player::State::Jump);
 		}
 		break;
@@ -133,6 +132,7 @@ GLvoid Jump::Enter(const Event& e, const GLint& value)
 {
 	t = 0;
 	mPlayer->SetDir(KEY_SPACEBAR, UP);
+	soundManager->PlayEffectSound(EffectSound::Jump, 0.2f, GL_TRUE);
 }
 GLvoid Jump::Exit()
 {
@@ -163,8 +163,7 @@ GLvoid Jump::Update()
 			}
 			else
 			{
-				t = 0;
-				mPlayer->SetDir(KEY_SPACEBAR, UP);
+				mPlayer->ChangeState(Player::State::Jump);
 			}
 		}
 		return;
@@ -262,14 +261,14 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS + 1.0f, mFpCamera->GetPviotedPosition().y - 18, 0);
 	
-	mGun = new Gun(gunPosition, &mPosition);
+	mRifle = new Gun(gunPosition, &mPosition);
 	mSniper = new Sniper(gunPosition, &mPosition);
 	mShotGun = new ShotGun(gunPosition, &mPosition);
 	mLauncher = new Launcher(gunPosition, &mPosition);
 
 
 	// Gun* mPlayGun = nullptr
-	mPlayGun = mGun;
+	mPlayGun = mRifle;
 	// 총 교체에 따라 
 	// mPlayGun =  mShotgun
 	// mPlayGun =  mPistol
@@ -566,6 +565,7 @@ GLvoid Player::ReleaseLegRotation()
 	constexpr GLfloat maxLegRotation = 30.0f;
 	GLfloat legRotaionSpeed = 4.0f * (mLegRotation * 0.01f);
 	GLfloat legRotation = timer::DeltaTime() * maxLegRotation * legRotaionSpeed;
+
 	if (mLegDir > 0)
 	{
 		mLegRotation -= legRotation * mLegDir;
@@ -647,7 +647,7 @@ GLvoid Player::ChaingeGun()
 	switch (gun_num)
 	{
 	case 0:
-		mPlayGun = mGun;
+		mPlayGun = mRifle;
 		break;
 
 	case 1:

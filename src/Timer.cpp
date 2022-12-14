@@ -53,7 +53,7 @@ GLvoid timer::CalculateFPS()
 	}
 
 	lastTime = crntTime;
-	//PrintFPS(fps);
+	PrintFPS(fps);
 }
 GLfloat timer::DeltaTime()
 {
@@ -201,4 +201,17 @@ GLboolean LightRotation_Y(GLint value)
 	light->RotatePosition({ 0, 0, 0 }, Vector3::Up(), 100 * timer::DeltaTime() * dir);
 
 	return GL_TRUE;
+}
+
+
+
+chrono::steady_clock::time_point start;
+GLvoid timer::StartRecord()
+{
+	start = chrono::high_resolution_clock::now();
+}
+GLvoid timer::PrintDuration()
+{
+	auto duration = chrono::high_resolution_clock::now() - start;
+	cout << "Duration : " << chrono::duration_cast<chrono::milliseconds>(duration).count() << "ms" << endl;
 }

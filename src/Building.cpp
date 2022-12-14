@@ -34,6 +34,7 @@ Building::Building(const BuildingType& type, const glm::vec3& position, const gl
 
 	extern BulletManager* bulletManager;
 	bulletManager->AddCollisionObject(this);
+	bulletManager->AddParticleCollision(this);
 }
 Building::~Building()
 {
@@ -81,6 +82,11 @@ GLboolean Building::CheckCollision(const Circle* boundingCircle) const
 }
 GLboolean Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
+	if (::CheckCollision(ConvertVec2(mObject->GetPosition()), ConvertVec2(bullet.crntPos), mObject->GetRadius(), bullet.radius) == GL_FALSE)
+	{
+		return GL_FALSE;
+	}
+
 	switch(mCollisionType)
 	{
 	case CollisionType::Rect:
@@ -186,7 +192,7 @@ GLvoid BuildingManager::Update()
 	for (auto it = buildings.begin(); it != buildings.end();)
 	{
 		Building* building = *it;
-		if (building->IsDestroyed() == GL_TRUE)
+		if (building != nullptr && building->IsDestroyed() == GL_TRUE)
 		{
 			it = buildings.erase(it);
 			if (building == mCore)

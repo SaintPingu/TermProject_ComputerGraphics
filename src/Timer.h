@@ -37,5 +37,8 @@ namespace timer {
 	GLvoid CalculateFPS();
 	/* 경과한 시간(DeltaTime) 반환 */
 	GLfloat DeltaTime();
+
+	GLvoid StartRecord();
+	GLvoid PrintDuration();
 }
 

@@ -95,7 +95,7 @@ private:
 
 	// guns
 	Gun* mPlayGun = nullptr;
-	Gun* mGun = nullptr;
+	Gun* mRifle = nullptr;
 	Sniper* mSniper = nullptr;
 	ShotGun* mShotGun = nullptr;
 	Launcher* mLauncher = nullptr;

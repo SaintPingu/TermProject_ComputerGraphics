@@ -18,6 +18,7 @@ private:
 public:
 	virtual GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal) abstract;
 	GLvoid Destroy();
+	GLvoid PushDestroy();
 	inline constexpr GLboolean IsDestroyed() const { return mIsDestroyed; };
 	inline constexpr GLvoid SetID(const GLint& id) { mID = id; }
 	inline constexpr GLint GetID() { return mID; }
@@ -25,45 +26,55 @@ public:
 
 
 
+class Bullet : public SharedObject {
+	BulletType mType = BulletType::Normal;
+
+	/* 무게, 중력의 영향을 받는 정도 (n배) */
+	GLfloat mWeight = 0.0f;
+
+	GLfloat mDamage = 0.0f;
+
+	/* 이전 좌표값 */
+	glm::vec3 mPrevPos = glm::vec3(0, 0, 0);
+	/* 시작 좌표값 */
+	glm::vec3 mOrigin = glm::vec3(0, 0, 0);
+
+	/* 발사 후 경과한 시간 */
+	GLfloat mT = 0.0f;
+
+	/* 탄퍼짐 */
+	GLint mSpreadAmount = 2;
+
+	GLfloat mAngleX = 0.0f;
+	GLfloat mAngleY = 0.0f;
+	GLfloat mAngleZ = 0.0f;
+	GLfloat mVelocity = 0.0f;
+
+	GLboolean mDestroyed = GL_FALSE;
+public:
+	Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+	~Bullet();
+	GLvoid Update();
+	inline constexpr GLvoid Destroy() { mDestroyed = GL_TRUE; }
+	inline constexpr GLboolean IsDestroyed() const { return mDestroyed; }
+
+	BulletAtt GetAttribute() const;
+	COLORREF GetColor() const;
+	inline constexpr BulletType GetType() const { return mType; }
+};
+
 class BulletManager {
 private:
-	class Bullet : public SharedObject {
-		BulletType mType = BulletType::Normal;
-
-		/* 무게, 중력의 영향을 받는 정도 (n배) */
-		GLfloat mWeight = 0.0f;
-
-		GLfloat mDamage = 0.0f;
-
-		/* 이전 좌표값 */
-		glm::vec3 mPrevPos = glm::vec3(0, 0, 0);
-		/* 시작 좌표값 */
-		glm::vec3 mOrigin = glm::vec3(0, 0, 0);
-
-		/* 발사 후 경과한 시간 */
-		GLfloat mT = 0.0f;
-
-		/* 탄퍼짐 */
-		GLint mSpreadAmount = 2;
-
-		GLfloat mAngleX = 0.0f;
-		GLfloat mAngleY = 0.0f;
-		GLfloat mAngleZ = 0.0f;
-		GLfloat mVelocity = 0.0f;
-	public:
-		Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
-		~Bullet();
-		GLvoid Update();
-
-		BulletAtt GetAttribute() const;
-		COLORREF GetColor() const;
-		inline constexpr BulletType GetType() const { return mType; }
-	};
-
 	GLint mID = 0;
 	vector<Bullet*> mBulletList;
+	vector<Bullet*> mParticles;
 	vector<PaintPlane*> mPaints;
 	vector<IBulletCollisionable*> mCollisionObjectList;
+	vector<IBulletCollisionable*> mParticleCollisions;
+
+	vector<IBulletCollisionable*> mStackDeletion;
+
+	GLfloat mCrntInkSoundDelay = 0.0f;
 public:
 	BulletManager();
 	~BulletManager();
@@ -76,5 +87,8 @@ public:
 	inline constexpr const vector<PaintPlane*>& GetPaints() const { return mPaints; }
 
 	GLvoid AddCollisionObject(IBulletCollisionable* object);
+	GLvoid AddParticleCollision(IBulletCollisionable* object);
 	GLvoid DelCollisionObject(IBulletCollisionable* object);
+	GLvoid PushDeleteObject(IBulletCollisionable* object);
+	GLvoid ClearStack();
 };
