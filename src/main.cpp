@@ -157,7 +157,7 @@ GLvoid Init()
 	mouseCenter = { screenWidth / 2 + screenPosX, screenHeight / 2 + screenPosY };
 
 	waveManager->Start();
-	soundManager->PlayBGMSound(BGMSound::Normal, 0.05f, GL_TRUE);
+	soundManager->PlayBGMSound(BGMSound::Normal, 0.2f, GL_TRUE);
 	//system("cls");
 }
 
@@ -586,9 +586,6 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 	case '3':
 		SetCameraMode(CameraMode::ThirdPerson);
 		break;
-	case '4':
-		SetCameraMode(CameraMode::ZoomFirstPerson);
-		break;
 	case '0':
 		//SetCameraMode(CameraMode::Light);
 		break;
@@ -632,15 +629,15 @@ GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 	}
 
 	// WARNING : (GLUT_KEY_LEFT == 'd') -> 100 //
-	switch (key)
-	{
-	case GLUT_KEY_HOME:
-		cameraFree->Look({ 0,0,0 });
-		break;
-	case GLUT_KEY_F1:
-		isWireFrame = !isWireFrame;
-		break;
-	}
+	//switch (key)
+	//{
+	//case GLUT_KEY_HOME:
+	//	cameraFree->Look({ 0,0,0 });
+	//	break;
+	//case GLUT_KEY_F1:
+	//	isWireFrame = !isWireFrame;
+	//	break;
+	//}
 
 	if (player != nullptr)
 	{
@@ -692,13 +689,6 @@ GLvoid SetCameraMode(const CameraMode& mode)
 		{
 			cameraMain = player->GetThirdPersonCamera();
 		}
-		break;
-	case CameraMode::ZoomFirstPerson:
-		if (player != nullptr)
-		{
-			cameraMain = player->GetZoomFirstPersonCamera();
-		}
-
 		break;
 	case CameraMode::Light:
 		cameraMain = cameraFree;

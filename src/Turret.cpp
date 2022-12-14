@@ -78,7 +78,7 @@ GLvoid TurretManager::Turret::Fire()
 	data.type = BulletType::Normal;
 	data.color = PINK;
 	data.weight = 30.0f;
-	data.damage = 30.0f;
+	data.damage = 20.0f;
 	data.scale = 0.1f;
 	data.velocity = 300.0f;
 	data.model = Models::LowSphere;

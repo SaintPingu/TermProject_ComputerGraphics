@@ -34,7 +34,7 @@ private:
 
 	UITexture mWaves_Tens;
 	UITexture mWaves_Units;
-	UITexture mBlackScreen;
+	UITexture mGameOver;
 public:
 	UIManager();
 

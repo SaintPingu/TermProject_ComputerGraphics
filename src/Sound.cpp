@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Sound.h"
 #include "Camera.h"
+#include "Timer.h"
 
 #define EFFECT_MAX_DISTANCE 600
 
@@ -21,7 +22,7 @@ SoundManager::SoundManager()
 	FMOD_RESULT result = FMOD_OK;
 
 	// bgmSound
-	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bgm_intro.wav", FMOD_LOOP_NORMAL, 0, &bgmSounds[static_cast<GLint>(BGMSound::Normal)]);
+	result = FMOD_System_CreateSound(soundSystem, "Sounds\\bgm.mp3", FMOD_LOOP_NORMAL, 0, &bgmSounds[static_cast<GLint>(BGMSound::Normal)]);
 	CheckResult(result);
 
 	result = FMOD_System_CreateSound(soundSystem, "Sounds\\sound_hit.mp3", FMOD_DEFAULT, 0, &effectSounds[static_cast<GLint>(EffectSound::Hit)]);

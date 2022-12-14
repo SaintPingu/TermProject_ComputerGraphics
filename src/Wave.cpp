@@ -25,9 +25,9 @@ GLvoid WaveManager::Start()
 	GLint mapWidth = static_cast<GLint>(crntMap->GetMaxWidth());
 	GLfloat mapTop = crntMap->GetTop();
 
-	const GLuint numOfBlooper = mCrntWave * 3;
-	const GLuint numOfEgg = mCrntWave * 2;
-	const GLuint numOfKoromon = mCrntWave * 2;
+	const GLuint numOfBlooper = mCrntWave * 2;
+	const GLuint numOfEgg = mCrntWave * 1;
+	const GLuint numOfKoromon = mCrntWave * 1;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -53,7 +53,7 @@ GLvoid WaveManager::Update()
 	if (monsterManager->CheckEnemyEmpty())
 	{
 		mCrntWave++;
-		mPlayer->AddHoldturret(3);
+		mPlayer->AddHoldturret(1);
 
 		WaveManager::Start();
 		cout << mCrntWave << endl;

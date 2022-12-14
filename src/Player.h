@@ -115,7 +115,7 @@ private:
 	GLfloat mHP = 100.0f;
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
-	GLint mHoldTurret = 3;
+	GLint mHoldTurret = 0;
 	GLfloat mFrameTime = 0.0f;
 
 	// for collision

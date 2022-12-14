@@ -64,9 +64,9 @@ UIManager::UIManager()
 	mHoldTurret.pos = glm::vec2(-0.64f, 0.8f);
 	mHoldTurret.scale = 0.01f;
 
-	mBlackScreen.texture = Textures::UI_GAME_OVER;
-	mBlackScreen.pos = glm::vec2(0, 0);
-	mBlackScreen.scale = 0.2f;
+	mGameOver.texture = Textures::UI_GAME_OVER;
+	mGameOver.pos = glm::vec2(0, 0);
+	mGameOver.scale = 0.2f;
 
 	mWaves_Tens.texture = Textures::UI_NUM_0;
 	mWaves_Tens.pos = glm::vec2(-0.08f, -0.22f);
@@ -161,7 +161,7 @@ GLvoid UIManager::Draw()
 		mWaves_Tens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + wave_ten);
 		mWaves_Units.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + wave_Unit);
 
-		DrawPlane(mBlackScreen);
+		DrawPlane(mGameOver);
 		DrawPlane(mWaves_Tens);
 		DrawPlane(mWaves_Units);
 	}

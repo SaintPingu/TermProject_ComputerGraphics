@@ -156,7 +156,7 @@ GLvoid Monster::Damage(const GLfloat& damage)
 		switch (mType)
 		{
 		case MonsterType::Blooper:
-			soundManager->PlayEffectSound(EffectSound::M_BlooperDead, mObject->GetPosition());
+			soundManager->PlayEffectSound(EffectSound::M_BlooperDead, mObject->GetPosition(), 0.5f);
 			break;
 		case MonsterType::Egg:
 			soundManager->PlayEffectSound(EffectSound::M_EggDead, mObject->GetPosition());
