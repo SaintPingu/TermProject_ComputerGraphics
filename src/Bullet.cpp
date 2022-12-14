@@ -21,6 +21,7 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 	mType = type;
 
 	GLfloat scale = 0.0f;
+	Models model;
 	switch (type)
 	{
 	case BulletType::Normal:
@@ -28,21 +29,21 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		scale = 0.1f;
 		mVelocity = 300.0f;
 		mDamage = 20.0f;
-		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
+		model = Models::LowSphere;
 		break;
 	case BulletType::Particle_Explosion:
 		mWeight = 100.0f;
 		scale = 0.1f;
 		mVelocity = 150.0f;
 		mDamage = 0.0f;
-		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
+		model = Models::LowSphere;
 		break;
 	case BulletType::Rocket:
 		mWeight = 100.0f;
 		scale = 1.5f;
 		mVelocity = 300.0f;
 		mDamage = 60.0f;
-		SharedObject::Init(GetIdentityModelObject(Models::GeoSphere));
+		model = Models::GeoSphere;
 		break;
 
 	case BulletType::Sniper:
@@ -50,13 +51,14 @@ BulletManager::Bullet::Bullet(const BulletType& type, const COLORREF& color, con
 		scale = 0.1f;
 		mVelocity = 500.0f;
 		mDamage = 150.0f;
-		SharedObject::Init(GetIdentityModelObject(Models::LowSphere));
+		model = Models::LowSphere;
 		break;
 
 	default:
 		assert(0);
 		break;
 	}
+	SharedObject::Init(GetIdentityModelObject(model));
 
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;

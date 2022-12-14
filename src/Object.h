@@ -21,6 +21,8 @@ protected:
 
 	/* rotation(공전) 중심 좌표 */
 	const glm::vec3* mRotationPivot = nullptr;
+	/* local rotation(자전전) 중심 좌표 */
+	const glm::vec3* mLocalRotationPivot = nullptr;
 	/* position 중심 좌표 */
 	const glm::vec3* mPivot = nullptr;
 

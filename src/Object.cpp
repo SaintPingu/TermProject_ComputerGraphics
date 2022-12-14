@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Bullet.h"
 
-#define PAINT_DISAPEAR_TIME 8.0f
+#define PAINT_DISAPEAR_TIME 5.0f
 
 #define INIT_LOOK Vector3::Front()
 

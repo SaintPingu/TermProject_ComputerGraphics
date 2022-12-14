@@ -230,6 +230,9 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mLegL->SetPivot(mBody->GetRefPos());
 	mLegR->SetPivot(mBody->GetRefPos());
 
+	mHead->MoveY(31, GL_FALSE);
+	mArms->MoveY(28, GL_FALSE);
+
 	mFpCamera = new Camera();
 	mFpCamera->SetPivot(&mPosition);
 	mFpCamera->SetPosY(38);
@@ -251,6 +254,8 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mZoomFPCamera->SetFovY(110.0f);
 	mZoomFPCamera->SetLook(mBody->GetLook());
 
+	mHead->SetRotationPivot(mFpCamera->GetRefPos());
+	mArms->SetRotationPivot(mFpCamera->GetRefPos());
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
 	
@@ -491,6 +496,10 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 	mArms->RotateLocal(0, pitch, 0);
 	mLegL->RotateLocal(0, pitch, 0);
 	mLegR->RotateLocal(0, pitch, 0);
+
+	mHead->RotateLocal(yaw, 0, 0);
+	mArms->RotateLocal(yaw, 0, 0);
+
 
 	mFpCamera->SetLook(mBody->GetLook());
 	mFpCamera->RotateLocal(mYaw, 0, 0);

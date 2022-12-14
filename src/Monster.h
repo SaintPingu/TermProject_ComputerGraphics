@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
 
-enum class MonsterType { Blooper, Egg, Koromon };
+enum class MonsterType { None, Blooper, Egg, Koromon };
 
 class Player;
 class Building;
@@ -22,7 +22,7 @@ protected:
 	GLfloat mAttackDelay = 3.0f;
 	GLfloat mCrntAttackDelay = 0.0f;
 
-	MonsterType mType;
+	MonsterType mType = MonsterType::None;
 
 	CollisionType mCollisionType = CollisionType::None;
 	COLORREF mExplosionColor = WHITE;

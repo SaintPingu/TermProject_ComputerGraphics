@@ -6,6 +6,8 @@
 #include "Building.h"
 #include "Sound.h"
 
+#define MIN_DISTANCE 10 //PLAYER_RADIUS
+
 extern BulletManager* bulletManager;
 extern BuildingManager* buildingManager;
 extern SoundManager* soundManager;
@@ -86,7 +88,12 @@ GLvoid Monster::Update(const glm::vec3* target)
 		return;
 	}
 	Look(target);
-	mObject->MoveZ(mSpeed);
+
+	GLfloat length = glm::length(ConvertVec2(mObject->GetPosition()) - ConvertVec2(*target));
+	if (length > MIN_DISTANCE)
+	{
+		mObject->MoveZ(mSpeed);
+	}
 }
 GLvoid Monster::Draw() const
 {
@@ -274,7 +281,11 @@ GLvoid Koromon::Update(const glm::vec3* target)
 	const GLfloat mAngleY = sin(DEGREE_TO_RADIAN(yaw));
 	const GLfloat mAngleZ = cos(DEGREE_TO_RADIAN(yaw));
 
-	mObject->MoveZ(mSpeed * mAngleZ);
+	GLfloat length = glm::length(ConvertVec2(mObject->GetPosition()) - ConvertVec2(*target));
+	if (length > MIN_DISTANCE)
+	{
+		mObject->MoveZ(mSpeed * mAngleZ);
+	}
 	mObject->MoveY(mSpeed * mAngleY - (0.5f * GRAVITY * t * t * weight));
 }
 
