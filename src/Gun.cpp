@@ -11,7 +11,6 @@ extern BulletManager* bulletManager;
 Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 {
 	mObject = new SharedObject(GetIdentityTextureObject(Textures::Gun));
-	//mObject->SetColor(WHITE);
 
 	mObject->SetPivot(pivot);
 	mObject->SetPosition(gunPosition);
@@ -64,7 +63,19 @@ GLvoid Gun::Rotate(const GLfloat& yaw, const GLfloat& pitch)
 	mObject->Rotate(Vector3::Up(), mPitch);
 	mObject->RotateLocal(mYaw, 0, 0);
 }
+GLvoid Gun::RotateLocal(const GLfloat& yaw, const GLfloat& pitch)
+{
+	mYaw = yaw;
+	mPitch = pitch;
 
+	mObject->ResetRotation();
+	mObject->ResetLook();
+	mObject->SetPosition(mGunPosition);
+	mObject->RotatePosition({ mGunPosition.x , mGunPosition.y + 10, 0 }, Vector3::Right(), yaw);
+
+	mObject->Rotate(Vector3::Up(), mPitch);
+	mObject->RotateLocal(mYaw, 0, 0);
+}
 
 GLvoid Gun::Shot()
 {
@@ -98,7 +109,7 @@ GLvoid ShotGun::Shot()
 	MultiplyVector(mObject->GetTransform(), origin);
 	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch);
 	soundManager->PlayEffectSound(EffectSound::Shotgun_shot, 0.5f, GL_TRUE);
-	for (size_t i = 0; i < mBuckbullets; i++)
+	for (GLint i = 0; i < mBuckbullets; i++)
 	{
 		GLfloat m_b_angle = mBuckAngle - (i * mBuckAngle/mBuckbullets * 2);
 		bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch + m_b_angle);

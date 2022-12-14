@@ -31,9 +31,13 @@ public:
 	inline constexpr GLvoid StopFire() { mIsFire = GL_FALSE; }
 
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid RotateLocal(const GLfloat& yaw, const GLfloat& pitch);
 	inline constexpr GLint GetAmmo() const { return mAmmo; };
 	inline constexpr GLint GetMaxAmmo() const { return mMaxAmmo; };
 	inline constexpr GunType GetType() const { return mType; };
+
+	inline constexpr GLfloat GetYaw() const { return mYaw; }
+	inline constexpr GLfloat GetPitch() const { return mPitch; }
 
 };
 

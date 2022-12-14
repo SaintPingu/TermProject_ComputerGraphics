@@ -32,10 +32,11 @@ GLvoid Idle::Enter(const Event& e, const GLint& value)
 }
 GLvoid Idle::Exit()
 {
+	
 }
 GLvoid Idle::Update()
 {
-	
+	mPlayer->ReleaseLegRotation();
 }
 
 GLvoid Idle::HandleEvent(const Event& e, const GLint& key)
@@ -232,6 +233,8 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 	mHead->MoveY(31, GL_FALSE);
 	mArms->MoveY(28, GL_FALSE);
+	mLegL->MoveY(16, GL_FALSE);
+	mLegR->MoveY(16, GL_FALSE);
 
 	mFpCamera = new Camera();
 	mFpCamera->SetPivot(&mPosition);
@@ -242,7 +245,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mTpCamera = new Camera();
 	mTpCamera->SetPivot(&mPosition);
 	mTpCamera->SetPosY(100);
-	mTpCamera->SetPosZ(-50);
+	mTpCamera->SetPosZ(-75);
 	mTpCamera->SetFovY(110.0f);
 	mTpCamera->Look(mBody->GetPosition());
 
@@ -257,7 +260,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	mHead->SetRotationPivot(mFpCamera->GetRefPos());
 	mArms->SetRotationPivot(mFpCamera->GetRefPos());
 
-	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS, mFpCamera->GetPviotedPosition().y - 20, 0);
+	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS + 1.0f, mFpCamera->GetPviotedPosition().y - 18, 0);
 	
 	mGun = new Gun(gunPosition, &mPosition);
 	mSniper = new Sniper(gunPosition, &mPosition);
@@ -276,7 +279,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 	// 으로 되도록
 
 
-	mBoundingCircle = new Circle(mBody->GetRefPos(), PLAYER_RADIUS, { 0, 0.1f, 0 });
+	mBoundingCircle = new Circle(mBody->GetRefPos(), PLAYER_RADIUS, GL_TRUE);
 	mBoundingCircle->SetColor(BLUE);
 
 	ChangeState(State::Idle);
@@ -413,13 +416,14 @@ GLvoid Player::DrawIcon() const
 
 GLvoid Player::ProcessKeyDown(const GLint& key)
 {
-	if (key == 'r' || key == 'R')
+	switch (key)
 	{
+	case 'r':
+	case 'R':
 		Install_Turret();
 		return;
-	}
-	else if (key == 'q' || key == 'Q')
-	{
+	case 'q':
+	case 'Q':
 		ChaingeGun();
 		return;
 	}
@@ -468,13 +472,17 @@ GLvoid Player::Move()
 	}
 
 
-	static float frameTime = 0;
-	if (frameTime > RUN_SOUND_TERM)
+	if (mFrameTime > RUN_SOUND_TERM)
 	{
 		soundManager->PlayEffectSound(EffectSound::Run, 1.0f, GL_TRUE);
-		frameTime = 0;
+		mFrameTime = 0;
 	}
-	else frameTime += timer::DeltaTime();
+	else
+	{
+		mFrameTime += timer::DeltaTime();
+	}
+
+	RotateLeg();
 }
 GLvoid Player::Stop()
 {
@@ -491,26 +499,86 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 		mYaw = 89.0f * GetSign(mYaw);
 	}
 
-	mHead->RotateLocal(0, pitch, 0);
 	mBody->RotateLocal(0, pitch, 0);
-	mArms->RotateLocal(0, pitch, 0);
-	mLegL->RotateLocal(0, pitch, 0);
-	mLegR->RotateLocal(0, pitch, 0);
+	mHead->SetLook(mBody->GetLook());
+	mArms->SetLook(mBody->GetLook());
+	mLegL->SetLook(mBody->GetLook());
+	mLegR->SetLook(mBody->GetLook());
 
-	mHead->RotateLocal(yaw, 0, 0);
-	mArms->RotateLocal(yaw, 0, 0);
-
+	mHead->RotateLocal(mYaw, 0, 0);
+	mArms->RotateLocal(mYaw, 0, 0);
+	mLegR->RotateLocal(mLegRotation, 0, 0);
+	mLegL->RotateLocal(-mLegRotation, 0, 0);
 
 	mFpCamera->SetLook(mBody->GetLook());
 	mFpCamera->RotateLocal(mYaw, 0, 0);
 
 	mTpCamera->SetLook(mBody->GetLook());
 	mTpCamera->SetPosition({ 0, 100, -50 });
-	mTpCamera->RotatePosition({ 0,0,0 }, Vector3::Up(), mPitch);
-	mTpCamera->RotateLocal(mYaw -15.0f, 0, 0);
+	mTpCamera->RotatePosition({ 0,0,0 }, mTpCamera->GetUp(), mPitch);
 
-	mPlayGun->Rotate(mYaw, mPitch);
-	//gun->RotatePosition({ 0,0,0 }, Vector3::Up(), pitch);
+	GLfloat tpCameraYaw = mYaw;
+	constexpr GLfloat tpCameraAngle = 30.0f;
+	if (tpCameraYaw > mTPCameraMaxYaw + tpCameraAngle)
+	{
+		tpCameraYaw = mTPCameraMaxYaw + tpCameraAngle;
+	}
+	else if (tpCameraYaw - tpCameraAngle < -70.0f)
+	{
+		tpCameraYaw = tpCameraAngle - 70.0f;
+	}
+	mTpCamera->RotatePosition(mHead->GetPosition(), mTpCamera->GetRight(), tpCameraYaw);
+	mTpCamera->RotateLocal(tpCameraYaw - tpCameraAngle, 0, 0);
+
+	if (*mCameraMode == CameraMode::FirstPerson)
+	{
+		mPlayGun->Rotate(mYaw, mPitch);
+	}
+	else
+	{
+		mPlayGun->RotateLocal(mYaw, mPitch);
+	}
+}
+GLvoid Player::RotateLeg()
+{
+	// 1초에 maxLegRotation만큼 legRotationSpeed 배수로 회전
+	constexpr GLfloat legRotaionSpeed = 4.0f;
+	constexpr GLfloat maxLegRotation = 30.0f;
+	GLfloat legRotation = timer::DeltaTime() * maxLegRotation * legRotaionSpeed;
+	if (fabs(mLegRotation + legRotation) >= maxLegRotation)
+	{
+		mLegDir *= -1;
+	}
+
+	mLegRotation += legRotation * mLegDir;
+	mLegR->SetLook(mBody->GetLook());
+	mLegL->SetLook(mBody->GetLook());
+	mLegR->RotateLocal(mLegRotation, 0, 0);
+	mLegL->RotateLocal(-mLegRotation, 0, 0);
+}
+GLvoid Player::ReleaseLegRotation()
+{
+	if (fabs(mLegRotation) <= 0.1f)
+	{
+		return;
+	}
+
+	constexpr GLfloat maxLegRotation = 30.0f;
+	GLfloat legRotaionSpeed = 4.0f * (mLegRotation * 0.01f);
+	GLfloat legRotation = timer::DeltaTime() * maxLegRotation * legRotaionSpeed;
+	if (mLegDir > 0)
+	{
+		mLegRotation -= legRotation * mLegDir;
+	}
+	else
+	{
+		mLegRotation += legRotation * mLegDir;
+	}
+
+	mLegR->SetLook(mBody->GetLook());
+	mLegL->SetLook(mBody->GetLook());
+	mLegR->RotateLocal(mLegRotation, 0, 0);
+	mLegL->RotateLocal(-mLegRotation, 0, 0);
 }
 
 glm::vec3 Player::GetPosition() const
@@ -574,7 +642,7 @@ GLvoid Player::Install_Turret()
 GLvoid Player::ChaingeGun()
 {
 	static int gun_num = 0;
-
+	Gun* prevGun = mPlayGun;
 	if (++gun_num > 3) gun_num = 0;
 	switch (gun_num)
 	{
@@ -594,6 +662,8 @@ GLvoid Player::ChaingeGun()
 		mPlayGun = mSniper;
 		break;
 	}
+
+	mPlayGun->RotateLocal(prevGun->GetYaw(), prevGun->GetPitch());
 }
 
 GLvoid Player::AddHoldturret(const GLint& value)

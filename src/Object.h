@@ -54,6 +54,7 @@ public:
 	/* look벡터 영향 없는 글로벌 좌표계에서 이동 */
 	GLvoid MoveGlobal(const glm::vec3& vector, const GLboolean& applyTime = GL_TRUE);
 	GLvoid SetPivot(const glm::vec3* pivot);
+	inline constexpr const glm::vec3* GetPivot() const { return mPivot; }
 
 	//********** [ Rotation ] **********//
 	/* axis를 기준으로 공전 */
@@ -404,8 +405,10 @@ private:
 	glm::vec3 mOffset = { 0,0,0 };
 
 	GLfloat mRadius = 0.0f;
+
+	GLboolean mIsShadow = GL_FALSE;
 public:
-	Circle(const glm::vec3* pivot, const GLfloat& radius, const glm::vec3 offset = { 0,0,0 });
+	Circle(const glm::vec3* pivot, const GLfloat& radius, const GLboolean& isShadow = GL_FALSE);
 
 	GLvoid Draw() const;
 

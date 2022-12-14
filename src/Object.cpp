@@ -1170,17 +1170,20 @@ GLvoid Cuboid::Draw() const
 }
 
 
-Circle::Circle(const glm::vec3* position, const GLfloat& radius, const glm::vec3 offset)
+Circle::Circle(const glm::vec3* position, const GLfloat& radius, const GLboolean& isShadow)
 {
-	mOffset = offset;
 	mRadius = radius;
+	mIsShadow = isShadow;
 	mCircle = new SharedObject(GetIdentityModelObject(Models::Circle));
 	mCircle->SetScale(radius);
 	mCircle->SetPivot(position);
-	mCircle->Move(offset, GL_FALSE);
 }
 GLvoid Circle::Draw() const
 {
+	if (mIsShadow)
+	{
+		mCircle->SetPosY(0.1f - mCircle->GetPivot()->y);
+	}
 	mCircle->Draw();
 }
 GLvoid Circle::SetColor(const COLORREF& color)

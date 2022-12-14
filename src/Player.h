@@ -84,12 +84,16 @@ private:
 	// position
 	glm::vec3 mPosition = { 0, 0, 0 };
 
-	// childs
+	// bodies
 	SharedObject* mHead = nullptr;
 	SharedObject* mBody = nullptr;
 	SharedObject* mArms = nullptr;
 	SharedObject* mLegL = nullptr;
 	SharedObject* mLegR = nullptr;
+	GLfloat mLegRotation = 0.0f;
+	GLint mLegDir = LEFT;
+
+	// guns
 	Gun* mPlayGun = nullptr;
 	Gun* mGun = nullptr;
 	Sniper* mSniper = nullptr;
@@ -102,6 +106,7 @@ private:
 	Camera* mTpCamera = nullptr;
 	glm::vec3 mTpCameraPosition = { 0, 0, 0 };
 	GLfloat mTpCameraPitch = 0.0f;
+	GLfloat mTPCameraMaxYaw = 45.0f;
 
 	Camera* mZoomFPCamera = nullptr;
 
@@ -110,6 +115,7 @@ private:
 	GLfloat mSpeed = PLAYER_WALK_SPEED;
 	GLfloat mJumpSpeed = PLAYER_JUMP_SPEED;
 	GLint mHoldTurret = 3;
+	GLfloat mFrameTime = 0.0f;
 
 	// for collision
 	Circle* mBoundingCircle = nullptr;
@@ -156,6 +162,8 @@ public:
 
 	// Rotation
 	GLvoid Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& roll);
+	GLvoid RotateLeg();
+	GLvoid ReleaseLegRotation();
 
 	// Variables
 	const glm::vec3* GetRefPos() const { return &mPosition; }
