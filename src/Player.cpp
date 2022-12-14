@@ -479,7 +479,7 @@ GLvoid Player::Move()
 
 	if (mFrameTime > RUN_SOUND_TERM)
 	{
-		soundManager->PlayEffectSound(EffectSound::Run, 1.0f, GL_TRUE);
+		soundManager->PlayWalkSound(EffectSound::Run, 1.0f);
 		mFrameTime = 0;
 	}
 	else

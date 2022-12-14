@@ -7,7 +7,7 @@ enum class EffectSound { Fire = 0, Hit, Damaged, Run, Reload, CheageWeapon, Empt
 	Normal_shot, Shotgun_shot, Launcher_shot, Sniper_shot ,Jump , 
 	M_BlooperDead , M_EggDead, M_KoromonDead
 	,Turret_install, Turret_FindEnemy ,_count };
-enum class SoundChannel { Bgm = 0, Effect, _count };
+enum class SoundChannel { Bgm = 0, Fire, Effect, Walk, _count };
 
 // has Channel
 constexpr GLuint NUM_SOUND_BGM = static_cast<GLuint>(BGMSound::_count);
@@ -32,6 +32,8 @@ public:
 	SoundManager();
 	
 	/* volume을 수정할 경우 new channel을 True로 해야 함. */
+	GLvoid PlayFireSound(const EffectSound& effectSound, const GLfloat& volume = 1.0f);
+	GLvoid PlayWalkSound(const EffectSound& effectSound, const GLfloat& volume = 1.0f);
 	GLvoid PlayEffectSound(const EffectSound& effectSound, const glm::vec3& position, const GLfloat& volume = 1.0f);
 	GLvoid PlayEffectSound(const EffectSound& effectSound, const GLfloat& volume = 1.0f, GLboolean isNewChannel = GL_FALSE);
 	GLvoid StopEffectSound();

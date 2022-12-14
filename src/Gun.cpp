@@ -96,15 +96,15 @@ GLvoid Gun::Shot()
 	{
 	case GunType::Rifle:
 		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
-		soundManager->PlayEffectSound(EffectSound::Normal_shot, 0.1f, GL_TRUE);
+		soundManager->PlayFireSound(EffectSound::Normal_shot, 0.1f);
 		break;
 	case GunType::Launcher:
 		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
-		soundManager->PlayEffectSound(EffectSound::Launcher_shot, 0.2f, GL_TRUE);
+		soundManager->PlayFireSound(EffectSound::Launcher_shot, 0.2f);
 		break;
 	case GunType::Sniper:
 		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
-		soundManager->PlayEffectSound(EffectSound::Sniper_shot, 0.1f, GL_TRUE);
+		soundManager->PlayFireSound(EffectSound::Sniper_shot, 0.1f);
 		break;
 	default:
 		assert(0);
@@ -169,7 +169,7 @@ GLvoid ShotGun::Shot()
 		// mPitch + m_b_angle 부터 mPitch - m_b_angle 까지 mBuckbullets 만큼 발사
 	}
 
-	soundManager->PlayEffectSound(EffectSound::Shotgun_shot, 0.2f, GL_TRUE);
+	soundManager->PlayFireSound(EffectSound::Shotgun_shot, 0.2f);
 }
 
 Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)

@@ -89,6 +89,17 @@ SoundManager::SoundManager()
 	}
 }
 
+GLvoid SoundManager::PlayFireSound(const EffectSound& effectSound, const GLfloat& volume)
+{
+	FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Fire)]);
+	FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Fire)], volume);
+}
+GLvoid SoundManager::PlayWalkSound(const EffectSound& effectSound, const GLfloat& volume)
+{
+	FMOD_System_PlaySound(soundSystem, effectSounds[static_cast<GLint>(effectSound)], 0, GL_FALSE, &soundChannel[static_cast<GLint>(SoundChannel::Walk)]);
+	FMOD_Channel_SetVolume(soundChannel[static_cast<GLint>(SoundChannel::Walk)], volume);
+}
+
 GLvoid SoundManager::PlayEffectSound(const EffectSound& effectSound, const glm::vec3& position, const GLfloat& volume)
 {
 	FMOD_System_Update(soundSystem);

@@ -155,7 +155,7 @@ GLvoid BulletManager::Draw() const
 
 GLboolean ProcessCollision(Bullet* bullet, IBulletCollisionable* object, vector<PaintPlane*>& paints, GLfloat& crntInkSoundDelay)
 {
-	constexpr GLfloat inkSoundDelay = 0.2f;
+	constexpr GLfloat inkSoundDelay = 0.5f;
 	constexpr GLfloat NO_NORMAL = 9;
 
 	glm::vec3 hitPoint;
