@@ -85,23 +85,24 @@ GLvoid Gun::Shot()
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
 
+	BulletData data;
+
 	switch (mType)
 	{
 	case GunType::Rifle:
-		bulletManager->Create(BulletType::Normal, WHITE, origin, bulletPos, mYaw, mPitch, mVelocity);
+		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
 		soundManager->PlayEffectSound(EffectSound::Normal_shot, 0.1f, GL_TRUE);
 		break;
-	case GunType::Shotgun:
-		bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch, mVelocity);
-		soundManager->PlayEffectSound(EffectSound::Shotgun_shot, 0.2f, GL_TRUE);
-		break;
 	case GunType::Launcher:
-		bulletManager->Create(BulletType::Rocket, RED, origin, bulletPos, mYaw, mPitch, mVelocity);
+		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
 		soundManager->PlayEffectSound(EffectSound::Launcher_shot, 0.2f, GL_TRUE);
 		break;
 	case GunType::Sniper:
-		bulletManager->Create(BulletType::Normal, GREEN, origin, bulletPos, mYaw, mPitch, mVelocity);
+		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
 		soundManager->PlayEffectSound(EffectSound::Sniper_shot, 0.1f, GL_TRUE);
+		break;
+	default:
+		assert(0);
 		break;
 	}
 }
@@ -112,7 +113,14 @@ Rifle::Rifle(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosi
 	mMaxAmmo = 30;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.1f;
-	mVelocity = 300.0f;
+
+	mBulletData.type = BulletType::Normal;
+	mBulletData.color = WHITE;
+	mBulletData.scale = 0.1f;
+	mBulletData.velocity = 300.0f;
+	mBulletData.weight = 30.0f;
+	mBulletData.damage = 20.0f;
+	mBulletData.model = Models::LowSphere;
 }
 
 ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
@@ -121,7 +129,14 @@ ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gun
 	mMaxAmmo = 20;
 	mAmmo = mMaxAmmo; 
 	mFireDelay = 0.2f;
-	mVelocity = 200.0f;
+	
+	mBulletData.type = BulletType::Normal;
+	mBulletData.color = BLUE;
+	mBulletData.scale = 0.05f;
+	mBulletData.velocity = 200.0f;
+	mBulletData.weight = 100.0f;
+	mBulletData.damage = 5.0f;
+	mBulletData.model = Models::LowSphere;
 }
 
 GLvoid ShotGun::Shot() 
@@ -131,11 +146,11 @@ GLvoid ShotGun::Shot()
 
 	MultiplyVector(mObject->GetTransform(), bulletPos);
 	MultiplyVector(mObject->GetTransform(), origin);
-	bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch, mVelocity);
+	bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch);
 	for (GLint i = 0; i < mBuckbullets; i++)
 	{
 		GLfloat m_b_angle = mBuckAngle - (i * mBuckAngle/mBuckbullets * 2);
-		bulletManager->Create(BulletType::Normal, BLUE, origin, bulletPos, mYaw, mPitch + m_b_angle, mVelocity);
+		bulletManager->Create(mBulletData, origin, bulletPos, mYaw, mPitch + m_b_angle);
 		// mPitch + m_b_angle 부터 mPitch - m_b_angle 까지 mBuckbullets 만큼 발사
 	}
 
@@ -148,7 +163,14 @@ Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPo
 	mMaxAmmo = 8;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.5f;
-	mVelocity = 500.0f;
+
+	mBulletData.type = BulletType::Normal;
+	mBulletData.color = GREEN;
+	mBulletData.scale = 0.25f;
+	mBulletData.velocity = 600.0f;
+	mBulletData.weight = 20.0f;
+	mBulletData.damage = 80.0f;
+	mBulletData.model = Models::LowSphere;
 }
 
 Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
@@ -157,5 +179,12 @@ Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(g
 	mMaxAmmo = 5;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.4f;
-	mVelocity = 150.0f;
+
+	mBulletData.type = BulletType::Rocket;
+	mBulletData.color = RED;
+	mBulletData.scale = 1.5f;
+	mBulletData.velocity = 300.0f;
+	mBulletData.weight = 100.0f;
+	mBulletData.damage = 150.0f;
+	mBulletData.model = Models::GeoSphere;
 }

@@ -73,7 +73,17 @@ GLvoid TurretManager::Turret::Fire()
 	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
 
 	soundManager->PlayEffectSound(EffectSound::Normal_shot, mObject_Head->GetPosition(), 0.1f);
-	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch, mVelocity);
+
+	BulletData data;
+	data.type = BulletType::Normal;
+	data.color = PINK;
+	data.weight = 30.0f;
+	data.damage = 30.0f;
+	data.scale = 0.1f;
+	data.velocity = 300.0f;
+	data.model = Models::LowSphere;
+
+	bulletManager->Create(data, originPos, bulletPos, yaw, pitch);
 }
 
 

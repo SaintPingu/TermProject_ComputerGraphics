@@ -16,53 +16,21 @@ GLvoid IBulletCollisionable::Destroy()
 };
 
 
-Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity) : SharedObject()
+Bullet::Bullet(const BulletData& data, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject()
 {
-	mType = type;
-	mVelocity = velocity;
+	mType = data.type;
+	mWeight = data.weight;
+	mVelocity = data.velocity;
+	mDamage= data.damage;
+	SetScale(data.scale);
+	SetColor(data.color);
 
-	GLfloat scale = 0.0f;
-	Models model;
-	switch (type)
-	{
-	case BulletType::Normal:
-		mWeight = 30.0f;
-		scale = 0.1f;
-		mDamage = 20.0f;
-		model = Models::LowSphere;
-		break;
-	case BulletType::Particle_Explosion:
-		mWeight = 100.0f;
-		scale = 0.1f;
-		mDamage = 0.0f;
-		model = Models::LowSphere;
-		break;
-	case BulletType::Rocket:
-		mWeight = 100.0f;
-		scale = 1.5f;
-		mDamage = 60.0f;
-		model = Models::GeoSphere;
-		break;
-
-	case BulletType::Sniper:
-		mWeight = 10.0f;
-		scale = 0.1f;
-		mDamage = 150.0f;
-		model = Models::LowSphere;
-		break;
-
-	default:
-		assert(0);
-		break;
-	}
-	SharedObject::Init(GetIdentityModelObject(model));
+	SharedObject::Init(GetIdentityModelObject(data.model));
 
 	GLfloat resultYaw = yaw + rand() % (mSpreadAmount*2) - mSpreadAmount;
 	GLfloat resultPitch = pitch + rand() % (mSpreadAmount*2) - mSpreadAmount;
 
-	SetScale(scale);
 	RotateLocal(0, resultPitch, 0);
-	SetColor(color);
 
 	mPrevPos = origin;
 	mPosition = position;
@@ -129,10 +97,10 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity)
+GLvoid BulletManager::Create(const BulletData& data, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
 {
-	Bullet* bullet = new Bullet(type, color, origin, position, yaw, pitch, velocity);
-	if (type == BulletType::Particle_Explosion)
+	Bullet* bullet = new Bullet(data, origin, position, yaw, pitch);
+	if (data.type == BulletType::Particle_Explosion)
 	{
 		mParticles.emplace_back(bullet);
 	}
@@ -159,9 +127,19 @@ GLvoid BulletManager::CreateExplosion(const COLORREF& color, const glm::vec3& po
 		pos.y += rand() % (r * 2) - r;
 		pos.z += rand() % (r * 2) - r;
 
-		Create(BulletType::Particle_Explosion, color, origin, pos, yaw, pitch, particleVelocity);
+		BulletData data;
+		data.type = BulletType::Particle_Explosion;
+		data.weight = 100.0f;
+		data.damage = 0.0f;
+		data.scale = 0.1f;
+		data.velocity = particleVelocity;
+		data.color = color;
+		data.model = Models::LowSphere;
+
+		Create(data, origin, pos, yaw, pitch);
 	}
 }
+
 GLvoid BulletManager::Draw() const
 {
 	for (const Bullet* bullet : mBulletList)

@@ -1,7 +1,8 @@
 #pragma once
-#include "Object.h"
+#include "Bullet.h"
 
 enum class GunType { None, Rifle, Launcher, Shotgun, Sniper, White };
+struct BulletData;
 
 class Gun {
 protected:
@@ -18,9 +19,12 @@ protected:
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
 	GLfloat mVelocity = 0.0f;
+	GLfloat mDamage = 0.0f;
 
 	GLint mAmmo = 0;
 	GLint mMaxAmmo = 0;
+
+	BulletData mBulletData;
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 

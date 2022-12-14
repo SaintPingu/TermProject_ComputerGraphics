@@ -11,6 +11,18 @@ typedef struct BulletAtt {
 	GLfloat damage = 0.0f;
 }BulletAtt;
 
+typedef struct BulletData {
+	BulletType type = BulletType::Normal;
+	COLORREF color = WHITE;
+
+	GLfloat weight = 0.0f;
+	GLfloat scale = 0.0f;
+	GLfloat damage = 0.0f;
+	GLfloat velocity = 0.0f;
+
+	Models model;
+}BulletData;
+
 class IBulletCollisionable abstract {
 private:
 	GLint mID = 0;
@@ -51,7 +63,7 @@ class Bullet : public SharedObject {
 
 	GLboolean mDestroyed = GL_FALSE;
 public:
-	Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity);
+	Bullet(const BulletData& data, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
 	~Bullet();
 	GLvoid Update();
 	inline constexpr GLvoid Destroy() { mDestroyed = GL_TRUE; }
@@ -75,7 +87,7 @@ private:
 public:
 	BulletManager();
 	~BulletManager();
-	GLvoid Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity);
+	GLvoid Create(const BulletData& data, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
 	GLvoid CreateExplosion(const COLORREF& color, const glm::vec3& position, const GLfloat& radius, const GLint& amount = 20);
 	GLvoid Draw() const;
 	GLvoid Update();
