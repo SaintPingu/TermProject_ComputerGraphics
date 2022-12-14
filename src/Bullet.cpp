@@ -14,12 +14,7 @@ GLvoid IBulletCollisionable::Destroy()
 	mIsDestroyed = GL_TRUE;
 	bulletManager->DelCollisionObject(this);
 };
-GLvoid IBulletCollisionable::PushDestroy()
-{
-	extern BulletManager* bulletManager;
-	mIsDestroyed = GL_TRUE;
-	bulletManager->PushDeleteObject(this);
-};
+
 
 Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity) : SharedObject()
 {
@@ -233,11 +228,19 @@ GLvoid BulletManager::Update()
 	{
 		Bullet* bullet = (*iter);
 
-		for (IBulletCollisionable* object : mCollisionObjectList)
+		for (auto iter2 = mCollisionObjectList.begin(); iter2 != mCollisionObjectList.end(); ++iter2)
 		{
+			IBulletCollisionable* object = *iter2;
+
+			size_t beforeSize = mCollisionObjectList.size();
 			if (ProcessCollision(bullet, object, mPaints, mCrntInkSoundDelay) == GL_TRUE)
 			{
 				break;
+			}
+			size_t afterSize = mCollisionObjectList.size();
+			if (beforeSize < afterSize)
+			{
+				--iter2;
 			}
 		}
 
@@ -470,18 +473,11 @@ GLvoid BulletManager::AddParticleCollision(IBulletCollisionable* object)
 {
 	mParticleCollisions.emplace_back(object);
 }
-GLvoid BulletManager::DelCollisionObject(IBulletCollisionable* object) {
+GLvoid BulletManager::DelCollisionObject(IBulletCollisionable* object)
+{
 	mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end() - 1, [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
-};
-GLvoid BulletManager::PushDeleteObject(IBulletCollisionable* object)
-{
-	mStackDeletion.emplace_back(object);
 }
-GLvoid BulletManager::ClearStack()
+GLvoid BulletManager::DelParticleCollision(IBulletCollisionable* object)
 {
-	for (IBulletCollisionable* object : mStackDeletion)
-	{
-		mCollisionObjectList.erase(remove_if(mCollisionObjectList.begin(), mCollisionObjectList.end() - 1, [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
-	}
-	mStackDeletion.clear();
+	mParticleCollisions.erase(remove_if(mParticleCollisions.begin(), mParticleCollisions.end() - 1, [&object](IBulletCollisionable* item) {return object->GetID() == item->GetID(); }));
 }

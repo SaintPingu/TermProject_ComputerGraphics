@@ -61,6 +61,7 @@ GLboolean Map::CheckCollision(const Circle* boundingCircle)
 
 GLboolean Map::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
+	constexpr GLfloat NO_NORMAL = 9;
 	if (bullet.crntPos.y < bullet.radius)
 	{
 		hitPoint = { bullet.prevPos.x, 0, bullet.prevPos.z };
@@ -116,5 +117,9 @@ GLboolean Map::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint
 	}
 
 	hitPoint = glm::vec3(intersection.x, bullet.prevPos.y, intersection.y);
+	if (bullet.crntPos.y > mMapObject->GetHeight())
+	{
+		normal.x = NO_NORMAL;
+	}
 	return true;
 }

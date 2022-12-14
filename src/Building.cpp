@@ -82,7 +82,8 @@ GLboolean Building::CheckCollision(const Circle* boundingCircle) const
 }
 GLboolean Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal)
 {
-	if (::CheckCollision(ConvertVec2(mObject->GetPosition()), ConvertVec2(bullet.crntPos), mObject->GetRadius(), bullet.radius) == GL_FALSE)
+	GLrect rect = mObject->GetRect();
+	if (::CheckCollision(ConvertVec2(mObject->GetPosition()), ConvertVec2(bullet.crntPos), rect.GetRadius(), bullet.radius) == GL_FALSE)
 	{
 		return GL_FALSE;
 	}
@@ -91,7 +92,6 @@ GLboolean Building::CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hit
 	{
 	case CollisionType::Rect:
 	{
-		GLrect rect = mObject->GetRect();
 		const glm::vec2 bulletCenter = { bullet.crntPos.x, bullet.crntPos.z };
 		GLfloat transformedPosY = mObject->GetTransformedPos().y;
 		if (::CheckCollision(rect, bulletCenter, bullet.radius) == GL_TRUE &&
@@ -166,6 +166,7 @@ GLvoid Building::Damage(const GLfloat& damage)
 	if (mHP <= 0)
 	{
 		Destroy();
+		bulletManager->DelParticleCollision(this);
 		bulletManager->CreateExplosion(mExplosionColor, mObject->GetCenterPos(), mObject->GetRadius(), 50);
 	}
 }

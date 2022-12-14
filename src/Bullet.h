@@ -18,7 +18,6 @@ private:
 public:
 	virtual GLboolean CheckCollisionBullet(const BulletAtt& bullet, glm::vec3& hitPoint, glm::vec3& normal) abstract;
 	GLvoid Destroy();
-	GLvoid PushDestroy();
 	inline constexpr GLboolean IsDestroyed() const { return mIsDestroyed; };
 	inline constexpr GLvoid SetID(const GLint& id) { mID = id; }
 	inline constexpr GLint GetID() { return mID; }
@@ -72,8 +71,6 @@ private:
 	vector<IBulletCollisionable*> mCollisionObjectList;
 	vector<IBulletCollisionable*> mParticleCollisions;
 
-	vector<IBulletCollisionable*> mStackDeletion;
-
 	GLfloat mCrntInkSoundDelay = 0.0f;
 public:
 	BulletManager();
@@ -89,6 +86,5 @@ public:
 	GLvoid AddCollisionObject(IBulletCollisionable* object);
 	GLvoid AddParticleCollision(IBulletCollisionable* object);
 	GLvoid DelCollisionObject(IBulletCollisionable* object);
-	GLvoid PushDeleteObject(IBulletCollisionable* object);
-	GLvoid ClearStack();
+	GLvoid DelParticleCollision(IBulletCollisionable* object);
 };
