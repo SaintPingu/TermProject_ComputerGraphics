@@ -8,7 +8,7 @@ private:
 	class Turret {
 	private:
 		GLfloat mFireDelay = 1.0f;
-		GLfloat mCrntJumpDelay = 0.0f;
+		GLfloat mCrntFireDelay = 0.0f;
 		GLfloat mRadius = 400.0f;
 		GLfloat mVelocity = 300.0f;
 

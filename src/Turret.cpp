@@ -35,7 +35,7 @@ GLvoid TurretManager::Turret::Draw() const
 
 GLvoid TurretManager::Turret::Update()
 {
-	mCrntJumpDelay += timer::DeltaTime();
+	mCrntFireDelay += timer::DeltaTime();
 
 	glm::vec3 targetPos;
 	if (monsterManager->GetShortestMonsterPos(mObject_Head->GetPosition(), mRadius, targetPos) == GL_TRUE)
@@ -47,7 +47,7 @@ GLvoid TurretManager::Turret::Update()
 		}
 		mObject_Head->Look(targetPos);
 
-		if (mCrntJumpDelay >= mFireDelay)
+		if (mCrntFireDelay >= mFireDelay)
 		{
 			Fire();
 		}
@@ -60,7 +60,7 @@ GLvoid TurretManager::Turret::Update()
 }
 GLvoid TurretManager::Turret::Fire()
 {
-	mCrntJumpDelay = 0;
+	mCrntFireDelay = 0;
 
 	glm::mat4 transform = mObject_Head->GetTransform();
 	glm::vec3 originPos = glm::vec3(0, 0, 0);

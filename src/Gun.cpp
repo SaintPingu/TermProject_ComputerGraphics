@@ -20,13 +20,22 @@ Gun::Gun(const glm::vec3& gunPosition, const glm::vec3* pivot)
 
 GLvoid Gun::Update()
 {
-	if (mIsFire == GL_FALSE)
+	if (IsReloading())
+	{
+		mCrntReloadTime -= timer::DeltaTime();
+		if (IsReloading() == GL_FALSE)
+		{
+			mAmmo = mMaxAmmo;
+		}
+		return;
+	}
+	else if (mIsFire == GL_FALSE)
 	{
 		return;
 	}
 
-	mCrntJumpDelay += timer::DeltaTime();
-	if (mCrntJumpDelay < mFireDelay)
+	mCrntFireDelay += timer::DeltaTime();
+	if (mCrntFireDelay < mFireDelay)
 	{
 		return;
 	}
@@ -37,12 +46,11 @@ GLvoid Gun::Update()
 	}
 	else
 	{
-		//cout << "ÃÑ¾Ë ºÎÁ·" << endl;
-		mAmmo = mMaxAmmo;
+		Reload();
 	}
 	 
 
-	mCrntJumpDelay = 0.0f;
+	mCrntFireDelay = 0.0f;
 	Shot();
 }
 
@@ -107,12 +115,20 @@ GLvoid Gun::Shot()
 	}
 }
 
+
+GLvoid Gun::Reload()
+{
+	mCrntReloadTime = mReloadTime;
+}
+
+
 Rifle::Rifle(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPosition, pivot)
 {
 	mType = GunType::Rifle;
 	mMaxAmmo = 30;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.1f;
+	mReloadTime = 2.0f;
 
 	mBulletData.type = BulletType::Normal;
 	mBulletData.color = WHITE;
@@ -129,6 +145,7 @@ ShotGun::ShotGun(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gun
 	mMaxAmmo = 20;
 	mAmmo = mMaxAmmo; 
 	mFireDelay = 0.2f;
+	mReloadTime = 1.0f;
 	
 	mBulletData.type = BulletType::Normal;
 	mBulletData.color = BLUE;
@@ -163,6 +180,7 @@ Sniper::Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(gunPo
 	mMaxAmmo = 8;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.5f;
+	mReloadTime = 3.0f;
 
 	mBulletData.type = BulletType::Normal;
 	mBulletData.color = GREEN;
@@ -179,6 +197,7 @@ Launcher::Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot) : Gun(g
 	mMaxAmmo = 5;
 	mAmmo = mMaxAmmo;
 	mFireDelay = 0.4f;
+	mReloadTime = 4.0f;
 
 	mBulletData.type = BulletType::Rocket;
 	mBulletData.color = RED;

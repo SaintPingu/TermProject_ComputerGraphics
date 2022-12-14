@@ -14,7 +14,7 @@ protected:
 	GLboolean mIsFire = GL_FALSE;
 
 	GLfloat mFireDelay = 0.0f;
-	GLfloat mCrntJumpDelay = 0.0f;
+	GLfloat mCrntFireDelay = 0.0f;
 
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
@@ -23,6 +23,8 @@ protected:
 
 	GLint mAmmo = 0;
 	GLint mMaxAmmo = 0;
+	GLfloat mReloadTime = 0.0f;
+	GLfloat mCrntReloadTime = 0.0f;
 
 	BulletData mBulletData;
 public:
@@ -45,6 +47,8 @@ public:
 	inline constexpr GLfloat GetYaw() const { return mYaw; }
 	inline constexpr GLfloat GetPitch() const { return mPitch; }
 
+	GLvoid Reload();
+	inline constexpr GLboolean IsReloading() const { return mCrntReloadTime > 0; }
 };
 
 class Rifle : public Gun

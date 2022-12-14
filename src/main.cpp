@@ -177,30 +177,30 @@ GLvoid InitMeshes()
 	turretManager->Create({ 0, 0, 100 });
 
 	//********** [ Coordinate system lines ] **********//
-	constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
-	LineObject* line = nullptr;
-	Vector3 vectorLine_1, vectorLine_2;
+	//constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
+	//LineObject* line = nullptr;
+	//Vector3 vectorLine_1, vectorLine_2;
 
-	vectorLine_1 = { -lineLength, 0.0f, 0.0f };
-	vectorLine_2 = { lineLength, 0.0f, 0.0f };
-	line = new LineObject(vectorLine_1, vectorLine_2);
-	line->SetColor(RED);
-	line->MoveGlobal({ lineLength, 0, 0 }, GL_FALSE);
-	AddObject(Shader::Color, line);
+	//vectorLine_1 = { -lineLength, 0.0f, 0.0f };
+	//vectorLine_2 = { lineLength, 0.0f, 0.0f };
+	//line = new LineObject(vectorLine_1, vectorLine_2);
+	//line->SetColor(RED);
+	//line->MoveGlobal({ lineLength, 0, 0 }, GL_FALSE);
+	//AddObject(Shader::Color, line);
 
-	vectorLine_1 = { 0.0f, -lineLength, 0.0f };
-	vectorLine_2 = { 0.0f, lineLength, 0.0f };
-	line = new LineObject(vectorLine_1, vectorLine_2);
-	line->SetColor(GREEN);
-	line->MoveGlobal({ 0, lineLength, 0 }, GL_FALSE);
-	AddObject(Shader::Color, line);
+	//vectorLine_1 = { 0.0f, -lineLength, 0.0f };
+	//vectorLine_2 = { 0.0f, lineLength, 0.0f };
+	//line = new LineObject(vectorLine_1, vectorLine_2);
+	//line->SetColor(GREEN);
+	//line->MoveGlobal({ 0, lineLength, 0 }, GL_FALSE);
+	//AddObject(Shader::Color, line);
 
-	vectorLine_1 = { 0.0f, 0.0f, -lineLength };
-	vectorLine_2 = { 0.0f, 0.0f, lineLength };
-	line = new LineObject(vectorLine_1, vectorLine_2);
-	line->SetColor(BLUE);
-	line->MoveGlobal({ 0, 0, lineLength }, GL_FALSE);
-	AddObject(Shader::Color, line);
+	//vectorLine_1 = { 0.0f, 0.0f, -lineLength };
+	//vectorLine_2 = { 0.0f, 0.0f, lineLength };
+	//line = new LineObject(vectorLine_1, vectorLine_2);
+	//line->SetColor(BLUE);
+	//line->MoveGlobal({ 0, 0, lineLength }, GL_FALSE);
+	//AddObject(Shader::Color, line);
 	//**************************************************//
 	
 	// test object

@@ -95,7 +95,7 @@ private:
 	GLint mLegDir = LEFT;
 
 	// guns
-	Gun* mPlayGun = nullptr;
+	Gun* mCrntGun = nullptr;
 	Rifle* mRifle = nullptr;
 	Sniper* mSniper = nullptr;
 	ShotGun* mShotGun = nullptr;

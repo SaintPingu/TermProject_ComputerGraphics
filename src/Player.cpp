@@ -268,7 +268,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 
 	// Gun* mPlayGun = nullptr
-	mPlayGun = mRifle;
+	mCrntGun = mRifle;
 	// 총 교체에 따라 
 	// mPlayGun =  mShotgun
 	// mPlayGun =  mPistol
@@ -393,13 +393,13 @@ GLvoid Player::Update()
 
 	mPosition = mBody->GetPviotedPosition();
 
-	mPlayGun->Update();
+	mCrntGun->Update();
 }
 GLvoid Player::Draw(const CameraMode& cameraMode) const
 {
 	if (cameraMode == CameraMode::FirstPerson)
 	{
-		mPlayGun->Draw();
+		mCrntGun->Draw();
 		return;
 	}
 
@@ -408,7 +408,7 @@ GLvoid Player::Draw(const CameraMode& cameraMode) const
 	mArms->Draw();
 	mLegL->Draw();
 	mLegR->Draw();
-	mPlayGun->Draw();
+	mCrntGun->Draw();
 	mBoundingCircle->Draw();
 }
 GLvoid Player::DrawIcon() const
@@ -421,6 +421,10 @@ GLvoid Player::ProcessKeyDown(const GLint& key)
 	{
 	case 'r':
 	case 'R':
+		mCrntGun->Reload();
+		return;
+	case 'f':
+	case 'F':
 		Install_Turret();
 		return;
 	case 'q':
@@ -442,11 +446,11 @@ GLvoid Player::ProcessMouse(GLint button, GLint state, GLint x, GLint y)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			mPlayGun->StartFire();
+			mCrntGun->StartFire();
 		}
 		else if (state == GLUT_UP)
 		{
-			mPlayGun->StopFire();
+			mCrntGun->StopFire();
 		}
 		break;
 	}
@@ -533,11 +537,11 @@ GLvoid Player::Rotate(const GLfloat& yaw, const GLfloat& pitch, const GLfloat& r
 
 	if (*mCameraMode == CameraMode::FirstPerson)
 	{
-		mPlayGun->Rotate(mYaw, mPitch);
+		mCrntGun->Rotate(mYaw, mPitch);
 	}
 	else
 	{
-		mPlayGun->RotateLocal(mYaw, mPitch);
+		mCrntGun->RotateLocal(mYaw, mPitch);
 	}
 }
 GLvoid Player::RotateLeg()
@@ -590,17 +594,17 @@ glm::vec3 Player::GetPosition() const
 
 GLint Player::GetAmmo() const
 {
-	return mPlayGun->GetAmmo();
+	return mCrntGun->GetAmmo();
 }
 
 GLint Player::GetMaxAmmo() const
 {
-	return mPlayGun->GetMaxAmmo();
+	return mCrntGun->GetMaxAmmo();
 }
 
 GunType Player::GetGunType() const
 {
-	if (mPlayGun != nullptr) return mPlayGun->GetType();
+	if (mCrntGun != nullptr) return mCrntGun->GetType();
 	else return GunType::None;
 }
 
@@ -644,28 +648,28 @@ GLvoid Player::Install_Turret()
 GLvoid Player::ChaingeGun()
 {
 	static int gun_num = 0;
-	Gun* prevGun = mPlayGun;
+	Gun* prevGun = mCrntGun;
 	if (++gun_num > 3) gun_num = 0;
 	switch (gun_num)
 	{
 	case 0:
-		mPlayGun = mRifle;
+		mCrntGun = mRifle;
 		break;
 
 	case 1:
-		mPlayGun = mShotGun;
+		mCrntGun = mShotGun;
 		break;
 
 	case 2:
-		mPlayGun = mLauncher;
+		mCrntGun = mLauncher;
 		break;
 
 	case 3:
-		mPlayGun = mSniper;
+		mCrntGun = mSniper;
 		break;
 	}
 
-	mPlayGun->RotateLocal(prevGun->GetYaw(), prevGun->GetPitch());
+	mCrntGun->RotateLocal(prevGun->GetYaw(), prevGun->GetPitch());
 }
 
 GLvoid Player::AddHoldturret(const GLint& value)
