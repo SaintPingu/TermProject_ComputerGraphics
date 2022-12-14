@@ -312,3 +312,13 @@ GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id
 	this_thread::yield();
 	return GL_FALSE;
 }
+
+static GLboolean isGameOver = GL_FALSE;
+GLvoid GameOver()
+{
+	isGameOver = GL_TRUE;
+}
+GLboolean IsGameOver()
+{
+	return isGameOver;
+}

@@ -4,6 +4,9 @@
 #include "Model.h"
 #include "Player.h"
 #include "Gun.h"
+#include "Wave.h"
+
+extern WaveManager* waveManager;
 UIManager::UIManager()
 {
 	const Model* planeModel = GetModel(Models::Plane);
@@ -61,6 +64,17 @@ UIManager::UIManager()
 	mHoldTurret.pos = glm::vec2(-0.64f, 0.8f);
 	mHoldTurret.scale = 0.01f;
 
+	mBlackScreen.texture = Textures::UI_GAME_OVER;
+	mBlackScreen.pos = glm::vec2(0, 0);
+	mBlackScreen.scale = 0.2f;
+
+	mWaves_Tens.texture = Textures::UI_NUM_0;
+	mWaves_Tens.pos = glm::vec2(-0.08f, -0.22f);
+	mWaves_Tens.scale = 0.025f;
+
+	mWaves_Units.texture = Textures::UI_NUM_0;
+	mWaves_Units.pos = glm::vec2(0.08f, -0.22f);
+	mWaves_Units.scale = 0.025f;
 }
 
 GLvoid UIManager::DrawPlane(const UITexture& texture)
@@ -138,6 +152,19 @@ GLvoid UIManager::Draw()
 
 	DrawPlane(mgun_symbol);
 
+	if (IsGameOver())
+	{
+		GLint wave = waveManager->GetWave();
+		GLint wave_ten = static_cast<GLint>(wave * 0.1f);
+		GLint wave_Unit = wave % 10;
+
+		mWaves_Tens.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + wave_ten);
+		mWaves_Units.texture = static_cast<Textures>(static_cast<GLint>(Textures::UI_NUM_0) + wave_Unit);
+
+		DrawPlane(mBlackScreen);
+		DrawPlane(mWaves_Tens);
+		DrawPlane(mWaves_Units);
+	}
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

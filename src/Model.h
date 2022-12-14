@@ -41,6 +41,7 @@ enum class Textures {
 	UI_LAUNCHER_SYMBOL,
 	UI_SNIPER_SYMBOL,
 	UI_TURRET_SYMBOL,
+	UI_GAME_OVER,
 	_count
 };
 constexpr GLuint NUM_MODEL = static_cast<GLuint>(Models::_count);

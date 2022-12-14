@@ -47,7 +47,7 @@ void main(void)
 	vec3 result = (ambient + diffuse + specular) * objectColor * light.intensity;
 
 	vec4 TexColor = texture(outTexture, fs_in.TexCoord) * vec4(result, 1.0);
-	if (TexColor.a < 0.5)
+	if (TexColor.a < 0.1)
 		discard;
 
 	FragColor = TexColor;

@@ -40,11 +40,7 @@ GLvoid Gun::Update()
 		return;
 	}
 
-	if (mAmmo > 0)
-	{
-		--mAmmo;
-	}
-	else
+	if (--mAmmo <= 0)
 	{
 		Reload();
 	}

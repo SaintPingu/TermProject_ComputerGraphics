@@ -308,6 +308,7 @@ unordered_map<Textures, const GLchar*> textureMap{
 	{Textures::UI_LAUNCHER_SYMBOL, "ui_weapon_Launcher.png" },
 	{Textures::UI_SNIPER_SYMBOL, "ui_weapon_Sniper.png" },
 	{Textures::UI_TURRET_SYMBOL, "ui_Turret_symbol.png" },
+	{Textures::UI_GAME_OVER, "ui_game_over.png" },
 
 };
 

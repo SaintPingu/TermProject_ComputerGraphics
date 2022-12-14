@@ -32,7 +32,9 @@ private:
 	UITexture mHoldTurret;
 	const Player* mPlayer = nullptr;
 
-
+	UITexture mWaves_Tens;
+	UITexture mWaves_Units;
+	UITexture mBlackScreen;
 public:
 	UIManager();
 

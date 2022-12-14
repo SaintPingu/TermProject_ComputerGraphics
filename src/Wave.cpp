@@ -9,7 +9,7 @@ extern Map* crntMap;
 
 WaveManager::WaveManager()
 {
-	crntWave = 1;
+	mCrntWave = 1;
 }
 
 glm::vec2 WaveManager::GetRandomMonsterPos(const GLint& mapWidth, const GLfloat& mapTop)
@@ -25,9 +25,9 @@ GLvoid WaveManager::Start()
 	GLint mapWidth = static_cast<GLint>(crntMap->GetMaxWidth());
 	GLfloat mapTop = crntMap->GetTop();
 
-	const GLuint numOfBlooper = crntWave * 3;
-	const GLuint numOfEgg = crntWave * 2;
-	const GLuint numOfKoromon = crntWave * 2;
+	const GLuint numOfBlooper = mCrntWave * 3;
+	const GLuint numOfEgg = mCrntWave * 2;
+	const GLuint numOfKoromon = mCrntWave * 2;
 
 	for (GLuint i = 0; i < numOfBlooper; ++i)
 	{
@@ -52,10 +52,10 @@ GLvoid WaveManager::Update()
 {
 	if (monsterManager->CheckEnemyEmpty())
 	{
-		crntWave++;
+		mCrntWave++;
 		mPlayer->AddHoldturret(3);
 
 		WaveManager::Start();
-		cout << crntWave << endl;
+		cout << mCrntWave << endl;
 	}
 }

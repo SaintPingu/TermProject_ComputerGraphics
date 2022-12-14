@@ -174,7 +174,6 @@ GLvoid InitMeshes()
 	uiManager = new UIManager();
 
 	buildingManager->Create(BuildingType::Core, { 0, 0, 550 });
-	turretManager->Create({ 0, 0, 100 });
 
 	//********** [ Coordinate system lines ] **********//
 	//constexpr GLfloat lineLength = (20.0f / 2.0f);	// radius = 10
@@ -319,7 +318,7 @@ GLvoid DrawScene()
 	DrawObjects(crntShader);
 	bulletManager->Draw();
 
-	light->Draw();
+	//light->Draw();
 
 	crntShader = Shader::Texture;
 	shd::Use(crntShader);
@@ -370,6 +369,12 @@ GLvoid DrawScene()
 ///// [ HANDLE EVENTS ] /////
 GLvoid Update()
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		glutPostRedisplay();
+		return;
+	}
+
 	timer::CalculateFPS();
 	timer::Update();
 
@@ -448,6 +453,11 @@ GLvoid Update()
 
 GLvoid Mouse(GLint button, GLint state, GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	switch (button)
 	{
 	case GLUT_LEFT_BUTTON:
@@ -481,10 +491,20 @@ GLvoid Mouse(GLint button, GLint state, GLint x, GLint y)
 
 GLvoid MouseMotion(GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	MousePassiveMotion(x, y);
 }
 GLvoid MousePassiveMotion(GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	POINT cursorPos;
 	GetCursorPos(&cursorPos);
 	crntPos = { cursorPos.x, cursorPos.y };
@@ -522,6 +542,16 @@ static unordered_map<unsigned char, unsigned char> CtrlMap = {
 };
 GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		if (key == KEY_ESCAPE)
+		{
+			glutLeaveMainLoop();
+		}
+
+		return;
+	}
+
 	if (CtrlMap.find(key) != CtrlMap.end())
 	{
 		key = CtrlMap[key];
@@ -579,6 +609,11 @@ GLvoid ProcessKeyDown(unsigned char key, GLint x, GLint y)
 }
 GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	if (CtrlMap.find(key) != CtrlMap.end())
 	{
 		key = CtrlMap[key];
@@ -591,6 +626,11 @@ GLvoid ProcessKeyUp(unsigned char key, GLint x, GLint y)
 }
 GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	// WARNING : (GLUT_KEY_LEFT == 'd') -> 100 //
 	switch (key)
 	{
@@ -614,6 +654,11 @@ GLvoid ProcessSpecialKeyDown(GLint key, GLint x, GLint y)
 }
 GLvoid ProcessSpecialKeyUp(GLint key, GLint x, GLint y)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	if (player != nullptr)
 	{
 		if (key == GLUT_KEY_LEFT)
@@ -626,6 +671,11 @@ GLvoid ProcessSpecialKeyUp(GLint key, GLint x, GLint y)
 
 GLvoid SetCameraMode(const CameraMode& mode)
 {
+	if (IsGameOver() == GL_TRUE)
+	{
+		return;
+	}
+
 	switch (mode)
 	{
 	case CameraMode::Free:

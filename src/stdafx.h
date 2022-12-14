@@ -753,3 +753,6 @@ void SetConsoleCursor(short x, short y);
 
 
 GLboolean FindEmptyCoreID(mutex& m, unordered_set<GLuint>& emptyCore, GLuint& id);
+
+GLvoid GameOver();
+GLboolean IsGameOver();

@@ -14,7 +14,7 @@ Building::Building(const BuildingType& type, const glm::vec3& position, const gl
 	switch (type)
 	{
 	case BuildingType::Core:
-		mHP = 10.0f;
+		mHP = 100.0f;
 		mExplosionColor = BLUE;
 		break;
 	}
@@ -165,6 +165,7 @@ GLvoid Building::Damage(const GLfloat& damage)
 	mHP -= damage;
 	if (mHP <= 0)
 	{
+		GameOver();
 		Destroy();
 		bulletManager->DelParticleCollision(this);
 		bulletManager->CreateExplosion(mExplosionColor, mObject->GetCenterPos(), mObject->GetRadius(), 50);

@@ -620,7 +620,7 @@ GLvoid Player::Damage(const GLfloat& damage)
 	soundManager->PlayEffectSound(EffectSound::Hit);
 	if (mHP <= 0)
 	{
-		//glutLeaveMainLoop();
+		GameOver();
 	}
 }
 
@@ -640,7 +640,8 @@ GLvoid Player::Install_Turret()
 {
 	if (mHoldTurret > 0)
 	{
-		turretManager->Create(GetPosition());
+		glm::vec3 position = GetPosition();
+		turretManager->Create({ position.x, 0, position.z });
 		mHoldTurret--;
 	}
 }
@@ -648,8 +649,18 @@ GLvoid Player::Install_Turret()
 GLvoid Player::ChaingeGun()
 {
 	static int gun_num = 0;
+
+	if (mCrntGun->IsReloading())
+	{
+		mCrntGun->Reload();
+	}
+
+	if (++gun_num > 3)
+	{
+		gun_num = 0;
+	}
+
 	Gun* prevGun = mCrntGun;
-	if (++gun_num > 3) gun_num = 0;
 	switch (gun_num)
 	{
 	case 0:

@@ -1530,7 +1530,7 @@ GLvoid DrawBlendObjects()
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 
-	constexpr GLfloat maxPaintDistance = 100.0f;
+	constexpr GLfloat maxPaintDistance = 300.0f;
 
 	/* Camera À§Ä¡ */
 	extern const Camera* crntCamera;
