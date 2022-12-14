@@ -19,6 +19,7 @@ class Circle;
 class Gun;
 enum class GunType;
 
+class Rifle;
 class ShotGun;
 class Sniper;
 class Launcher;
@@ -95,7 +96,7 @@ private:
 
 	// guns
 	Gun* mPlayGun = nullptr;
-	Gun* mRifle = nullptr;
+	Rifle* mRifle = nullptr;
 	Sniper* mSniper = nullptr;
 	ShotGun* mShotGun = nullptr;
 	Launcher* mLauncher = nullptr;

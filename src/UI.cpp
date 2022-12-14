@@ -118,16 +118,16 @@ GLvoid UIManager::Draw()
 	GunType type = mPlayer->GetGunType();
 	switch (type)
 	{
-	case GunType::None:
+	case GunType::Rifle:
 		mgun_symbol.texture = Textures::UI_RIFLE_SYMBOL;
 		break;
-	case GunType::Red:
+	case GunType::Launcher:
 		mgun_symbol.texture = Textures::UI_LAUNCHER_SYMBOL;
 		break;
-	case GunType::Blue:
+	case GunType::Shotgun:
 		mgun_symbol.texture = Textures::UI_SHOTGUN_SYMBOL;
 		break;
-	case GunType::Green:
+	case GunType::Sniper:
 		mgun_symbol.texture = Textures::UI_SNIPER_SYMBOL;
 		break;
 	case GunType::White:

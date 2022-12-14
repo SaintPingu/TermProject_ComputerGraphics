@@ -10,6 +10,7 @@ private:
 		GLfloat mFireDelay = 1.0f;
 		GLfloat mCrntJumpDelay = 0.0f;
 		GLfloat mRadius = 400.0f;
+		GLfloat mVelocity = 300.0f;
 
 		SharedObject* mObject_Body = nullptr;
 		SharedObject* mObject_Head = nullptr;

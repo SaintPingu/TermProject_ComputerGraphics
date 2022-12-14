@@ -1,24 +1,26 @@
 #pragma once
 #include "Object.h"
 
-enum class GunType { None=0, Red, Blue, Green, White };
+enum class GunType { None, Rifle, Launcher, Shotgun, Sniper, White };
 
 class Gun {
 protected:
 	GunType mType = GunType::None;
+	
 	SharedObject* mObject = nullptr;
 	glm::vec3 mGunPosition = { 0,0,0 };
 
 	GLboolean mIsFire = GL_FALSE;
 
-	GLfloat mFireDelay = 0.1f;
+	GLfloat mFireDelay = 0.0f;
 	GLfloat mCrntJumpDelay = 0.0f;
 
 	GLfloat mYaw = 0.0f;
 	GLfloat mPitch = 0.0f;
+	GLfloat mVelocity = 0.0f;
 
-	GLint mAmmo = 30;
-	GLint mMaxAmmo = 30;
+	GLint mAmmo = 0;
+	GLint mMaxAmmo = 0;
 public:
 	Gun(const glm::vec3& gunPosition, const glm::vec3* pivot);
 
@@ -41,6 +43,12 @@ public:
 
 };
 
+class Rifle : public Gun
+{
+public:
+	Rifle(const glm::vec3& gunPosition, const glm::vec3* pivot);
+};
+
 class ShotGun : public Gun
 {
 public:
@@ -55,12 +63,10 @@ class Sniper : public Gun
 {
 public:
 	Sniper(const glm::vec3& gunPosition, const glm::vec3* pivot);
-	GLvoid Shot();
 };
 
 class Launcher : public Gun
 {
 public:
 	Launcher(const glm::vec3& gunPosition, const glm::vec3* pivot);
-	GLvoid Shot();
 };

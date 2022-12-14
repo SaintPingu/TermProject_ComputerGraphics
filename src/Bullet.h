@@ -52,7 +52,7 @@ class Bullet : public SharedObject {
 
 	GLboolean mDestroyed = GL_FALSE;
 public:
-	Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+	Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity);
 	~Bullet();
 	GLvoid Update();
 	inline constexpr GLvoid Destroy() { mDestroyed = GL_TRUE; }
@@ -78,7 +78,7 @@ private:
 public:
 	BulletManager();
 	~BulletManager();
-	GLvoid Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch);
+	GLvoid Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity);
 	GLvoid CreateExplosion(const COLORREF& color, const glm::vec3& position, const GLfloat& radius, const GLint& amount = 20);
 	GLvoid Draw() const;
 	GLvoid Update();

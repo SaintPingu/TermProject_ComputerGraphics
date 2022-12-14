@@ -18,6 +18,9 @@ TurretManager::Turret::Turret(const glm::vec3& position)
 	mObject_Body->SetPosition(position);
 	mObject_Head->SetPosition(position);
 	mObject_Head->MoveY(10, GL_FALSE);
+
+	mObject_Body->SetLook(Vector3::Back());
+	mObject_Head->SetLook(Vector3::Back());
 }
 TurretManager::Turret::~Turret()
 {
@@ -52,7 +55,7 @@ GLvoid TurretManager::Turret::Update()
 	else
 	{
 		mTargetOn = false;
-		mObject_Head->SetLook(Vector3::Front());
+		mObject_Head->SetLook(Vector3::Back());
 	}
 }
 GLvoid TurretManager::Turret::Fire()
@@ -70,7 +73,7 @@ GLvoid TurretManager::Turret::Fire()
 	GetYawPitch(mObject_Head->GetLook(), yaw, pitch);
 
 	soundManager->PlayEffectSound(EffectSound::Normal_shot, mObject_Head->GetPosition(), 0.1f);
-	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch);
+	bulletManager->Create(BulletType::Normal, PINK, originPos, bulletPos, yaw, pitch, mVelocity);
 }
 
 

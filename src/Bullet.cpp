@@ -21,9 +21,10 @@ GLvoid IBulletCollisionable::PushDestroy()
 	bulletManager->PushDeleteObject(this);
 };
 
-Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch) : SharedObject()
+Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity) : SharedObject()
 {
 	mType = type;
+	mVelocity = velocity;
 
 	GLfloat scale = 0.0f;
 	Models model;
@@ -32,21 +33,18 @@ Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& o
 	case BulletType::Normal:
 		mWeight = 30.0f;
 		scale = 0.1f;
-		mVelocity = 300.0f;
 		mDamage = 20.0f;
 		model = Models::LowSphere;
 		break;
 	case BulletType::Particle_Explosion:
 		mWeight = 100.0f;
 		scale = 0.1f;
-		mVelocity = 150.0f;
 		mDamage = 0.0f;
 		model = Models::LowSphere;
 		break;
 	case BulletType::Rocket:
 		mWeight = 100.0f;
 		scale = 1.5f;
-		mVelocity = 300.0f;
 		mDamage = 60.0f;
 		model = Models::GeoSphere;
 		break;
@@ -54,7 +52,6 @@ Bullet::Bullet(const BulletType& type, const COLORREF& color, const glm::vec3& o
 	case BulletType::Sniper:
 		mWeight = 10.0f;
 		scale = 0.1f;
-		mVelocity = 500.0f;
 		mDamage = 150.0f;
 		model = Models::LowSphere;
 		break;
@@ -137,9 +134,9 @@ BulletManager::~BulletManager()
 	}
 }
 
-GLvoid BulletManager::Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch)
+GLvoid BulletManager::Create(const BulletType& type, const COLORREF& color, const glm::vec3& origin, const glm::vec3& position, const GLfloat& yaw, const GLfloat& pitch, const GLfloat& velocity)
 {
-	Bullet* bullet = new Bullet(type, color, origin, position, yaw, pitch);
+	Bullet* bullet = new Bullet(type, color, origin, position, yaw, pitch, velocity);
 	if (type == BulletType::Particle_Explosion)
 	{
 		mParticles.emplace_back(bullet);
@@ -151,6 +148,8 @@ GLvoid BulletManager::Create(const BulletType& type, const COLORREF& color, cons
 }
 GLvoid BulletManager::CreateExplosion(const COLORREF& color, const glm::vec3& position, const GLfloat& radius, const GLint& amount)
 {
+	constexpr GLfloat particleVelocity = 150.0f;
+
 	glm::vec3 origin = position;
 	const GLint r = static_cast<GLint>(radius);
 
@@ -165,7 +164,7 @@ GLvoid BulletManager::CreateExplosion(const COLORREF& color, const glm::vec3& po
 		pos.y += rand() % (r * 2) - r;
 		pos.z += rand() % (r * 2) - r;
 
-		Create(BulletType::Particle_Explosion, color, origin, pos, yaw, pitch);
+		Create(BulletType::Particle_Explosion, color, origin, pos, yaw, pitch, particleVelocity);
 	}
 }
 GLvoid BulletManager::Draw() const

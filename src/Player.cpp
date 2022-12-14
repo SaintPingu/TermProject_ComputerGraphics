@@ -261,7 +261,7 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 	glm::vec3 gunPosition = glm::vec3(-PLAYER_RADIUS + 1.0f, mFpCamera->GetPviotedPosition().y - 18, 0);
 	
-	mRifle = new Gun(gunPosition, &mPosition);
+	mRifle = new Rifle(gunPosition, &mPosition);
 	mSniper = new Sniper(gunPosition, &mPosition);
 	mShotGun = new ShotGun(gunPosition, &mPosition);
 	mLauncher = new Launcher(gunPosition, &mPosition);
@@ -280,6 +280,8 @@ Player::Player(const glm::vec3& position, const CameraMode* cameraMode)
 
 	mBoundingCircle = new Circle(mBody->GetRefPos(), PLAYER_RADIUS, GL_TRUE);
 	mBoundingCircle->SetColor(BLUE);
+
+	Rotate(0, 180, 0);
 
 	ChangeState(State::Idle);
 }
